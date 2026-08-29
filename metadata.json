@@ -1,0 +1,6 @@
+{
+  "name": "AI Vulnerability Triage & Attack-Path Prioritizer",
+  "description": "Defensive cybersecurity intelligence platform that ingests, deduplicates, correlates, and constructs prioritized attack paths from authorized security scans with AI-assisted triage and remediation verification.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

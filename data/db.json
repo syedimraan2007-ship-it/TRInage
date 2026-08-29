@@ -1,0 +1,4821 @@
+{
+  "projects": [
+    {
+      "id": "PRJ-MTCF8DLI",
+      "name": "ai healthcare",
+      "targetScope": "aihealthcare.com",
+      "authorizedBy": "lead security arc",
+      "description": "",
+      "createdAt": "2026-08-28T03:57:57.078Z",
+      "updatedAt": "2026-08-28T03:57:57.078Z"
+    },
+    {
+      "id": "PRJ-MTCFE6W9",
+      "name": "pro 1",
+      "targetScope": "https://ai-rural-health-care.vercel.app/",
+      "authorizedBy": "lead",
+      "description": "",
+      "createdAt": "2026-08-28T04:02:28.329Z",
+      "updatedAt": "2026-08-28T04:02:28.329Z"
+    },
+    {
+      "id": "PRJ-MTCT4154",
+      "name": "pro2",
+      "targetScope": ".com",
+      "authorizedBy": "lead",
+      "description": "",
+      "createdAt": "2026-08-28T10:26:28.937Z",
+      "updatedAt": "2026-08-28T10:26:28.940Z"
+    },
+    {
+      "id": "PRJ-MTCTGIW4",
+      "name": "rgmcet",
+      "targetScope": ".com",
+      "authorizedBy": "lead",
+      "description": "",
+      "createdAt": "2026-08-28T10:36:11.812Z",
+      "updatedAt": "2026-08-28T10:36:11.812Z"
+    },
+    {
+      "id": "PRJ-MTEOSCGW",
+      "name": "dee",
+      "targetScope": "wdxeqdceqceceqcec.com",
+      "authorizedBy": "c1ercerce",
+      "description": "cre1cercre",
+      "createdAt": "2026-08-29T18:00:57.632Z",
+      "updatedAt": "2026-08-29T18:00:57.632Z"
+    }
+  ],
+  "scans": [
+    {
+      "id": "SCN-MTCT4F5Q",
+      "projectId": "PRJ-MTCT4154",
+      "filename": "sample-vulnerability-report.json",
+      "scannerType": "generic_json",
+      "uploadedAt": "2026-08-28T10:26:47.104Z",
+      "totalRawFindings": 11,
+      "deduplicatedCount": 10,
+      "status": "completed",
+      "statusMessage": "Completed analysis: 10 findings, 6 attack paths, 7 remediation actions.",
+      "summary": {
+        "critical": 3,
+        "high": 4,
+        "medium": 2,
+        "low": 1,
+        "info": 0
+      }
+    },
+    {
+      "id": "SCN-MTCT59DX",
+      "projectId": "PRJ-MTCF8DLI",
+      "filename": "sample-vulnerability-report.json",
+      "scannerType": "generic_json",
+      "uploadedAt": "2026-08-28T10:27:26.278Z",
+      "totalRawFindings": 11,
+      "deduplicatedCount": 10,
+      "status": "completed",
+      "statusMessage": "Completed analysis: 10 findings, 6 attack paths, 7 remediation actions.",
+      "summary": {
+        "critical": 3,
+        "high": 4,
+        "medium": 2,
+        "low": 1,
+        "info": 0
+      }
+    },
+    {
+      "id": "SCN-MTCTGVIO",
+      "projectId": "PRJ-MTCF8DLI",
+      "filename": "sample-vulnerability-report.json",
+      "scannerType": "generic_json",
+      "uploadedAt": "2026-08-28T10:36:28.179Z",
+      "totalRawFindings": 11,
+      "deduplicatedCount": 10,
+      "status": "completed",
+      "statusMessage": "Completed analysis: 10 findings, 6 attack paths, 7 remediation actions.",
+      "summary": {
+        "critical": 3,
+        "high": 4,
+        "medium": 2,
+        "low": 1,
+        "info": 0
+      }
+    },
+    {
+      "id": "SCN-MTEOSP4J",
+      "projectId": "PRJ-MTEOSCGW",
+      "filename": "sample-vulnerability-report.json",
+      "scannerType": "generic_json",
+      "uploadedAt": "2026-08-29T18:01:14.039Z",
+      "totalRawFindings": 11,
+      "deduplicatedCount": 10,
+      "status": "completed",
+      "statusMessage": "Completed analysis: 10 findings, 6 attack paths, 7 remediation actions.",
+      "summary": {
+        "critical": 3,
+        "high": 4,
+        "medium": 2,
+        "low": 1,
+        "info": 0
+      }
+    }
+  ],
+  "findings": [
+    {
+      "id": "FND-CT4F5Q-001",
+      "scanId": "SCN-MTCT4F5Q",
+      "projectId": "PRJ-MTCT4154",
+      "title": "SQL Injection in account lookup",
+      "vulnerabilityCategory": "SQL Injection",
+      "cwe": "CWE-89",
+      "severity": "Critical",
+      "confidence": "Confirmed",
+      "asset": "api.example.test",
+      "endpoint": "/api/accounts",
+      "evidence": {
+        "rawOutput": "Synthetic scanner evidence: parameter behavior changed during validation."
+      },
+      "description": "The account lookup endpoint appears to construct a database query from untrusted input.",
+      "authContext": "Unauthenticated",
+      "dataSensitivity": "PII/Financial",
+      "status": "open",
+      "dedupGroupId": "DEDUP-YXBpLmV4YW1w",
+      "sourceCount": 2,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-3465f6-0",
+          "rawJson": "{\"title\":\"SQL Injection in account lookup\",\"severity\":\"Critical\",\"endpoint\":\"/api/accounts\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: parameter behavior changed during validation.\"}}",
+          "timestamp": "2026-08-28T10:26:47.103Z",
+          "scanId": "SCN-MTCT4F5Q"
+        },
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-3465f6-1",
+          "rawJson": "{\"title\":\"SQL Injection in account lookup\",\"severity\":\"High\",\"endpoint\":\"/api/accounts?userId=sample\",\"evidence\":{\"rawOutput\":\"Synthetic duplicate observation from a second scanner pass.\"}}",
+          "timestamp": "2026-08-28T10:26:47.103Z",
+          "scanId": "SCN-MTCT4F5Q"
+        }
+      ],
+      "createdAt": "2026-08-28T10:26:47.103Z",
+      "aiTriage": {
+        "relevance": "High",
+        "calibratedConfidence": "confirmed by evidence",
+        "contextualSeverity": "Critical",
+        "businessImpact": "Direct unauthorized access to sensitive relational database records and tables.",
+        "exploitabilityAssessment": "Theoretical attack vector requiring parameter manipulation.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": true,
+        "reasoning": "Contextual evaluation for SQL Injection on asset api.example.test (/api/accounts). Severity aligned with risk impact.",
+        "keyRiskFactors": [
+          "SQL Injection",
+          "Unauthenticated",
+          "api.example.test Exposure"
+        ]
+      }
+    },
+    {
+      "id": "FND-CT4F5Q-002",
+      "scanId": "SCN-MTCT4F5Q",
+      "projectId": "PRJ-MTCT4154",
+      "title": "Server-Side Request Forgery in URL preview",
+      "vulnerabilityCategory": "SSRF",
+      "cwe": "CWE-918",
+      "severity": "High",
+      "confidence": "High",
+      "asset": "api.example.test",
+      "endpoint": "/api/preview",
+      "evidence": {
+        "rawOutput": "Synthetic scanner evidence: outbound request destination was accepted during validation."
+      },
+      "description": "The preview service retrieves a caller-controlled URL without sufficient destination restrictions.",
+      "authContext": "Unauthenticated",
+      "dataSensitivity": "Credentials/Secrets",
+      "status": "open",
+      "dedupGroupId": "DEDUP-YXBpLmV4YW1w",
+      "sourceCount": 1,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-15b327-0",
+          "rawJson": "{\"title\":\"Server-Side Request Forgery in URL preview\",\"severity\":\"High\",\"endpoint\":\"/api/preview\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: outbound request destination was accepted during validation.\"}}",
+          "timestamp": "2026-08-28T10:26:47.103Z",
+          "scanId": "SCN-MTCT4F5Q"
+        }
+      ],
+      "createdAt": "2026-08-28T10:26:47.103Z",
+      "aiTriage": {
+        "relevance": "High",
+        "calibratedConfidence": "strongly indicated",
+        "contextualSeverity": "High",
+        "businessImpact": "Internal network boundary breach allowing access to cloud metadata services and IAM tokens.",
+        "exploitabilityAssessment": "Theoretical attack vector requiring parameter manipulation.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": true,
+        "reasoning": "Contextual evaluation for SSRF on asset api.example.test (/api/preview). Severity aligned with risk impact.",
+        "keyRiskFactors": [
+          "SSRF",
+          "Unauthenticated",
+          "api.example.test Exposure"
+        ]
+      }
+    },
+    {
+      "id": "FND-CT4F5Q-003",
+      "scanId": "SCN-MTCT4F5Q",
+      "projectId": "PRJ-MTCT4154",
+      "title": "Broken object-level authorization",
+      "vulnerabilityCategory": "IDOR / Broken Access Control",
+      "cwe": "CWE-639",
+      "severity": "High",
+      "confidence": "Confirmed",
+      "asset": "api.example.test",
+      "endpoint": "/api/invoices/{id}",
+      "evidence": {
+        "rawOutput": "Synthetic scanner evidence: access-control response differed for a cross-tenant test record."
+      },
+      "description": "Authorization checks may not verify that the requested invoice belongs to the current tenant.",
+      "authContext": "Low Privilege",
+      "dataSensitivity": "PII/Financial",
+      "status": "open",
+      "dedupGroupId": "DEDUP-YXBpLmV4YW1w",
+      "sourceCount": 1,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-3bcb80-0",
+          "rawJson": "{\"title\":\"Broken object-level authorization\",\"severity\":\"High\",\"endpoint\":\"/api/invoices/{id}\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: access-control response differed for a cross-tenant test record.\"}}",
+          "timestamp": "2026-08-28T10:26:47.103Z",
+          "scanId": "SCN-MTCT4F5Q"
+        }
+      ],
+      "createdAt": "2026-08-28T10:26:47.103Z",
+      "aiTriage": {
+        "relevance": "High",
+        "calibratedConfidence": "confirmed by evidence",
+        "contextualSeverity": "High",
+        "businessImpact": "Unauthorized cross-tenant record tampering and horizontal data leakage.",
+        "exploitabilityAssessment": "Theoretical attack vector requiring parameter manipulation.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": true,
+        "reasoning": "Contextual evaluation for IDOR / Broken Access Control on asset api.example.test (/api/invoices/{id}). Severity aligned with risk impact.",
+        "keyRiskFactors": [
+          "IDOR / Broken Access Control",
+          "Low Privilege",
+          "api.example.test Exposure"
+        ]
+      }
+    },
+    {
+      "id": "FND-CT4F5Q-004",
+      "scanId": "SCN-MTCT4F5Q",
+      "projectId": "PRJ-MTCT4154",
+      "title": "JWT signature verification weakness",
+      "vulnerabilityCategory": "Broken Authentication / JWT",
+      "cwe": "CWE-287",
+      "severity": "Critical",
+      "confidence": "Medium",
+      "asset": "api.example.test",
+      "endpoint": "/api/auth/verify",
+      "evidence": {
+        "rawOutput": "Synthetic scanner evidence: token validation configuration requires manual verification."
+      },
+      "description": "Token validation configuration may allow an unsupported signing algorithm.",
+      "authContext": "Unauthenticated",
+      "dataSensitivity": "Credentials/Secrets",
+      "status": "open",
+      "dedupGroupId": "DEDUP-YXBpLmV4YW1w",
+      "sourceCount": 1,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-56cf0b-0",
+          "rawJson": "{\"title\":\"JWT signature verification weakness\",\"severity\":\"Critical\",\"endpoint\":\"/api/auth/verify\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: token validation configuration requires manual verification.\"}}",
+          "timestamp": "2026-08-28T10:26:47.103Z",
+          "scanId": "SCN-MTCT4F5Q"
+        }
+      ],
+      "createdAt": "2026-08-28T10:26:47.103Z",
+      "aiTriage": {
+        "relevance": "High",
+        "calibratedConfidence": "potentially exploitable",
+        "contextualSeverity": "Critical",
+        "businessImpact": "Authentication bypass allowing unprivileged actors to forge admin credentials.",
+        "exploitabilityAssessment": "Theoretical attack vector requiring parameter manipulation.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": true,
+        "reasoning": "Contextual evaluation for Broken Authentication / JWT on asset api.example.test (/api/auth/verify). Severity aligned with risk impact.",
+        "keyRiskFactors": [
+          "Broken Authentication / JWT",
+          "Unauthenticated",
+          "api.example.test Exposure"
+        ]
+      }
+    },
+    {
+      "id": "FND-CT4F5Q-005",
+      "scanId": "SCN-MTCT4F5Q",
+      "projectId": "PRJ-MTCT4154",
+      "title": "Reflected cross-site scripting",
+      "vulnerabilityCategory": "Cross-Site Scripting",
+      "cwe": "CWE-79",
+      "severity": "Medium",
+      "confidence": "High",
+      "asset": "web.example.test",
+      "endpoint": "/search",
+      "evidence": {
+        "rawOutput": "Synthetic scanner evidence: reflected input marker detected in response."
+      },
+      "description": "Search input is reflected into an HTML response without consistent contextual encoding.",
+      "authContext": "Unauthenticated",
+      "dataSensitivity": "Internal",
+      "status": "open",
+      "dedupGroupId": "DEDUP-d2ViLmV4YW1w",
+      "sourceCount": 1,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-79ecb4-0",
+          "rawJson": "{\"title\":\"Reflected cross-site scripting\",\"severity\":\"Medium\",\"endpoint\":\"/search\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: reflected input marker detected in response.\"}}",
+          "timestamp": "2026-08-28T10:26:47.103Z",
+          "scanId": "SCN-MTCT4F5Q"
+        }
+      ],
+      "createdAt": "2026-08-28T10:26:47.103Z",
+      "aiTriage": {
+        "relevance": "Medium",
+        "calibratedConfidence": "strongly indicated",
+        "contextualSeverity": "Medium",
+        "businessImpact": "Potential security weakness on web.example.test.",
+        "exploitabilityAssessment": "Theoretical attack vector requiring parameter manipulation.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": true,
+        "reasoning": "Contextual evaluation for Cross-Site Scripting on asset web.example.test (/search). Severity aligned with risk impact.",
+        "keyRiskFactors": [
+          "Cross-Site Scripting",
+          "Unauthenticated",
+          "web.example.test Exposure"
+        ]
+      }
+    },
+    {
+      "id": "FND-CT4F5Q-006",
+      "scanId": "SCN-MTCT4F5Q",
+      "projectId": "PRJ-MTCT4154",
+      "title": "Hardcoded cloud access token",
+      "vulnerabilityCategory": "Hardcoded Secret",
+      "cwe": "CWE-798",
+      "severity": "Critical",
+      "confidence": "Confirmed",
+      "asset": "Source Codebase",
+      "endpoint": "src/config/cloud.ts:18",
+      "evidence": {
+        "rawOutput": "Synthetic scanner evidence: placeholder token marker detected in source."
+      },
+      "description": "A cloud access token appears to be embedded in source configuration.",
+      "authContext": "Low Privilege",
+      "dataSensitivity": "Credentials/Secrets",
+      "status": "open",
+      "dedupGroupId": "DEDUP-c291cmNlIGNv",
+      "sourceCount": 1,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-471615-0",
+          "rawJson": "{\"title\":\"Hardcoded cloud access token\",\"severity\":\"Critical\",\"endpoint\":\"src/config/cloud.ts:18\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: placeholder token marker detected in source.\"}}",
+          "timestamp": "2026-08-28T10:26:47.103Z",
+          "scanId": "SCN-MTCT4F5Q"
+        }
+      ],
+      "createdAt": "2026-08-28T10:26:47.103Z",
+      "aiTriage": {
+        "relevance": "High",
+        "calibratedConfidence": "confirmed by evidence",
+        "contextualSeverity": "Critical",
+        "businessImpact": "Authentication bypass allowing unprivileged actors to forge admin credentials.",
+        "exploitabilityAssessment": "Theoretical attack vector requiring parameter manipulation.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": true,
+        "reasoning": "Contextual evaluation for Hardcoded Secret on asset Source Codebase (src/config/cloud.ts:18). Severity aligned with risk impact.",
+        "keyRiskFactors": [
+          "Hardcoded Secret",
+          "Low Privilege",
+          "Source Codebase Exposure"
+        ]
+      }
+    },
+    {
+      "id": "FND-CT4F5Q-007",
+      "scanId": "SCN-MTCT4F5Q",
+      "projectId": "PRJ-MTCT4154",
+      "title": "Vulnerable dependency in payment service",
+      "vulnerabilityCategory": "Dependency / Package Vulnerability",
+      "cve": "CVE-2025-0001",
+      "severity": "High",
+      "confidence": "Confirmed",
+      "asset": "payment-service:latest",
+      "endpoint": "package-lock.json",
+      "evidence": {
+        "rawOutput": "Synthetic scanner evidence: package version is below the recommended fixed version."
+      },
+      "description": "A production dependency has a known security issue and an available patched version.",
+      "authContext": "Internal Service",
+      "dataSensitivity": "Confidential",
+      "status": "open",
+      "dedupGroupId": "DEDUP-cGF5bWVudC1z",
+      "sourceCount": 1,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-40498c-0",
+          "rawJson": "{\"title\":\"Vulnerable dependency in payment service\",\"severity\":\"High\",\"endpoint\":\"package-lock.json\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: package version is below the recommended fixed version.\"}}",
+          "timestamp": "2026-08-28T10:26:47.103Z",
+          "scanId": "SCN-MTCT4F5Q"
+        }
+      ],
+      "createdAt": "2026-08-28T10:26:47.103Z",
+      "aiTriage": {
+        "relevance": "High",
+        "calibratedConfidence": "confirmed by evidence",
+        "contextualSeverity": "High",
+        "businessImpact": "Potential security weakness on payment-service:latest.",
+        "exploitabilityAssessment": "Theoretical attack vector requiring parameter manipulation.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": true,
+        "reasoning": "Contextual evaluation for Dependency / Package Vulnerability on asset payment-service:latest (package-lock.json). Severity aligned with risk impact.",
+        "keyRiskFactors": [
+          "Dependency / Package Vulnerability",
+          "Internal Service",
+          "payment-service:latest Exposure"
+        ]
+      }
+    },
+    {
+      "id": "FND-CT4F5Q-008",
+      "scanId": "SCN-MTCT4F5Q",
+      "projectId": "PRJ-MTCT4154",
+      "title": "Exposed database administration service",
+      "vulnerabilityCategory": "Unrestricted Network Exposure",
+      "cwe": "CWE-200",
+      "severity": "High",
+      "confidence": "Confirmed",
+      "asset": "db.internal.example.test",
+      "endpoint": ":5432",
+      "evidence": {
+        "rawOutput": "Synthetic scanner evidence: service exposure requires network policy review."
+      },
+      "description": "A database administration service appears reachable from an overly broad network segment.",
+      "authContext": "Unauthenticated",
+      "dataSensitivity": "PII/Financial",
+      "status": "open",
+      "dedupGroupId": "DEDUP-ZGIuaW50ZXJu",
+      "sourceCount": 1,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-52c397-0",
+          "rawJson": "{\"title\":\"Exposed database administration service\",\"severity\":\"High\",\"endpoint\":\":5432\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: service exposure requires network policy review.\"}}",
+          "timestamp": "2026-08-28T10:26:47.103Z",
+          "scanId": "SCN-MTCT4F5Q"
+        }
+      ],
+      "createdAt": "2026-08-28T10:26:47.103Z",
+      "aiTriage": {
+        "relevance": "High",
+        "calibratedConfidence": "confirmed by evidence",
+        "contextualSeverity": "High",
+        "businessImpact": "Potential security weakness on db.internal.example.test.",
+        "exploitabilityAssessment": "Theoretical attack vector requiring parameter manipulation.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": true,
+        "reasoning": "Contextual evaluation for Unrestricted Network Exposure on asset db.internal.example.test (:5432). Severity aligned with risk impact.",
+        "keyRiskFactors": [
+          "Unrestricted Network Exposure",
+          "Unauthenticated",
+          "db.internal.example.test Exposure"
+        ]
+      }
+    },
+    {
+      "id": "FND-CT4F5Q-009",
+      "scanId": "SCN-MTCT4F5Q",
+      "projectId": "PRJ-MTCT4154",
+      "title": "Missing security headers",
+      "vulnerabilityCategory": "Security Misconfiguration",
+      "cwe": "CWE-693",
+      "severity": "Low",
+      "confidence": "High",
+      "asset": "web.example.test",
+      "endpoint": "/",
+      "evidence": {
+        "rawOutput": "Synthetic scanner evidence: expected response headers were absent."
+      },
+      "description": "Recommended browser security headers are missing from the application response.",
+      "authContext": "Unauthenticated",
+      "dataSensitivity": "Internal",
+      "status": "open",
+      "dedupGroupId": "DEDUP-d2ViLmV4YW1w",
+      "sourceCount": 1,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-4c9c1a-0",
+          "rawJson": "{\"title\":\"Missing security headers\",\"severity\":\"Low\",\"endpoint\":\"/\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: expected response headers were absent.\"}}",
+          "timestamp": "2026-08-28T10:26:47.103Z",
+          "scanId": "SCN-MTCT4F5Q"
+        }
+      ],
+      "createdAt": "2026-08-28T10:26:47.103Z",
+      "aiTriage": {
+        "relevance": "Medium",
+        "calibratedConfidence": "strongly indicated",
+        "contextualSeverity": "Low",
+        "businessImpact": "Potential security weakness on web.example.test.",
+        "exploitabilityAssessment": "Theoretical attack vector requiring parameter manipulation.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": true,
+        "reasoning": "Contextual evaluation for Security Misconfiguration on asset web.example.test (/). Severity aligned with risk impact.",
+        "keyRiskFactors": [
+          "Security Misconfiguration",
+          "Unauthenticated",
+          "web.example.test Exposure"
+        ]
+      }
+    },
+    {
+      "id": "FND-CT4F5Q-010",
+      "scanId": "SCN-MTCT4F5Q",
+      "projectId": "PRJ-MTCT4154",
+      "title": "Verbose error disclosure",
+      "vulnerabilityCategory": "Information Exposure",
+      "cwe": "CWE-209",
+      "severity": "Medium",
+      "confidence": "Medium",
+      "asset": "api.example.test",
+      "endpoint": "/api/orders",
+      "evidence": {
+        "rawOutput": "Synthetic scanner evidence: stack trace marker observed in an error response."
+      },
+      "description": "Error responses disclose internal implementation details that should be hidden from clients.",
+      "authContext": "Unauthenticated",
+      "dataSensitivity": "Internal",
+      "status": "open",
+      "dedupGroupId": "DEDUP-YXBpLmV4YW1w",
+      "sourceCount": 1,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-3a3a1e-0",
+          "rawJson": "{\"title\":\"Verbose error disclosure\",\"severity\":\"Medium\",\"endpoint\":\"/api/orders\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: stack trace marker observed in an error response.\"}}",
+          "timestamp": "2026-08-28T10:26:47.103Z",
+          "scanId": "SCN-MTCT4F5Q"
+        }
+      ],
+      "createdAt": "2026-08-28T10:26:47.103Z",
+      "aiTriage": {
+        "relevance": "Medium",
+        "calibratedConfidence": "potentially exploitable",
+        "contextualSeverity": "Medium",
+        "businessImpact": "Potential security weakness on api.example.test.",
+        "exploitabilityAssessment": "Theoretical attack vector requiring parameter manipulation.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": true,
+        "reasoning": "Contextual evaluation for Information Exposure on asset api.example.test (/api/orders). Severity aligned with risk impact.",
+        "keyRiskFactors": [
+          "Information Exposure",
+          "Unauthenticated",
+          "api.example.test Exposure"
+        ]
+      }
+    },
+    {
+      "id": "FND-CT59DX-001",
+      "scanId": "SCN-MTCT59DX",
+      "projectId": "PRJ-MTCF8DLI",
+      "title": "SQL Injection in account lookup",
+      "vulnerabilityCategory": "SQL Injection",
+      "cwe": "CWE-89",
+      "severity": "Critical",
+      "confidence": "Confirmed",
+      "asset": "api.example.test",
+      "endpoint": "/api/accounts",
+      "evidence": {
+        "rawOutput": "Synthetic scanner evidence: parameter behavior changed during validation."
+      },
+      "description": "The account lookup endpoint appears to construct a database query from untrusted input.",
+      "authContext": "Unauthenticated",
+      "dataSensitivity": "PII/Financial",
+      "status": "open",
+      "dedupGroupId": "DEDUP-YXBpLmV4YW1w",
+      "sourceCount": 2,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-3465f6-0",
+          "rawJson": "{\"title\":\"SQL Injection in account lookup\",\"severity\":\"Critical\",\"endpoint\":\"/api/accounts\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: parameter behavior changed during validation.\"}}",
+          "timestamp": "2026-08-28T10:27:26.277Z",
+          "scanId": "SCN-MTCT59DX"
+        },
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-3465f6-1",
+          "rawJson": "{\"title\":\"SQL Injection in account lookup\",\"severity\":\"High\",\"endpoint\":\"/api/accounts?userId=sample\",\"evidence\":{\"rawOutput\":\"Synthetic duplicate observation from a second scanner pass.\"}}",
+          "timestamp": "2026-08-28T10:27:26.277Z",
+          "scanId": "SCN-MTCT59DX"
+        }
+      ],
+      "createdAt": "2026-08-28T10:27:26.277Z",
+      "aiTriage": {
+        "relevance": "High",
+        "calibratedConfidence": "confirmed by evidence",
+        "contextualSeverity": "Critical",
+        "businessImpact": "Direct unauthorized access to sensitive relational database records and tables.",
+        "exploitabilityAssessment": "Theoretical attack vector requiring parameter manipulation.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": true,
+        "reasoning": "Contextual evaluation for SQL Injection on asset api.example.test (/api/accounts). Severity aligned with risk impact.",
+        "keyRiskFactors": [
+          "SQL Injection",
+          "Unauthenticated",
+          "api.example.test Exposure"
+        ]
+      }
+    },
+    {
+      "id": "FND-CT59DX-002",
+      "scanId": "SCN-MTCT59DX",
+      "projectId": "PRJ-MTCF8DLI",
+      "title": "Server-Side Request Forgery in URL preview",
+      "vulnerabilityCategory": "SSRF",
+      "cwe": "CWE-918",
+      "severity": "High",
+      "confidence": "High",
+      "asset": "api.example.test",
+      "endpoint": "/api/preview",
+      "evidence": {
+        "rawOutput": "Synthetic scanner evidence: outbound request destination was accepted during validation."
+      },
+      "description": "The preview service retrieves a caller-controlled URL without sufficient destination restrictions.",
+      "authContext": "Unauthenticated",
+      "dataSensitivity": "Credentials/Secrets",
+      "status": "open",
+      "dedupGroupId": "DEDUP-YXBpLmV4YW1w",
+      "sourceCount": 1,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-15b327-0",
+          "rawJson": "{\"title\":\"Server-Side Request Forgery in URL preview\",\"severity\":\"High\",\"endpoint\":\"/api/preview\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: outbound request destination was accepted during validation.\"}}",
+          "timestamp": "2026-08-28T10:27:26.278Z",
+          "scanId": "SCN-MTCT59DX"
+        }
+      ],
+      "createdAt": "2026-08-28T10:27:26.278Z",
+      "aiTriage": {
+        "relevance": "High",
+        "calibratedConfidence": "strongly indicated",
+        "contextualSeverity": "High",
+        "businessImpact": "Internal network boundary breach allowing access to cloud metadata services and IAM tokens.",
+        "exploitabilityAssessment": "Theoretical attack vector requiring parameter manipulation.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": true,
+        "reasoning": "Contextual evaluation for SSRF on asset api.example.test (/api/preview). Severity aligned with risk impact.",
+        "keyRiskFactors": [
+          "SSRF",
+          "Unauthenticated",
+          "api.example.test Exposure"
+        ]
+      }
+    },
+    {
+      "id": "FND-CT59DX-003",
+      "scanId": "SCN-MTCT59DX",
+      "projectId": "PRJ-MTCF8DLI",
+      "title": "Broken object-level authorization",
+      "vulnerabilityCategory": "IDOR / Broken Access Control",
+      "cwe": "CWE-639",
+      "severity": "High",
+      "confidence": "Confirmed",
+      "asset": "api.example.test",
+      "endpoint": "/api/invoices/{id}",
+      "evidence": {
+        "rawOutput": "Synthetic scanner evidence: access-control response differed for a cross-tenant test record."
+      },
+      "description": "Authorization checks may not verify that the requested invoice belongs to the current tenant.",
+      "authContext": "Low Privilege",
+      "dataSensitivity": "PII/Financial",
+      "status": "open",
+      "dedupGroupId": "DEDUP-YXBpLmV4YW1w",
+      "sourceCount": 1,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-3bcb80-0",
+          "rawJson": "{\"title\":\"Broken object-level authorization\",\"severity\":\"High\",\"endpoint\":\"/api/invoices/{id}\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: access-control response differed for a cross-tenant test record.\"}}",
+          "timestamp": "2026-08-28T10:27:26.278Z",
+          "scanId": "SCN-MTCT59DX"
+        }
+      ],
+      "createdAt": "2026-08-28T10:27:26.278Z",
+      "aiTriage": {
+        "relevance": "High",
+        "calibratedConfidence": "confirmed by evidence",
+        "contextualSeverity": "High",
+        "businessImpact": "Unauthorized cross-tenant record tampering and horizontal data leakage.",
+        "exploitabilityAssessment": "Theoretical attack vector requiring parameter manipulation.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": true,
+        "reasoning": "Contextual evaluation for IDOR / Broken Access Control on asset api.example.test (/api/invoices/{id}). Severity aligned with risk impact.",
+        "keyRiskFactors": [
+          "IDOR / Broken Access Control",
+          "Low Privilege",
+          "api.example.test Exposure"
+        ]
+      }
+    },
+    {
+      "id": "FND-CT59DX-004",
+      "scanId": "SCN-MTCT59DX",
+      "projectId": "PRJ-MTCF8DLI",
+      "title": "JWT signature verification weakness",
+      "vulnerabilityCategory": "Broken Authentication / JWT",
+      "cwe": "CWE-287",
+      "severity": "Critical",
+      "confidence": "Medium",
+      "asset": "api.example.test",
+      "endpoint": "/api/auth/verify",
+      "evidence": {
+        "rawOutput": "Synthetic scanner evidence: token validation configuration requires manual verification."
+      },
+      "description": "Token validation configuration may allow an unsupported signing algorithm.",
+      "authContext": "Unauthenticated",
+      "dataSensitivity": "Credentials/Secrets",
+      "status": "open",
+      "dedupGroupId": "DEDUP-YXBpLmV4YW1w",
+      "sourceCount": 1,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-56cf0b-0",
+          "rawJson": "{\"title\":\"JWT signature verification weakness\",\"severity\":\"Critical\",\"endpoint\":\"/api/auth/verify\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: token validation configuration requires manual verification.\"}}",
+          "timestamp": "2026-08-28T10:27:26.278Z",
+          "scanId": "SCN-MTCT59DX"
+        }
+      ],
+      "createdAt": "2026-08-28T10:27:26.278Z",
+      "aiTriage": {
+        "relevance": "High",
+        "calibratedConfidence": "potentially exploitable",
+        "contextualSeverity": "Critical",
+        "businessImpact": "Authentication bypass allowing unprivileged actors to forge admin credentials.",
+        "exploitabilityAssessment": "Theoretical attack vector requiring parameter manipulation.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": true,
+        "reasoning": "Contextual evaluation for Broken Authentication / JWT on asset api.example.test (/api/auth/verify). Severity aligned with risk impact.",
+        "keyRiskFactors": [
+          "Broken Authentication / JWT",
+          "Unauthenticated",
+          "api.example.test Exposure"
+        ]
+      }
+    },
+    {
+      "id": "FND-CT59DX-005",
+      "scanId": "SCN-MTCT59DX",
+      "projectId": "PRJ-MTCF8DLI",
+      "title": "Reflected cross-site scripting",
+      "vulnerabilityCategory": "Cross-Site Scripting",
+      "cwe": "CWE-79",
+      "severity": "Medium",
+      "confidence": "High",
+      "asset": "web.example.test",
+      "endpoint": "/search",
+      "evidence": {
+        "rawOutput": "Synthetic scanner evidence: reflected input marker detected in response."
+      },
+      "description": "Search input is reflected into an HTML response without consistent contextual encoding.",
+      "authContext": "Unauthenticated",
+      "dataSensitivity": "Internal",
+      "status": "open",
+      "dedupGroupId": "DEDUP-d2ViLmV4YW1w",
+      "sourceCount": 1,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-79ecb4-0",
+          "rawJson": "{\"title\":\"Reflected cross-site scripting\",\"severity\":\"Medium\",\"endpoint\":\"/search\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: reflected input marker detected in response.\"}}",
+          "timestamp": "2026-08-28T10:27:26.278Z",
+          "scanId": "SCN-MTCT59DX"
+        }
+      ],
+      "createdAt": "2026-08-28T10:27:26.278Z",
+      "aiTriage": {
+        "relevance": "Medium",
+        "calibratedConfidence": "strongly indicated",
+        "contextualSeverity": "Medium",
+        "businessImpact": "Potential security weakness on web.example.test.",
+        "exploitabilityAssessment": "Theoretical attack vector requiring parameter manipulation.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": true,
+        "reasoning": "Contextual evaluation for Cross-Site Scripting on asset web.example.test (/search). Severity aligned with risk impact.",
+        "keyRiskFactors": [
+          "Cross-Site Scripting",
+          "Unauthenticated",
+          "web.example.test Exposure"
+        ]
+      }
+    },
+    {
+      "id": "FND-CT59DX-006",
+      "scanId": "SCN-MTCT59DX",
+      "projectId": "PRJ-MTCF8DLI",
+      "title": "Hardcoded cloud access token",
+      "vulnerabilityCategory": "Hardcoded Secret",
+      "cwe": "CWE-798",
+      "severity": "Critical",
+      "confidence": "Confirmed",
+      "asset": "Source Codebase",
+      "endpoint": "src/config/cloud.ts:18",
+      "evidence": {
+        "rawOutput": "Synthetic scanner evidence: placeholder token marker detected in source."
+      },
+      "description": "A cloud access token appears to be embedded in source configuration.",
+      "authContext": "Low Privilege",
+      "dataSensitivity": "Credentials/Secrets",
+      "status": "open",
+      "dedupGroupId": "DEDUP-c291cmNlIGNv",
+      "sourceCount": 1,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-471615-0",
+          "rawJson": "{\"title\":\"Hardcoded cloud access token\",\"severity\":\"Critical\",\"endpoint\":\"src/config/cloud.ts:18\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: placeholder token marker detected in source.\"}}",
+          "timestamp": "2026-08-28T10:27:26.278Z",
+          "scanId": "SCN-MTCT59DX"
+        }
+      ],
+      "createdAt": "2026-08-28T10:27:26.278Z",
+      "aiTriage": {
+        "relevance": "High",
+        "calibratedConfidence": "confirmed by evidence",
+        "contextualSeverity": "Critical",
+        "businessImpact": "Authentication bypass allowing unprivileged actors to forge admin credentials.",
+        "exploitabilityAssessment": "Theoretical attack vector requiring parameter manipulation.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": true,
+        "reasoning": "Contextual evaluation for Hardcoded Secret on asset Source Codebase (src/config/cloud.ts:18). Severity aligned with risk impact.",
+        "keyRiskFactors": [
+          "Hardcoded Secret",
+          "Low Privilege",
+          "Source Codebase Exposure"
+        ]
+      }
+    },
+    {
+      "id": "FND-CT59DX-007",
+      "scanId": "SCN-MTCT59DX",
+      "projectId": "PRJ-MTCF8DLI",
+      "title": "Vulnerable dependency in payment service",
+      "vulnerabilityCategory": "Dependency / Package Vulnerability",
+      "cve": "CVE-2025-0001",
+      "severity": "High",
+      "confidence": "Confirmed",
+      "asset": "payment-service:latest",
+      "endpoint": "package-lock.json",
+      "evidence": {
+        "rawOutput": "Synthetic scanner evidence: package version is below the recommended fixed version."
+      },
+      "description": "A production dependency has a known security issue and an available patched version.",
+      "authContext": "Internal Service",
+      "dataSensitivity": "Confidential",
+      "status": "open",
+      "dedupGroupId": "DEDUP-cGF5bWVudC1z",
+      "sourceCount": 1,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-40498c-0",
+          "rawJson": "{\"title\":\"Vulnerable dependency in payment service\",\"severity\":\"High\",\"endpoint\":\"package-lock.json\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: package version is below the recommended fixed version.\"}}",
+          "timestamp": "2026-08-28T10:27:26.278Z",
+          "scanId": "SCN-MTCT59DX"
+        }
+      ],
+      "createdAt": "2026-08-28T10:27:26.278Z",
+      "aiTriage": {
+        "relevance": "High",
+        "calibratedConfidence": "confirmed by evidence",
+        "contextualSeverity": "High",
+        "businessImpact": "Potential security weakness on payment-service:latest.",
+        "exploitabilityAssessment": "Theoretical attack vector requiring parameter manipulation.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": true,
+        "reasoning": "Contextual evaluation for Dependency / Package Vulnerability on asset payment-service:latest (package-lock.json). Severity aligned with risk impact.",
+        "keyRiskFactors": [
+          "Dependency / Package Vulnerability",
+          "Internal Service",
+          "payment-service:latest Exposure"
+        ]
+      }
+    },
+    {
+      "id": "FND-CT59DX-008",
+      "scanId": "SCN-MTCT59DX",
+      "projectId": "PRJ-MTCF8DLI",
+      "title": "Exposed database administration service",
+      "vulnerabilityCategory": "Unrestricted Network Exposure",
+      "cwe": "CWE-200",
+      "severity": "High",
+      "confidence": "Confirmed",
+      "asset": "db.internal.example.test",
+      "endpoint": ":5432",
+      "evidence": {
+        "rawOutput": "Synthetic scanner evidence: service exposure requires network policy review."
+      },
+      "description": "A database administration service appears reachable from an overly broad network segment.",
+      "authContext": "Unauthenticated",
+      "dataSensitivity": "PII/Financial",
+      "status": "open",
+      "dedupGroupId": "DEDUP-ZGIuaW50ZXJu",
+      "sourceCount": 1,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-52c397-0",
+          "rawJson": "{\"title\":\"Exposed database administration service\",\"severity\":\"High\",\"endpoint\":\":5432\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: service exposure requires network policy review.\"}}",
+          "timestamp": "2026-08-28T10:27:26.278Z",
+          "scanId": "SCN-MTCT59DX"
+        }
+      ],
+      "createdAt": "2026-08-28T10:27:26.278Z",
+      "aiTriage": {
+        "relevance": "High",
+        "calibratedConfidence": "confirmed by evidence",
+        "contextualSeverity": "High",
+        "businessImpact": "Potential security weakness on db.internal.example.test.",
+        "exploitabilityAssessment": "Theoretical attack vector requiring parameter manipulation.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": true,
+        "reasoning": "Contextual evaluation for Unrestricted Network Exposure on asset db.internal.example.test (:5432). Severity aligned with risk impact.",
+        "keyRiskFactors": [
+          "Unrestricted Network Exposure",
+          "Unauthenticated",
+          "db.internal.example.test Exposure"
+        ]
+      }
+    },
+    {
+      "id": "FND-CT59DX-009",
+      "scanId": "SCN-MTCT59DX",
+      "projectId": "PRJ-MTCF8DLI",
+      "title": "Missing security headers",
+      "vulnerabilityCategory": "Security Misconfiguration",
+      "cwe": "CWE-693",
+      "severity": "Low",
+      "confidence": "High",
+      "asset": "web.example.test",
+      "endpoint": "/",
+      "evidence": {
+        "rawOutput": "Synthetic scanner evidence: expected response headers were absent."
+      },
+      "description": "Recommended browser security headers are missing from the application response.",
+      "authContext": "Unauthenticated",
+      "dataSensitivity": "Internal",
+      "status": "open",
+      "dedupGroupId": "DEDUP-d2ViLmV4YW1w",
+      "sourceCount": 1,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-4c9c1a-0",
+          "rawJson": "{\"title\":\"Missing security headers\",\"severity\":\"Low\",\"endpoint\":\"/\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: expected response headers were absent.\"}}",
+          "timestamp": "2026-08-28T10:27:26.278Z",
+          "scanId": "SCN-MTCT59DX"
+        }
+      ],
+      "createdAt": "2026-08-28T10:27:26.278Z",
+      "aiTriage": {
+        "relevance": "Medium",
+        "calibratedConfidence": "strongly indicated",
+        "contextualSeverity": "Low",
+        "businessImpact": "Potential security weakness on web.example.test.",
+        "exploitabilityAssessment": "Theoretical attack vector requiring parameter manipulation.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": true,
+        "reasoning": "Contextual evaluation for Security Misconfiguration on asset web.example.test (/). Severity aligned with risk impact.",
+        "keyRiskFactors": [
+          "Security Misconfiguration",
+          "Unauthenticated",
+          "web.example.test Exposure"
+        ]
+      }
+    },
+    {
+      "id": "FND-CT59DX-010",
+      "scanId": "SCN-MTCT59DX",
+      "projectId": "PRJ-MTCF8DLI",
+      "title": "Verbose error disclosure",
+      "vulnerabilityCategory": "Information Exposure",
+      "cwe": "CWE-209",
+      "severity": "Medium",
+      "confidence": "Medium",
+      "asset": "api.example.test",
+      "endpoint": "/api/orders",
+      "evidence": {
+        "rawOutput": "Synthetic scanner evidence: stack trace marker observed in an error response."
+      },
+      "description": "Error responses disclose internal implementation details that should be hidden from clients.",
+      "authContext": "Unauthenticated",
+      "dataSensitivity": "Internal",
+      "status": "open",
+      "dedupGroupId": "DEDUP-YXBpLmV4YW1w",
+      "sourceCount": 1,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-3a3a1e-0",
+          "rawJson": "{\"title\":\"Verbose error disclosure\",\"severity\":\"Medium\",\"endpoint\":\"/api/orders\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: stack trace marker observed in an error response.\"}}",
+          "timestamp": "2026-08-28T10:27:26.278Z",
+          "scanId": "SCN-MTCT59DX"
+        }
+      ],
+      "createdAt": "2026-08-28T10:27:26.278Z",
+      "aiTriage": {
+        "relevance": "Medium",
+        "calibratedConfidence": "potentially exploitable",
+        "contextualSeverity": "Medium",
+        "businessImpact": "Potential security weakness on api.example.test.",
+        "exploitabilityAssessment": "Theoretical attack vector requiring parameter manipulation.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": true,
+        "reasoning": "Contextual evaluation for Information Exposure on asset api.example.test (/api/orders). Severity aligned with risk impact.",
+        "keyRiskFactors": [
+          "Information Exposure",
+          "Unauthenticated",
+          "api.example.test Exposure"
+        ]
+      }
+    },
+    {
+      "id": "FND-CTGVIO-001",
+      "scanId": "SCN-MTCTGVIO",
+      "projectId": "PRJ-MTCF8DLI",
+      "title": "SQL Injection in account lookup",
+      "vulnerabilityCategory": "SQL Injection",
+      "cwe": "CWE-89",
+      "severity": "Critical",
+      "confidence": "Confirmed",
+      "asset": "api.example.test",
+      "endpoint": "/api/accounts",
+      "evidence": {
+        "rawOutput": "Synthetic scanner evidence: parameter behavior changed during validation."
+      },
+      "description": "The account lookup endpoint appears to construct a database query from untrusted input.",
+      "authContext": "Unauthenticated",
+      "dataSensitivity": "PII/Financial",
+      "status": "open",
+      "dedupGroupId": "DEDUP-YXBpLmV4YW1w",
+      "sourceCount": 2,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-3465f6-0",
+          "rawJson": "{\"title\":\"SQL Injection in account lookup\",\"severity\":\"Critical\",\"endpoint\":\"/api/accounts\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: parameter behavior changed during validation.\"}}",
+          "timestamp": "2026-08-28T10:36:28.177Z",
+          "scanId": "SCN-MTCTGVIO"
+        },
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-3465f6-1",
+          "rawJson": "{\"title\":\"SQL Injection in account lookup\",\"severity\":\"High\",\"endpoint\":\"/api/accounts?userId=sample\",\"evidence\":{\"rawOutput\":\"Synthetic duplicate observation from a second scanner pass.\"}}",
+          "timestamp": "2026-08-28T10:36:28.177Z",
+          "scanId": "SCN-MTCTGVIO"
+        }
+      ],
+      "createdAt": "2026-08-28T10:36:28.178Z",
+      "aiTriage": {
+        "relevance": "High",
+        "calibratedConfidence": "confirmed by evidence",
+        "contextualSeverity": "Critical",
+        "businessImpact": "Direct unauthorized access to sensitive relational database records and tables.",
+        "exploitabilityAssessment": "Theoretical attack vector requiring parameter manipulation.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": true,
+        "reasoning": "Contextual evaluation for SQL Injection on asset api.example.test (/api/accounts). Severity aligned with risk impact.",
+        "keyRiskFactors": [
+          "SQL Injection",
+          "Unauthenticated",
+          "api.example.test Exposure"
+        ]
+      }
+    },
+    {
+      "id": "FND-CTGVIO-002",
+      "scanId": "SCN-MTCTGVIO",
+      "projectId": "PRJ-MTCF8DLI",
+      "title": "Server-Side Request Forgery in URL preview",
+      "vulnerabilityCategory": "SSRF",
+      "cwe": "CWE-918",
+      "severity": "High",
+      "confidence": "High",
+      "asset": "api.example.test",
+      "endpoint": "/api/preview",
+      "evidence": {
+        "rawOutput": "Synthetic scanner evidence: outbound request destination was accepted during validation."
+      },
+      "description": "The preview service retrieves a caller-controlled URL without sufficient destination restrictions.",
+      "authContext": "Unauthenticated",
+      "dataSensitivity": "Credentials/Secrets",
+      "status": "open",
+      "dedupGroupId": "DEDUP-YXBpLmV4YW1w",
+      "sourceCount": 1,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-15b327-0",
+          "rawJson": "{\"title\":\"Server-Side Request Forgery in URL preview\",\"severity\":\"High\",\"endpoint\":\"/api/preview\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: outbound request destination was accepted during validation.\"}}",
+          "timestamp": "2026-08-28T10:36:28.178Z",
+          "scanId": "SCN-MTCTGVIO"
+        }
+      ],
+      "createdAt": "2026-08-28T10:36:28.178Z",
+      "aiTriage": {
+        "relevance": "High",
+        "calibratedConfidence": "strongly indicated",
+        "contextualSeverity": "High",
+        "businessImpact": "Internal network boundary breach allowing access to cloud metadata services and IAM tokens.",
+        "exploitabilityAssessment": "Theoretical attack vector requiring parameter manipulation.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": true,
+        "reasoning": "Contextual evaluation for SSRF on asset api.example.test (/api/preview). Severity aligned with risk impact.",
+        "keyRiskFactors": [
+          "SSRF",
+          "Unauthenticated",
+          "api.example.test Exposure"
+        ]
+      }
+    },
+    {
+      "id": "FND-CTGVIO-003",
+      "scanId": "SCN-MTCTGVIO",
+      "projectId": "PRJ-MTCF8DLI",
+      "title": "Broken object-level authorization",
+      "vulnerabilityCategory": "IDOR / Broken Access Control",
+      "cwe": "CWE-639",
+      "severity": "High",
+      "confidence": "Confirmed",
+      "asset": "api.example.test",
+      "endpoint": "/api/invoices/{id}",
+      "evidence": {
+        "rawOutput": "Synthetic scanner evidence: access-control response differed for a cross-tenant test record."
+      },
+      "description": "Authorization checks may not verify that the requested invoice belongs to the current tenant.",
+      "authContext": "Low Privilege",
+      "dataSensitivity": "PII/Financial",
+      "status": "open",
+      "dedupGroupId": "DEDUP-YXBpLmV4YW1w",
+      "sourceCount": 1,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-3bcb80-0",
+          "rawJson": "{\"title\":\"Broken object-level authorization\",\"severity\":\"High\",\"endpoint\":\"/api/invoices/{id}\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: access-control response differed for a cross-tenant test record.\"}}",
+          "timestamp": "2026-08-28T10:36:28.178Z",
+          "scanId": "SCN-MTCTGVIO"
+        }
+      ],
+      "createdAt": "2026-08-28T10:36:28.178Z",
+      "aiTriage": {
+        "relevance": "High",
+        "calibratedConfidence": "confirmed by evidence",
+        "contextualSeverity": "High",
+        "businessImpact": "Unauthorized cross-tenant record tampering and horizontal data leakage.",
+        "exploitabilityAssessment": "Theoretical attack vector requiring parameter manipulation.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": true,
+        "reasoning": "Contextual evaluation for IDOR / Broken Access Control on asset api.example.test (/api/invoices/{id}). Severity aligned with risk impact.",
+        "keyRiskFactors": [
+          "IDOR / Broken Access Control",
+          "Low Privilege",
+          "api.example.test Exposure"
+        ]
+      }
+    },
+    {
+      "id": "FND-CTGVIO-004",
+      "scanId": "SCN-MTCTGVIO",
+      "projectId": "PRJ-MTCF8DLI",
+      "title": "JWT signature verification weakness",
+      "vulnerabilityCategory": "Broken Authentication / JWT",
+      "cwe": "CWE-287",
+      "severity": "Critical",
+      "confidence": "Medium",
+      "asset": "api.example.test",
+      "endpoint": "/api/auth/verify",
+      "evidence": {
+        "rawOutput": "Synthetic scanner evidence: token validation configuration requires manual verification."
+      },
+      "description": "Token validation configuration may allow an unsupported signing algorithm.",
+      "authContext": "Unauthenticated",
+      "dataSensitivity": "Credentials/Secrets",
+      "status": "open",
+      "dedupGroupId": "DEDUP-YXBpLmV4YW1w",
+      "sourceCount": 1,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-56cf0b-0",
+          "rawJson": "{\"title\":\"JWT signature verification weakness\",\"severity\":\"Critical\",\"endpoint\":\"/api/auth/verify\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: token validation configuration requires manual verification.\"}}",
+          "timestamp": "2026-08-28T10:36:28.178Z",
+          "scanId": "SCN-MTCTGVIO"
+        }
+      ],
+      "createdAt": "2026-08-28T10:36:28.178Z",
+      "aiTriage": {
+        "relevance": "High",
+        "calibratedConfidence": "potentially exploitable",
+        "contextualSeverity": "Critical",
+        "businessImpact": "Authentication bypass allowing unprivileged actors to forge admin credentials.",
+        "exploitabilityAssessment": "Theoretical attack vector requiring parameter manipulation.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": true,
+        "reasoning": "Contextual evaluation for Broken Authentication / JWT on asset api.example.test (/api/auth/verify). Severity aligned with risk impact.",
+        "keyRiskFactors": [
+          "Broken Authentication / JWT",
+          "Unauthenticated",
+          "api.example.test Exposure"
+        ]
+      }
+    },
+    {
+      "id": "FND-CTGVIO-005",
+      "scanId": "SCN-MTCTGVIO",
+      "projectId": "PRJ-MTCF8DLI",
+      "title": "Reflected cross-site scripting",
+      "vulnerabilityCategory": "Cross-Site Scripting",
+      "cwe": "CWE-79",
+      "severity": "Medium",
+      "confidence": "High",
+      "asset": "web.example.test",
+      "endpoint": "/search",
+      "evidence": {
+        "rawOutput": "Synthetic scanner evidence: reflected input marker detected in response."
+      },
+      "description": "Search input is reflected into an HTML response without consistent contextual encoding.",
+      "authContext": "Unauthenticated",
+      "dataSensitivity": "Internal",
+      "status": "open",
+      "dedupGroupId": "DEDUP-d2ViLmV4YW1w",
+      "sourceCount": 1,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-79ecb4-0",
+          "rawJson": "{\"title\":\"Reflected cross-site scripting\",\"severity\":\"Medium\",\"endpoint\":\"/search\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: reflected input marker detected in response.\"}}",
+          "timestamp": "2026-08-28T10:36:28.178Z",
+          "scanId": "SCN-MTCTGVIO"
+        }
+      ],
+      "createdAt": "2026-08-28T10:36:28.178Z",
+      "aiTriage": {
+        "relevance": "Medium",
+        "calibratedConfidence": "strongly indicated",
+        "contextualSeverity": "Medium",
+        "businessImpact": "Potential security weakness on web.example.test.",
+        "exploitabilityAssessment": "Theoretical attack vector requiring parameter manipulation.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": true,
+        "reasoning": "Contextual evaluation for Cross-Site Scripting on asset web.example.test (/search). Severity aligned with risk impact.",
+        "keyRiskFactors": [
+          "Cross-Site Scripting",
+          "Unauthenticated",
+          "web.example.test Exposure"
+        ]
+      }
+    },
+    {
+      "id": "FND-CTGVIO-006",
+      "scanId": "SCN-MTCTGVIO",
+      "projectId": "PRJ-MTCF8DLI",
+      "title": "Hardcoded cloud access token",
+      "vulnerabilityCategory": "Hardcoded Secret",
+      "cwe": "CWE-798",
+      "severity": "Critical",
+      "confidence": "Confirmed",
+      "asset": "Source Codebase",
+      "endpoint": "src/config/cloud.ts:18",
+      "evidence": {
+        "rawOutput": "Synthetic scanner evidence: placeholder token marker detected in source."
+      },
+      "description": "A cloud access token appears to be embedded in source configuration.",
+      "authContext": "Low Privilege",
+      "dataSensitivity": "Credentials/Secrets",
+      "status": "open",
+      "dedupGroupId": "DEDUP-c291cmNlIGNv",
+      "sourceCount": 1,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-471615-0",
+          "rawJson": "{\"title\":\"Hardcoded cloud access token\",\"severity\":\"Critical\",\"endpoint\":\"src/config/cloud.ts:18\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: placeholder token marker detected in source.\"}}",
+          "timestamp": "2026-08-28T10:36:28.178Z",
+          "scanId": "SCN-MTCTGVIO"
+        }
+      ],
+      "createdAt": "2026-08-28T10:36:28.178Z",
+      "aiTriage": {
+        "relevance": "High",
+        "calibratedConfidence": "confirmed by evidence",
+        "contextualSeverity": "Critical",
+        "businessImpact": "Authentication bypass allowing unprivileged actors to forge admin credentials.",
+        "exploitabilityAssessment": "Theoretical attack vector requiring parameter manipulation.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": true,
+        "reasoning": "Contextual evaluation for Hardcoded Secret on asset Source Codebase (src/config/cloud.ts:18). Severity aligned with risk impact.",
+        "keyRiskFactors": [
+          "Hardcoded Secret",
+          "Low Privilege",
+          "Source Codebase Exposure"
+        ]
+      }
+    },
+    {
+      "id": "FND-CTGVIO-007",
+      "scanId": "SCN-MTCTGVIO",
+      "projectId": "PRJ-MTCF8DLI",
+      "title": "Vulnerable dependency in payment service",
+      "vulnerabilityCategory": "Dependency / Package Vulnerability",
+      "cve": "CVE-2025-0001",
+      "severity": "High",
+      "confidence": "Confirmed",
+      "asset": "payment-service:latest",
+      "endpoint": "package-lock.json",
+      "evidence": {
+        "rawOutput": "Synthetic scanner evidence: package version is below the recommended fixed version."
+      },
+      "description": "A production dependency has a known security issue and an available patched version.",
+      "authContext": "Internal Service",
+      "dataSensitivity": "Confidential",
+      "status": "open",
+      "dedupGroupId": "DEDUP-cGF5bWVudC1z",
+      "sourceCount": 1,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-40498c-0",
+          "rawJson": "{\"title\":\"Vulnerable dependency in payment service\",\"severity\":\"High\",\"endpoint\":\"package-lock.json\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: package version is below the recommended fixed version.\"}}",
+          "timestamp": "2026-08-28T10:36:28.178Z",
+          "scanId": "SCN-MTCTGVIO"
+        }
+      ],
+      "createdAt": "2026-08-28T10:36:28.178Z",
+      "aiTriage": {
+        "relevance": "High",
+        "calibratedConfidence": "confirmed by evidence",
+        "contextualSeverity": "High",
+        "businessImpact": "Potential security weakness on payment-service:latest.",
+        "exploitabilityAssessment": "Theoretical attack vector requiring parameter manipulation.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": true,
+        "reasoning": "Contextual evaluation for Dependency / Package Vulnerability on asset payment-service:latest (package-lock.json). Severity aligned with risk impact.",
+        "keyRiskFactors": [
+          "Dependency / Package Vulnerability",
+          "Internal Service",
+          "payment-service:latest Exposure"
+        ]
+      }
+    },
+    {
+      "id": "FND-CTGVIO-008",
+      "scanId": "SCN-MTCTGVIO",
+      "projectId": "PRJ-MTCF8DLI",
+      "title": "Exposed database administration service",
+      "vulnerabilityCategory": "Unrestricted Network Exposure",
+      "cwe": "CWE-200",
+      "severity": "High",
+      "confidence": "Confirmed",
+      "asset": "db.internal.example.test",
+      "endpoint": ":5432",
+      "evidence": {
+        "rawOutput": "Synthetic scanner evidence: service exposure requires network policy review."
+      },
+      "description": "A database administration service appears reachable from an overly broad network segment.",
+      "authContext": "Unauthenticated",
+      "dataSensitivity": "PII/Financial",
+      "status": "open",
+      "dedupGroupId": "DEDUP-ZGIuaW50ZXJu",
+      "sourceCount": 1,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-52c397-0",
+          "rawJson": "{\"title\":\"Exposed database administration service\",\"severity\":\"High\",\"endpoint\":\":5432\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: service exposure requires network policy review.\"}}",
+          "timestamp": "2026-08-28T10:36:28.179Z",
+          "scanId": "SCN-MTCTGVIO"
+        }
+      ],
+      "createdAt": "2026-08-28T10:36:28.179Z",
+      "aiTriage": {
+        "relevance": "High",
+        "calibratedConfidence": "confirmed by evidence",
+        "contextualSeverity": "High",
+        "businessImpact": "Potential security weakness on db.internal.example.test.",
+        "exploitabilityAssessment": "Theoretical attack vector requiring parameter manipulation.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": true,
+        "reasoning": "Contextual evaluation for Unrestricted Network Exposure on asset db.internal.example.test (:5432). Severity aligned with risk impact.",
+        "keyRiskFactors": [
+          "Unrestricted Network Exposure",
+          "Unauthenticated",
+          "db.internal.example.test Exposure"
+        ]
+      }
+    },
+    {
+      "id": "FND-CTGVIO-009",
+      "scanId": "SCN-MTCTGVIO",
+      "projectId": "PRJ-MTCF8DLI",
+      "title": "Missing security headers",
+      "vulnerabilityCategory": "Security Misconfiguration",
+      "cwe": "CWE-693",
+      "severity": "Low",
+      "confidence": "High",
+      "asset": "web.example.test",
+      "endpoint": "/",
+      "evidence": {
+        "rawOutput": "Synthetic scanner evidence: expected response headers were absent."
+      },
+      "description": "Recommended browser security headers are missing from the application response.",
+      "authContext": "Unauthenticated",
+      "dataSensitivity": "Internal",
+      "status": "open",
+      "dedupGroupId": "DEDUP-d2ViLmV4YW1w",
+      "sourceCount": 1,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-4c9c1a-0",
+          "rawJson": "{\"title\":\"Missing security headers\",\"severity\":\"Low\",\"endpoint\":\"/\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: expected response headers were absent.\"}}",
+          "timestamp": "2026-08-28T10:36:28.179Z",
+          "scanId": "SCN-MTCTGVIO"
+        }
+      ],
+      "createdAt": "2026-08-28T10:36:28.179Z",
+      "aiTriage": {
+        "relevance": "Medium",
+        "calibratedConfidence": "strongly indicated",
+        "contextualSeverity": "Low",
+        "businessImpact": "Potential security weakness on web.example.test.",
+        "exploitabilityAssessment": "Theoretical attack vector requiring parameter manipulation.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": true,
+        "reasoning": "Contextual evaluation for Security Misconfiguration on asset web.example.test (/). Severity aligned with risk impact.",
+        "keyRiskFactors": [
+          "Security Misconfiguration",
+          "Unauthenticated",
+          "web.example.test Exposure"
+        ]
+      }
+    },
+    {
+      "id": "FND-CTGVIO-010",
+      "scanId": "SCN-MTCTGVIO",
+      "projectId": "PRJ-MTCF8DLI",
+      "title": "Verbose error disclosure",
+      "vulnerabilityCategory": "Information Exposure",
+      "cwe": "CWE-209",
+      "severity": "Medium",
+      "confidence": "Medium",
+      "asset": "api.example.test",
+      "endpoint": "/api/orders",
+      "evidence": {
+        "rawOutput": "Synthetic scanner evidence: stack trace marker observed in an error response."
+      },
+      "description": "Error responses disclose internal implementation details that should be hidden from clients.",
+      "authContext": "Unauthenticated",
+      "dataSensitivity": "Internal",
+      "status": "open",
+      "dedupGroupId": "DEDUP-YXBpLmV4YW1w",
+      "sourceCount": 1,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-3a3a1e-0",
+          "rawJson": "{\"title\":\"Verbose error disclosure\",\"severity\":\"Medium\",\"endpoint\":\"/api/orders\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: stack trace marker observed in an error response.\"}}",
+          "timestamp": "2026-08-28T10:36:28.179Z",
+          "scanId": "SCN-MTCTGVIO"
+        }
+      ],
+      "createdAt": "2026-08-28T10:36:28.179Z",
+      "aiTriage": {
+        "relevance": "Medium",
+        "calibratedConfidence": "potentially exploitable",
+        "contextualSeverity": "Medium",
+        "businessImpact": "Potential security weakness on api.example.test.",
+        "exploitabilityAssessment": "Theoretical attack vector requiring parameter manipulation.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": true,
+        "reasoning": "Contextual evaluation for Information Exposure on asset api.example.test (/api/orders). Severity aligned with risk impact.",
+        "keyRiskFactors": [
+          "Information Exposure",
+          "Unauthenticated",
+          "api.example.test Exposure"
+        ]
+      }
+    },
+    {
+      "id": "FND-EOSP4J-001",
+      "scanId": "SCN-MTEOSP4J",
+      "projectId": "PRJ-MTEOSCGW",
+      "title": "SQL Injection in account lookup",
+      "vulnerabilityCategory": "SQL Injection",
+      "cwe": "CWE-89",
+      "severity": "Critical",
+      "confidence": "Confirmed",
+      "asset": "api.example.test",
+      "endpoint": "/api/accounts",
+      "evidence": {
+        "rawOutput": "Synthetic scanner evidence: parameter behavior changed during validation."
+      },
+      "description": "The account lookup endpoint appears to construct a database query from untrusted input.",
+      "authContext": "Unauthenticated",
+      "dataSensitivity": "PII/Financial",
+      "status": "open",
+      "dedupGroupId": "DEDUP-YXBpLmV4YW1w",
+      "sourceCount": 2,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-3465f6-0",
+          "rawJson": "{\"title\":\"SQL Injection in account lookup\",\"severity\":\"Critical\",\"endpoint\":\"/api/accounts\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: parameter behavior changed during validation.\"}}",
+          "timestamp": "2026-08-29T18:01:14.038Z",
+          "scanId": "SCN-MTEOSP4J"
+        },
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-3465f6-1",
+          "rawJson": "{\"title\":\"SQL Injection in account lookup\",\"severity\":\"High\",\"endpoint\":\"/api/accounts?userId=sample\",\"evidence\":{\"rawOutput\":\"Synthetic duplicate observation from a second scanner pass.\"}}",
+          "timestamp": "2026-08-29T18:01:14.038Z",
+          "scanId": "SCN-MTEOSP4J"
+        }
+      ],
+      "createdAt": "2026-08-29T18:01:14.038Z",
+      "aiTriage": {
+        "relevance": "High",
+        "calibratedConfidence": "confirmed by evidence",
+        "contextualSeverity": "Critical",
+        "businessImpact": "Direct unauthorized access to sensitive relational database records and tables.",
+        "exploitabilityAssessment": "Theoretical attack vector requiring parameter manipulation.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": true,
+        "reasoning": "Contextual evaluation for SQL Injection on asset api.example.test (/api/accounts). Severity aligned with risk impact.",
+        "keyRiskFactors": [
+          "SQL Injection",
+          "Unauthenticated",
+          "api.example.test Exposure"
+        ]
+      }
+    },
+    {
+      "id": "FND-EOSP4J-002",
+      "scanId": "SCN-MTEOSP4J",
+      "projectId": "PRJ-MTEOSCGW",
+      "title": "Server-Side Request Forgery in URL preview",
+      "vulnerabilityCategory": "SSRF",
+      "cwe": "CWE-918",
+      "severity": "High",
+      "confidence": "High",
+      "asset": "api.example.test",
+      "endpoint": "/api/preview",
+      "evidence": {
+        "rawOutput": "Synthetic scanner evidence: outbound request destination was accepted during validation."
+      },
+      "description": "The preview service retrieves a caller-controlled URL without sufficient destination restrictions.",
+      "authContext": "Unauthenticated",
+      "dataSensitivity": "Credentials/Secrets",
+      "status": "open",
+      "dedupGroupId": "DEDUP-YXBpLmV4YW1w",
+      "sourceCount": 1,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-15b327-0",
+          "rawJson": "{\"title\":\"Server-Side Request Forgery in URL preview\",\"severity\":\"High\",\"endpoint\":\"/api/preview\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: outbound request destination was accepted during validation.\"}}",
+          "timestamp": "2026-08-29T18:01:14.038Z",
+          "scanId": "SCN-MTEOSP4J"
+        }
+      ],
+      "createdAt": "2026-08-29T18:01:14.038Z",
+      "aiTriage": {
+        "relevance": "High",
+        "calibratedConfidence": "strongly indicated",
+        "contextualSeverity": "High",
+        "businessImpact": "Internal network boundary breach allowing access to cloud metadata services and IAM tokens.",
+        "exploitabilityAssessment": "Theoretical attack vector requiring parameter manipulation.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": true,
+        "reasoning": "Contextual evaluation for SSRF on asset api.example.test (/api/preview). Severity aligned with risk impact.",
+        "keyRiskFactors": [
+          "SSRF",
+          "Unauthenticated",
+          "api.example.test Exposure"
+        ]
+      }
+    },
+    {
+      "id": "FND-EOSP4J-003",
+      "scanId": "SCN-MTEOSP4J",
+      "projectId": "PRJ-MTEOSCGW",
+      "title": "Broken object-level authorization",
+      "vulnerabilityCategory": "IDOR / Broken Access Control",
+      "cwe": "CWE-639",
+      "severity": "High",
+      "confidence": "Confirmed",
+      "asset": "api.example.test",
+      "endpoint": "/api/invoices/{id}",
+      "evidence": {
+        "rawOutput": "Synthetic scanner evidence: access-control response differed for a cross-tenant test record."
+      },
+      "description": "Authorization checks may not verify that the requested invoice belongs to the current tenant.",
+      "authContext": "Low Privilege",
+      "dataSensitivity": "PII/Financial",
+      "status": "open",
+      "dedupGroupId": "DEDUP-YXBpLmV4YW1w",
+      "sourceCount": 1,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-3bcb80-0",
+          "rawJson": "{\"title\":\"Broken object-level authorization\",\"severity\":\"High\",\"endpoint\":\"/api/invoices/{id}\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: access-control response differed for a cross-tenant test record.\"}}",
+          "timestamp": "2026-08-29T18:01:14.038Z",
+          "scanId": "SCN-MTEOSP4J"
+        }
+      ],
+      "createdAt": "2026-08-29T18:01:14.038Z",
+      "aiTriage": {
+        "relevance": "High",
+        "calibratedConfidence": "confirmed by evidence",
+        "contextualSeverity": "High",
+        "businessImpact": "Unauthorized cross-tenant record tampering and horizontal data leakage.",
+        "exploitabilityAssessment": "Theoretical attack vector requiring parameter manipulation.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": true,
+        "reasoning": "Contextual evaluation for IDOR / Broken Access Control on asset api.example.test (/api/invoices/{id}). Severity aligned with risk impact.",
+        "keyRiskFactors": [
+          "IDOR / Broken Access Control",
+          "Low Privilege",
+          "api.example.test Exposure"
+        ]
+      }
+    },
+    {
+      "id": "FND-EOSP4J-004",
+      "scanId": "SCN-MTEOSP4J",
+      "projectId": "PRJ-MTEOSCGW",
+      "title": "JWT signature verification weakness",
+      "vulnerabilityCategory": "Broken Authentication / JWT",
+      "cwe": "CWE-287",
+      "severity": "Critical",
+      "confidence": "Medium",
+      "asset": "api.example.test",
+      "endpoint": "/api/auth/verify",
+      "evidence": {
+        "rawOutput": "Synthetic scanner evidence: token validation configuration requires manual verification."
+      },
+      "description": "Token validation configuration may allow an unsupported signing algorithm.",
+      "authContext": "Unauthenticated",
+      "dataSensitivity": "Credentials/Secrets",
+      "status": "open",
+      "dedupGroupId": "DEDUP-YXBpLmV4YW1w",
+      "sourceCount": 1,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-56cf0b-0",
+          "rawJson": "{\"title\":\"JWT signature verification weakness\",\"severity\":\"Critical\",\"endpoint\":\"/api/auth/verify\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: token validation configuration requires manual verification.\"}}",
+          "timestamp": "2026-08-29T18:01:14.038Z",
+          "scanId": "SCN-MTEOSP4J"
+        }
+      ],
+      "createdAt": "2026-08-29T18:01:14.038Z",
+      "aiTriage": {
+        "relevance": "High",
+        "calibratedConfidence": "potentially exploitable",
+        "contextualSeverity": "Critical",
+        "businessImpact": "Authentication bypass allowing unprivileged actors to forge admin credentials.",
+        "exploitabilityAssessment": "Theoretical attack vector requiring parameter manipulation.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": true,
+        "reasoning": "Contextual evaluation for Broken Authentication / JWT on asset api.example.test (/api/auth/verify). Severity aligned with risk impact.",
+        "keyRiskFactors": [
+          "Broken Authentication / JWT",
+          "Unauthenticated",
+          "api.example.test Exposure"
+        ]
+      }
+    },
+    {
+      "id": "FND-EOSP4J-005",
+      "scanId": "SCN-MTEOSP4J",
+      "projectId": "PRJ-MTEOSCGW",
+      "title": "Reflected cross-site scripting",
+      "vulnerabilityCategory": "Cross-Site Scripting",
+      "cwe": "CWE-79",
+      "severity": "Medium",
+      "confidence": "High",
+      "asset": "web.example.test",
+      "endpoint": "/search",
+      "evidence": {
+        "rawOutput": "Synthetic scanner evidence: reflected input marker detected in response."
+      },
+      "description": "Search input is reflected into an HTML response without consistent contextual encoding.",
+      "authContext": "Unauthenticated",
+      "dataSensitivity": "Internal",
+      "status": "open",
+      "dedupGroupId": "DEDUP-d2ViLmV4YW1w",
+      "sourceCount": 1,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-79ecb4-0",
+          "rawJson": "{\"title\":\"Reflected cross-site scripting\",\"severity\":\"Medium\",\"endpoint\":\"/search\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: reflected input marker detected in response.\"}}",
+          "timestamp": "2026-08-29T18:01:14.038Z",
+          "scanId": "SCN-MTEOSP4J"
+        }
+      ],
+      "createdAt": "2026-08-29T18:01:14.038Z",
+      "aiTriage": {
+        "relevance": "Medium",
+        "calibratedConfidence": "strongly indicated",
+        "contextualSeverity": "Medium",
+        "businessImpact": "Potential security weakness on web.example.test.",
+        "exploitabilityAssessment": "Theoretical attack vector requiring parameter manipulation.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": true,
+        "reasoning": "Contextual evaluation for Cross-Site Scripting on asset web.example.test (/search). Severity aligned with risk impact.",
+        "keyRiskFactors": [
+          "Cross-Site Scripting",
+          "Unauthenticated",
+          "web.example.test Exposure"
+        ]
+      }
+    },
+    {
+      "id": "FND-EOSP4J-006",
+      "scanId": "SCN-MTEOSP4J",
+      "projectId": "PRJ-MTEOSCGW",
+      "title": "Hardcoded cloud access token",
+      "vulnerabilityCategory": "Hardcoded Secret",
+      "cwe": "CWE-798",
+      "severity": "Critical",
+      "confidence": "Confirmed",
+      "asset": "Source Codebase",
+      "endpoint": "src/config/cloud.ts:18",
+      "evidence": {
+        "rawOutput": "Synthetic scanner evidence: placeholder token marker detected in source."
+      },
+      "description": "A cloud access token appears to be embedded in source configuration.",
+      "authContext": "Low Privilege",
+      "dataSensitivity": "Credentials/Secrets",
+      "status": "open",
+      "dedupGroupId": "DEDUP-c291cmNlIGNv",
+      "sourceCount": 1,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-471615-0",
+          "rawJson": "{\"title\":\"Hardcoded cloud access token\",\"severity\":\"Critical\",\"endpoint\":\"src/config/cloud.ts:18\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: placeholder token marker detected in source.\"}}",
+          "timestamp": "2026-08-29T18:01:14.038Z",
+          "scanId": "SCN-MTEOSP4J"
+        }
+      ],
+      "createdAt": "2026-08-29T18:01:14.038Z",
+      "aiTriage": {
+        "relevance": "High",
+        "calibratedConfidence": "confirmed by evidence",
+        "contextualSeverity": "Critical",
+        "businessImpact": "Authentication bypass allowing unprivileged actors to forge admin credentials.",
+        "exploitabilityAssessment": "Theoretical attack vector requiring parameter manipulation.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": true,
+        "reasoning": "Contextual evaluation for Hardcoded Secret on asset Source Codebase (src/config/cloud.ts:18). Severity aligned with risk impact.",
+        "keyRiskFactors": [
+          "Hardcoded Secret",
+          "Low Privilege",
+          "Source Codebase Exposure"
+        ]
+      }
+    },
+    {
+      "id": "FND-EOSP4J-007",
+      "scanId": "SCN-MTEOSP4J",
+      "projectId": "PRJ-MTEOSCGW",
+      "title": "Vulnerable dependency in payment service",
+      "vulnerabilityCategory": "Dependency / Package Vulnerability",
+      "cve": "CVE-2025-0001",
+      "severity": "High",
+      "confidence": "Confirmed",
+      "asset": "payment-service:latest",
+      "endpoint": "package-lock.json",
+      "evidence": {
+        "rawOutput": "Synthetic scanner evidence: package version is below the recommended fixed version."
+      },
+      "description": "A production dependency has a known security issue and an available patched version.",
+      "authContext": "Internal Service",
+      "dataSensitivity": "Confidential",
+      "status": "open",
+      "dedupGroupId": "DEDUP-cGF5bWVudC1z",
+      "sourceCount": 1,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-40498c-0",
+          "rawJson": "{\"title\":\"Vulnerable dependency in payment service\",\"severity\":\"High\",\"endpoint\":\"package-lock.json\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: package version is below the recommended fixed version.\"}}",
+          "timestamp": "2026-08-29T18:01:14.038Z",
+          "scanId": "SCN-MTEOSP4J"
+        }
+      ],
+      "createdAt": "2026-08-29T18:01:14.038Z",
+      "aiTriage": {
+        "relevance": "High",
+        "calibratedConfidence": "confirmed by evidence",
+        "contextualSeverity": "High",
+        "businessImpact": "Potential security weakness on payment-service:latest.",
+        "exploitabilityAssessment": "Theoretical attack vector requiring parameter manipulation.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": true,
+        "reasoning": "Contextual evaluation for Dependency / Package Vulnerability on asset payment-service:latest (package-lock.json). Severity aligned with risk impact.",
+        "keyRiskFactors": [
+          "Dependency / Package Vulnerability",
+          "Internal Service",
+          "payment-service:latest Exposure"
+        ]
+      }
+    },
+    {
+      "id": "FND-EOSP4J-008",
+      "scanId": "SCN-MTEOSP4J",
+      "projectId": "PRJ-MTEOSCGW",
+      "title": "Exposed database administration service",
+      "vulnerabilityCategory": "Unrestricted Network Exposure",
+      "cwe": "CWE-200",
+      "severity": "High",
+      "confidence": "Confirmed",
+      "asset": "db.internal.example.test",
+      "endpoint": ":5432",
+      "evidence": {
+        "rawOutput": "Synthetic scanner evidence: service exposure requires network policy review."
+      },
+      "description": "A database administration service appears reachable from an overly broad network segment.",
+      "authContext": "Unauthenticated",
+      "dataSensitivity": "PII/Financial",
+      "status": "open",
+      "dedupGroupId": "DEDUP-ZGIuaW50ZXJu",
+      "sourceCount": 1,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-52c397-0",
+          "rawJson": "{\"title\":\"Exposed database administration service\",\"severity\":\"High\",\"endpoint\":\":5432\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: service exposure requires network policy review.\"}}",
+          "timestamp": "2026-08-29T18:01:14.038Z",
+          "scanId": "SCN-MTEOSP4J"
+        }
+      ],
+      "createdAt": "2026-08-29T18:01:14.038Z",
+      "aiTriage": {
+        "relevance": "High",
+        "calibratedConfidence": "confirmed by evidence",
+        "contextualSeverity": "High",
+        "businessImpact": "Potential security weakness on db.internal.example.test.",
+        "exploitabilityAssessment": "Theoretical attack vector requiring parameter manipulation.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": true,
+        "reasoning": "Contextual evaluation for Unrestricted Network Exposure on asset db.internal.example.test (:5432). Severity aligned with risk impact.",
+        "keyRiskFactors": [
+          "Unrestricted Network Exposure",
+          "Unauthenticated",
+          "db.internal.example.test Exposure"
+        ]
+      }
+    },
+    {
+      "id": "FND-EOSP4J-009",
+      "scanId": "SCN-MTEOSP4J",
+      "projectId": "PRJ-MTEOSCGW",
+      "title": "Missing security headers",
+      "vulnerabilityCategory": "Security Misconfiguration",
+      "cwe": "CWE-693",
+      "severity": "Low",
+      "confidence": "High",
+      "asset": "web.example.test",
+      "endpoint": "/",
+      "evidence": {
+        "rawOutput": "Synthetic scanner evidence: expected response headers were absent."
+      },
+      "description": "Recommended browser security headers are missing from the application response.",
+      "authContext": "Unauthenticated",
+      "dataSensitivity": "Internal",
+      "status": "open",
+      "dedupGroupId": "DEDUP-d2ViLmV4YW1w",
+      "sourceCount": 1,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-4c9c1a-0",
+          "rawJson": "{\"title\":\"Missing security headers\",\"severity\":\"Low\",\"endpoint\":\"/\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: expected response headers were absent.\"}}",
+          "timestamp": "2026-08-29T18:01:14.039Z",
+          "scanId": "SCN-MTEOSP4J"
+        }
+      ],
+      "createdAt": "2026-08-29T18:01:14.039Z",
+      "aiTriage": {
+        "relevance": "Medium",
+        "calibratedConfidence": "strongly indicated",
+        "contextualSeverity": "Low",
+        "businessImpact": "Potential security weakness on web.example.test.",
+        "exploitabilityAssessment": "Theoretical attack vector requiring parameter manipulation.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": true,
+        "reasoning": "Contextual evaluation for Security Misconfiguration on asset web.example.test (/). Severity aligned with risk impact.",
+        "keyRiskFactors": [
+          "Security Misconfiguration",
+          "Unauthenticated",
+          "web.example.test Exposure"
+        ]
+      }
+    },
+    {
+      "id": "FND-EOSP4J-010",
+      "scanId": "SCN-MTEOSP4J",
+      "projectId": "PRJ-MTEOSCGW",
+      "title": "Verbose error disclosure",
+      "vulnerabilityCategory": "Information Exposure",
+      "cwe": "CWE-209",
+      "severity": "Medium",
+      "confidence": "Medium",
+      "asset": "api.example.test",
+      "endpoint": "/api/orders",
+      "evidence": {
+        "rawOutput": "Synthetic scanner evidence: stack trace marker observed in an error response."
+      },
+      "description": "Error responses disclose internal implementation details that should be hidden from clients.",
+      "authContext": "Unauthenticated",
+      "dataSensitivity": "Internal",
+      "status": "open",
+      "dedupGroupId": "DEDUP-YXBpLmV4YW1w",
+      "sourceCount": 1,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-3a3a1e-0",
+          "rawJson": "{\"title\":\"Verbose error disclosure\",\"severity\":\"Medium\",\"endpoint\":\"/api/orders\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: stack trace marker observed in an error response.\"}}",
+          "timestamp": "2026-08-29T18:01:14.039Z",
+          "scanId": "SCN-MTEOSP4J"
+        }
+      ],
+      "createdAt": "2026-08-29T18:01:14.039Z",
+      "aiTriage": {
+        "relevance": "Medium",
+        "calibratedConfidence": "potentially exploitable",
+        "contextualSeverity": "Medium",
+        "businessImpact": "Potential security weakness on api.example.test.",
+        "exploitabilityAssessment": "Theoretical attack vector requiring parameter manipulation.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": true,
+        "reasoning": "Contextual evaluation for Information Exposure on asset api.example.test (/api/orders). Severity aligned with risk impact.",
+        "keyRiskFactors": [
+          "Information Exposure",
+          "Unauthenticated",
+          "api.example.test Exposure"
+        ]
+      }
+    }
+  ],
+  "relationships": [],
+  "attackPaths": [
+    {
+      "id": "PTH-CT4F5Q-001",
+      "projectId": "PRJ-MTCT4154",
+      "scanId": "SCN-MTCT4F5Q",
+      "title": "Server-Side Request Forgery in URL preview pivoting into SQL Injection in account lookup",
+      "summary": "An attacker sends requests to the public interface (api.example.test), exploits SSRF, pivots into internal services, and executes SQL Injection in account lookup to compromise backend databases.",
+      "nodes": [
+        {
+          "id": "node-threat-1",
+          "type": "threat_actor",
+          "label": "External Attacker",
+          "subLabel": "Public Internet Ingress",
+          "isEntrypoint": true
+        },
+        {
+          "id": "node-asset-1",
+          "type": "asset",
+          "label": "api.example.test",
+          "subLabel": "/api/preview",
+          "assetRef": "api.example.test"
+        },
+        {
+          "id": "node-vuln-1",
+          "type": "vulnerability",
+          "label": "Server-Side Request Forgery in URL preview",
+          "findingRef": "FND-CT4F5Q-002",
+          "severity": "High"
+        },
+        {
+          "id": "node-asset-2",
+          "type": "asset",
+          "label": "api.example.test",
+          "subLabel": "/api/accounts",
+          "assetRef": "api.example.test"
+        },
+        {
+          "id": "node-vuln-2",
+          "type": "vulnerability",
+          "label": "SQL Injection in account lookup",
+          "findingRef": "FND-CT4F5Q-001",
+          "severity": "Critical"
+        },
+        {
+          "id": "node-target-1",
+          "type": "datastore",
+          "label": "Core Relational / Payments DB",
+          "subLabel": "High Sensitivity Customer Data",
+          "isTarget": true
+        }
+      ],
+      "edges": [
+        {
+          "id": "e1",
+          "fromNodeId": "node-threat-1",
+          "toNodeId": "node-asset-1",
+          "relation": "reaches",
+          "label": "Public Web Request",
+          "riskWeight": 10
+        },
+        {
+          "id": "e2",
+          "fromNodeId": "node-asset-1",
+          "toNodeId": "node-vuln-1",
+          "relation": "exploits",
+          "label": "Triggers Ingress Flaw",
+          "riskWeight": 10
+        },
+        {
+          "id": "e3",
+          "fromNodeId": "node-vuln-1",
+          "toNodeId": "node-asset-2",
+          "relation": "pivots_to",
+          "label": "Internal Pivot / Token Reuse",
+          "riskWeight": 10
+        },
+        {
+          "id": "e4",
+          "fromNodeId": "node-asset-2",
+          "toNodeId": "node-vuln-2",
+          "relation": "exploits",
+          "label": "Executes Extraction",
+          "riskWeight": 10
+        },
+        {
+          "id": "e5",
+          "fromNodeId": "node-vuln-2",
+          "toNodeId": "node-target-1",
+          "relation": "exfiltrates",
+          "label": "Customer Data Exfiltration",
+          "riskWeight": 10
+        }
+      ],
+      "participatingFindingIds": [
+        "FND-CT4F5Q-002",
+        "FND-CT4F5Q-001"
+      ],
+      "participatingAssets": [
+        "api.example.test",
+        "api.example.test"
+      ],
+      "prerequisites": [
+        "Internet access to public endpoint",
+        "Lack of internal network egress filtering"
+      ],
+      "impactAssessment": "High-severity breach involving internal pivot and sensitive data compromise.",
+      "recommendedFixSequence": [
+        "1. Immediately enforce strict egress firewalling & input validation on api.example.test",
+        "2. Sanitize database queries and rotate credentials on api.example.test"
+      ],
+      "remediationBottleneckFindingId": "FND-CT4F5Q-002",
+      "status": "active",
+      "confidence": "Confirmed",
+      "contextualScore": 100,
+      "severity": "Critical",
+      "scoreBreakdown": {
+        "exposureScore": 25,
+        "exploitabilityScore": 25,
+        "assetCriticalityScore": 25,
+        "chainImpactScore": 25,
+        "bonusPenalties": 5,
+        "totalScore": 100,
+        "explanation": "Deterministic Contextual Formula: Exposure (25/25) + Exploitability (25/25) + Asset Criticality (25/25) + Chain Pivot Impact (25/25) + Unauth Crown-Jewel Modifier (+5) = 100/100."
+      }
+    },
+    {
+      "id": "PTH-CT4F5Q-002",
+      "projectId": "PRJ-MTCT4154",
+      "scanId": "SCN-MTCT4F5Q",
+      "title": "Direct Exploitation: Broken object-level authorization on api.example.test",
+      "summary": "Direct vulnerability path targeting api.example.test via /api/invoices/{id}. May allow unauthorized actions or information disclosure.",
+      "nodes": [
+        {
+          "id": "threat-2",
+          "type": "threat_actor",
+          "label": "Adversary",
+          "isEntrypoint": true
+        },
+        {
+          "id": "asset-2",
+          "type": "asset",
+          "label": "api.example.test",
+          "subLabel": "/api/invoices/{id}",
+          "assetRef": "api.example.test"
+        },
+        {
+          "id": "vuln-2",
+          "type": "vulnerability",
+          "label": "Broken object-level authorization",
+          "findingRef": "FND-CT4F5Q-003",
+          "severity": "High"
+        },
+        {
+          "id": "target-2",
+          "type": "datastore",
+          "label": "api.example.test Service Resources",
+          "isTarget": true
+        }
+      ],
+      "edges": [
+        {
+          "id": "e-2-1",
+          "fromNodeId": "threat-2",
+          "toNodeId": "asset-2",
+          "relation": "reaches",
+          "label": "Network Access",
+          "riskWeight": 8
+        },
+        {
+          "id": "e-2-2",
+          "fromNodeId": "asset-2",
+          "toNodeId": "vuln-2",
+          "relation": "exploits",
+          "label": "Exploits Vulnerability",
+          "riskWeight": 10
+        },
+        {
+          "id": "e-2-3",
+          "fromNodeId": "vuln-2",
+          "toNodeId": "target-2",
+          "relation": "impacts",
+          "label": "Unauthorized Impact",
+          "riskWeight": 9
+        }
+      ],
+      "participatingFindingIds": [
+        "FND-CT4F5Q-003"
+      ],
+      "participatingAssets": [
+        "api.example.test"
+      ],
+      "prerequisites": [
+        "Direct reachability of service endpoint"
+      ],
+      "impactAssessment": "Unauthorized cross-tenant record tampering and horizontal data leakage.",
+      "recommendedFixSequence": [
+        "Remediate Broken object-level authorization at /api/invoices/{id}"
+      ],
+      "remediationBottleneckFindingId": "FND-CT4F5Q-003",
+      "status": "active",
+      "confidence": "Confirmed",
+      "contextualScore": 100,
+      "severity": "Critical",
+      "scoreBreakdown": {
+        "exposureScore": 25,
+        "exploitabilityScore": 20,
+        "assetCriticalityScore": 25,
+        "chainImpactScore": 25,
+        "bonusPenalties": 5,
+        "totalScore": 100,
+        "explanation": "Deterministic Contextual Formula: Exposure (25/25) + Exploitability (20/25) + Asset Criticality (25/25) + Chain Pivot Impact (25/25) + Unauth Crown-Jewel Modifier (+5) = 100/100."
+      }
+    },
+    {
+      "id": "PTH-CT4F5Q-004",
+      "projectId": "PRJ-MTCT4154",
+      "scanId": "SCN-MTCT4F5Q",
+      "title": "Direct Exploitation: Hardcoded cloud access token on Source Codebase",
+      "summary": "Direct vulnerability path targeting Source Codebase via src/config/cloud.ts:18. May allow unauthorized actions or information disclosure.",
+      "nodes": [
+        {
+          "id": "threat-4",
+          "type": "threat_actor",
+          "label": "Adversary",
+          "isEntrypoint": true
+        },
+        {
+          "id": "asset-4",
+          "type": "asset",
+          "label": "Source Codebase",
+          "subLabel": "src/config/cloud.ts:18",
+          "assetRef": "Source Codebase"
+        },
+        {
+          "id": "vuln-4",
+          "type": "vulnerability",
+          "label": "Hardcoded cloud access token",
+          "findingRef": "FND-CT4F5Q-006",
+          "severity": "Critical"
+        },
+        {
+          "id": "target-4",
+          "type": "datastore",
+          "label": "Source Codebase Service Resources",
+          "isTarget": true
+        }
+      ],
+      "edges": [
+        {
+          "id": "e-4-1",
+          "fromNodeId": "threat-4",
+          "toNodeId": "asset-4",
+          "relation": "reaches",
+          "label": "Network Access",
+          "riskWeight": 8
+        },
+        {
+          "id": "e-4-2",
+          "fromNodeId": "asset-4",
+          "toNodeId": "vuln-4",
+          "relation": "exploits",
+          "label": "Exploits Vulnerability",
+          "riskWeight": 10
+        },
+        {
+          "id": "e-4-3",
+          "fromNodeId": "vuln-4",
+          "toNodeId": "target-4",
+          "relation": "impacts",
+          "label": "Unauthorized Impact",
+          "riskWeight": 9
+        }
+      ],
+      "participatingFindingIds": [
+        "FND-CT4F5Q-006"
+      ],
+      "participatingAssets": [
+        "Source Codebase"
+      ],
+      "prerequisites": [
+        "Direct reachability of service endpoint"
+      ],
+      "impactAssessment": "Authentication bypass allowing unprivileged actors to forge admin credentials.",
+      "recommendedFixSequence": [
+        "Remediate Hardcoded cloud access token at src/config/cloud.ts:18"
+      ],
+      "remediationBottleneckFindingId": "FND-CT4F5Q-006",
+      "status": "active",
+      "confidence": "Confirmed",
+      "contextualScore": 100,
+      "severity": "Critical",
+      "scoreBreakdown": {
+        "exposureScore": 25,
+        "exploitabilityScore": 25,
+        "assetCriticalityScore": 25,
+        "chainImpactScore": 25,
+        "bonusPenalties": 5,
+        "totalScore": 100,
+        "explanation": "Deterministic Contextual Formula: Exposure (25/25) + Exploitability (25/25) + Asset Criticality (25/25) + Chain Pivot Impact (25/25) + Unauth Crown-Jewel Modifier (+5) = 100/100."
+      }
+    },
+    {
+      "id": "PTH-CT4F5Q-005",
+      "projectId": "PRJ-MTCT4154",
+      "scanId": "SCN-MTCT4F5Q",
+      "title": "Direct Exploitation: Vulnerable dependency in payment service on payment-service:latest",
+      "summary": "Direct vulnerability path targeting payment-service:latest via package-lock.json. May allow unauthorized actions or information disclosure.",
+      "nodes": [
+        {
+          "id": "threat-5",
+          "type": "threat_actor",
+          "label": "Adversary",
+          "isEntrypoint": true
+        },
+        {
+          "id": "asset-5",
+          "type": "asset",
+          "label": "payment-service:latest",
+          "subLabel": "package-lock.json",
+          "assetRef": "payment-service:latest"
+        },
+        {
+          "id": "vuln-5",
+          "type": "vulnerability",
+          "label": "Vulnerable dependency in payment service",
+          "findingRef": "FND-CT4F5Q-007",
+          "severity": "High"
+        },
+        {
+          "id": "target-5",
+          "type": "datastore",
+          "label": "payment-service:latest Service Resources",
+          "isTarget": true
+        }
+      ],
+      "edges": [
+        {
+          "id": "e-5-1",
+          "fromNodeId": "threat-5",
+          "toNodeId": "asset-5",
+          "relation": "reaches",
+          "label": "Network Access",
+          "riskWeight": 8
+        },
+        {
+          "id": "e-5-2",
+          "fromNodeId": "asset-5",
+          "toNodeId": "vuln-5",
+          "relation": "exploits",
+          "label": "Exploits Vulnerability",
+          "riskWeight": 10
+        },
+        {
+          "id": "e-5-3",
+          "fromNodeId": "vuln-5",
+          "toNodeId": "target-5",
+          "relation": "impacts",
+          "label": "Unauthorized Impact",
+          "riskWeight": 9
+        }
+      ],
+      "participatingFindingIds": [
+        "FND-CT4F5Q-007"
+      ],
+      "participatingAssets": [
+        "payment-service:latest"
+      ],
+      "prerequisites": [
+        "Direct reachability of service endpoint"
+      ],
+      "impactAssessment": "Potential security weakness on payment-service:latest.",
+      "recommendedFixSequence": [
+        "Remediate Vulnerable dependency in payment service at package-lock.json"
+      ],
+      "remediationBottleneckFindingId": "FND-CT4F5Q-007",
+      "status": "active",
+      "confidence": "Confirmed",
+      "contextualScore": 100,
+      "severity": "Critical",
+      "scoreBreakdown": {
+        "exposureScore": 25,
+        "exploitabilityScore": 20,
+        "assetCriticalityScore": 25,
+        "chainImpactScore": 25,
+        "bonusPenalties": 5,
+        "totalScore": 100,
+        "explanation": "Deterministic Contextual Formula: Exposure (25/25) + Exploitability (20/25) + Asset Criticality (25/25) + Chain Pivot Impact (25/25) + Unauth Crown-Jewel Modifier (+5) = 100/100."
+      }
+    },
+    {
+      "id": "PTH-CT4F5Q-006",
+      "projectId": "PRJ-MTCT4154",
+      "scanId": "SCN-MTCT4F5Q",
+      "title": "Direct Exploitation: Exposed database administration service on db.internal.example.test",
+      "summary": "Direct vulnerability path targeting db.internal.example.test via :5432. May allow unauthorized actions or information disclosure.",
+      "nodes": [
+        {
+          "id": "threat-6",
+          "type": "threat_actor",
+          "label": "Adversary",
+          "isEntrypoint": true
+        },
+        {
+          "id": "asset-6",
+          "type": "asset",
+          "label": "db.internal.example.test",
+          "subLabel": ":5432",
+          "assetRef": "db.internal.example.test"
+        },
+        {
+          "id": "vuln-6",
+          "type": "vulnerability",
+          "label": "Exposed database administration service",
+          "findingRef": "FND-CT4F5Q-008",
+          "severity": "High"
+        },
+        {
+          "id": "target-6",
+          "type": "datastore",
+          "label": "db.internal.example.test Service Resources",
+          "isTarget": true
+        }
+      ],
+      "edges": [
+        {
+          "id": "e-6-1",
+          "fromNodeId": "threat-6",
+          "toNodeId": "asset-6",
+          "relation": "reaches",
+          "label": "Network Access",
+          "riskWeight": 8
+        },
+        {
+          "id": "e-6-2",
+          "fromNodeId": "asset-6",
+          "toNodeId": "vuln-6",
+          "relation": "exploits",
+          "label": "Exploits Vulnerability",
+          "riskWeight": 10
+        },
+        {
+          "id": "e-6-3",
+          "fromNodeId": "vuln-6",
+          "toNodeId": "target-6",
+          "relation": "impacts",
+          "label": "Unauthorized Impact",
+          "riskWeight": 9
+        }
+      ],
+      "participatingFindingIds": [
+        "FND-CT4F5Q-008"
+      ],
+      "participatingAssets": [
+        "db.internal.example.test"
+      ],
+      "prerequisites": [
+        "Direct reachability of service endpoint"
+      ],
+      "impactAssessment": "Potential security weakness on db.internal.example.test.",
+      "recommendedFixSequence": [
+        "Remediate Exposed database administration service at :5432"
+      ],
+      "remediationBottleneckFindingId": "FND-CT4F5Q-008",
+      "status": "active",
+      "confidence": "Confirmed",
+      "contextualScore": 100,
+      "severity": "Critical",
+      "scoreBreakdown": {
+        "exposureScore": 25,
+        "exploitabilityScore": 20,
+        "assetCriticalityScore": 25,
+        "chainImpactScore": 25,
+        "bonusPenalties": 5,
+        "totalScore": 100,
+        "explanation": "Deterministic Contextual Formula: Exposure (25/25) + Exploitability (20/25) + Asset Criticality (25/25) + Chain Pivot Impact (25/25) + Unauth Crown-Jewel Modifier (+5) = 100/100."
+      }
+    },
+    {
+      "id": "PTH-CT4F5Q-003",
+      "projectId": "PRJ-MTCT4154",
+      "scanId": "SCN-MTCT4F5Q",
+      "title": "Direct Exploitation: JWT signature verification weakness on api.example.test",
+      "summary": "Direct vulnerability path targeting api.example.test via /api/auth/verify. May allow unauthorized actions or information disclosure.",
+      "nodes": [
+        {
+          "id": "threat-3",
+          "type": "threat_actor",
+          "label": "Adversary",
+          "isEntrypoint": true
+        },
+        {
+          "id": "asset-3",
+          "type": "asset",
+          "label": "api.example.test",
+          "subLabel": "/api/auth/verify",
+          "assetRef": "api.example.test"
+        },
+        {
+          "id": "vuln-3",
+          "type": "vulnerability",
+          "label": "JWT signature verification weakness",
+          "findingRef": "FND-CT4F5Q-004",
+          "severity": "Critical"
+        },
+        {
+          "id": "target-3",
+          "type": "datastore",
+          "label": "api.example.test Service Resources",
+          "isTarget": true
+        }
+      ],
+      "edges": [
+        {
+          "id": "e-3-1",
+          "fromNodeId": "threat-3",
+          "toNodeId": "asset-3",
+          "relation": "reaches",
+          "label": "Network Access",
+          "riskWeight": 8
+        },
+        {
+          "id": "e-3-2",
+          "fromNodeId": "asset-3",
+          "toNodeId": "vuln-3",
+          "relation": "exploits",
+          "label": "Exploits Vulnerability",
+          "riskWeight": 10
+        },
+        {
+          "id": "e-3-3",
+          "fromNodeId": "vuln-3",
+          "toNodeId": "target-3",
+          "relation": "impacts",
+          "label": "Unauthorized Impact",
+          "riskWeight": 9
+        }
+      ],
+      "participatingFindingIds": [
+        "FND-CT4F5Q-004"
+      ],
+      "participatingAssets": [
+        "api.example.test"
+      ],
+      "prerequisites": [
+        "Direct reachability of service endpoint"
+      ],
+      "impactAssessment": "Authentication bypass allowing unprivileged actors to forge admin credentials.",
+      "recommendedFixSequence": [
+        "Remediate JWT signature verification weakness at /api/auth/verify"
+      ],
+      "remediationBottleneckFindingId": "FND-CT4F5Q-004",
+      "status": "active",
+      "confidence": "Confirmed",
+      "contextualScore": 97,
+      "severity": "Critical",
+      "scoreBreakdown": {
+        "exposureScore": 25,
+        "exploitabilityScore": 22,
+        "assetCriticalityScore": 25,
+        "chainImpactScore": 25,
+        "bonusPenalties": 0,
+        "totalScore": 97,
+        "explanation": "Deterministic Contextual Formula: Exposure (25/25) + Exploitability (22/25) + Asset Criticality (25/25) + Chain Pivot Impact (25/25) = 97/100."
+      }
+    },
+    {
+      "id": "PTH-CT59DX-001",
+      "projectId": "PRJ-MTCF8DLI",
+      "scanId": "SCN-MTCT59DX",
+      "title": "Server-Side Request Forgery in URL preview pivoting into SQL Injection in account lookup",
+      "summary": "An attacker sends requests to the public interface (api.example.test), exploits SSRF, pivots into internal services, and executes SQL Injection in account lookup to compromise backend databases.",
+      "nodes": [
+        {
+          "id": "node-threat-1",
+          "type": "threat_actor",
+          "label": "External Attacker",
+          "subLabel": "Public Internet Ingress",
+          "isEntrypoint": true
+        },
+        {
+          "id": "node-asset-1",
+          "type": "asset",
+          "label": "api.example.test",
+          "subLabel": "/api/preview",
+          "assetRef": "api.example.test"
+        },
+        {
+          "id": "node-vuln-1",
+          "type": "vulnerability",
+          "label": "Server-Side Request Forgery in URL preview",
+          "findingRef": "FND-CT59DX-002",
+          "severity": "High"
+        },
+        {
+          "id": "node-asset-2",
+          "type": "asset",
+          "label": "api.example.test",
+          "subLabel": "/api/accounts",
+          "assetRef": "api.example.test"
+        },
+        {
+          "id": "node-vuln-2",
+          "type": "vulnerability",
+          "label": "SQL Injection in account lookup",
+          "findingRef": "FND-CT59DX-001",
+          "severity": "Critical"
+        },
+        {
+          "id": "node-target-1",
+          "type": "datastore",
+          "label": "Core Relational / Payments DB",
+          "subLabel": "High Sensitivity Customer Data",
+          "isTarget": true
+        }
+      ],
+      "edges": [
+        {
+          "id": "e1",
+          "fromNodeId": "node-threat-1",
+          "toNodeId": "node-asset-1",
+          "relation": "reaches",
+          "label": "Public Web Request",
+          "riskWeight": 10
+        },
+        {
+          "id": "e2",
+          "fromNodeId": "node-asset-1",
+          "toNodeId": "node-vuln-1",
+          "relation": "exploits",
+          "label": "Triggers Ingress Flaw",
+          "riskWeight": 10
+        },
+        {
+          "id": "e3",
+          "fromNodeId": "node-vuln-1",
+          "toNodeId": "node-asset-2",
+          "relation": "pivots_to",
+          "label": "Internal Pivot / Token Reuse",
+          "riskWeight": 10
+        },
+        {
+          "id": "e4",
+          "fromNodeId": "node-asset-2",
+          "toNodeId": "node-vuln-2",
+          "relation": "exploits",
+          "label": "Executes Extraction",
+          "riskWeight": 10
+        },
+        {
+          "id": "e5",
+          "fromNodeId": "node-vuln-2",
+          "toNodeId": "node-target-1",
+          "relation": "exfiltrates",
+          "label": "Customer Data Exfiltration",
+          "riskWeight": 10
+        }
+      ],
+      "participatingFindingIds": [
+        "FND-CT59DX-002",
+        "FND-CT59DX-001"
+      ],
+      "participatingAssets": [
+        "api.example.test",
+        "api.example.test"
+      ],
+      "prerequisites": [
+        "Internet access to public endpoint",
+        "Lack of internal network egress filtering"
+      ],
+      "impactAssessment": "High-severity breach involving internal pivot and sensitive data compromise.",
+      "recommendedFixSequence": [
+        "1. Immediately enforce strict egress firewalling & input validation on api.example.test",
+        "2. Sanitize database queries and rotate credentials on api.example.test"
+      ],
+      "remediationBottleneckFindingId": "FND-CT59DX-002",
+      "status": "active",
+      "confidence": "Confirmed",
+      "contextualScore": 100,
+      "severity": "Critical",
+      "scoreBreakdown": {
+        "exposureScore": 25,
+        "exploitabilityScore": 25,
+        "assetCriticalityScore": 25,
+        "chainImpactScore": 25,
+        "bonusPenalties": 5,
+        "totalScore": 100,
+        "explanation": "Deterministic Contextual Formula: Exposure (25/25) + Exploitability (25/25) + Asset Criticality (25/25) + Chain Pivot Impact (25/25) + Unauth Crown-Jewel Modifier (+5) = 100/100."
+      }
+    },
+    {
+      "id": "PTH-CT59DX-002",
+      "projectId": "PRJ-MTCF8DLI",
+      "scanId": "SCN-MTCT59DX",
+      "title": "Direct Exploitation: Broken object-level authorization on api.example.test",
+      "summary": "Direct vulnerability path targeting api.example.test via /api/invoices/{id}. May allow unauthorized actions or information disclosure.",
+      "nodes": [
+        {
+          "id": "threat-2",
+          "type": "threat_actor",
+          "label": "Adversary",
+          "isEntrypoint": true
+        },
+        {
+          "id": "asset-2",
+          "type": "asset",
+          "label": "api.example.test",
+          "subLabel": "/api/invoices/{id}",
+          "assetRef": "api.example.test"
+        },
+        {
+          "id": "vuln-2",
+          "type": "vulnerability",
+          "label": "Broken object-level authorization",
+          "findingRef": "FND-CT59DX-003",
+          "severity": "High"
+        },
+        {
+          "id": "target-2",
+          "type": "datastore",
+          "label": "api.example.test Service Resources",
+          "isTarget": true
+        }
+      ],
+      "edges": [
+        {
+          "id": "e-2-1",
+          "fromNodeId": "threat-2",
+          "toNodeId": "asset-2",
+          "relation": "reaches",
+          "label": "Network Access",
+          "riskWeight": 8
+        },
+        {
+          "id": "e-2-2",
+          "fromNodeId": "asset-2",
+          "toNodeId": "vuln-2",
+          "relation": "exploits",
+          "label": "Exploits Vulnerability",
+          "riskWeight": 10
+        },
+        {
+          "id": "e-2-3",
+          "fromNodeId": "vuln-2",
+          "toNodeId": "target-2",
+          "relation": "impacts",
+          "label": "Unauthorized Impact",
+          "riskWeight": 9
+        }
+      ],
+      "participatingFindingIds": [
+        "FND-CT59DX-003"
+      ],
+      "participatingAssets": [
+        "api.example.test"
+      ],
+      "prerequisites": [
+        "Direct reachability of service endpoint"
+      ],
+      "impactAssessment": "Unauthorized cross-tenant record tampering and horizontal data leakage.",
+      "recommendedFixSequence": [
+        "Remediate Broken object-level authorization at /api/invoices/{id}"
+      ],
+      "remediationBottleneckFindingId": "FND-CT59DX-003",
+      "status": "active",
+      "confidence": "Confirmed",
+      "contextualScore": 100,
+      "severity": "Critical",
+      "scoreBreakdown": {
+        "exposureScore": 25,
+        "exploitabilityScore": 20,
+        "assetCriticalityScore": 25,
+        "chainImpactScore": 25,
+        "bonusPenalties": 5,
+        "totalScore": 100,
+        "explanation": "Deterministic Contextual Formula: Exposure (25/25) + Exploitability (20/25) + Asset Criticality (25/25) + Chain Pivot Impact (25/25) + Unauth Crown-Jewel Modifier (+5) = 100/100."
+      }
+    },
+    {
+      "id": "PTH-CT59DX-004",
+      "projectId": "PRJ-MTCF8DLI",
+      "scanId": "SCN-MTCT59DX",
+      "title": "Direct Exploitation: Hardcoded cloud access token on Source Codebase",
+      "summary": "Direct vulnerability path targeting Source Codebase via src/config/cloud.ts:18. May allow unauthorized actions or information disclosure.",
+      "nodes": [
+        {
+          "id": "threat-4",
+          "type": "threat_actor",
+          "label": "Adversary",
+          "isEntrypoint": true
+        },
+        {
+          "id": "asset-4",
+          "type": "asset",
+          "label": "Source Codebase",
+          "subLabel": "src/config/cloud.ts:18",
+          "assetRef": "Source Codebase"
+        },
+        {
+          "id": "vuln-4",
+          "type": "vulnerability",
+          "label": "Hardcoded cloud access token",
+          "findingRef": "FND-CT59DX-006",
+          "severity": "Critical"
+        },
+        {
+          "id": "target-4",
+          "type": "datastore",
+          "label": "Source Codebase Service Resources",
+          "isTarget": true
+        }
+      ],
+      "edges": [
+        {
+          "id": "e-4-1",
+          "fromNodeId": "threat-4",
+          "toNodeId": "asset-4",
+          "relation": "reaches",
+          "label": "Network Access",
+          "riskWeight": 8
+        },
+        {
+          "id": "e-4-2",
+          "fromNodeId": "asset-4",
+          "toNodeId": "vuln-4",
+          "relation": "exploits",
+          "label": "Exploits Vulnerability",
+          "riskWeight": 10
+        },
+        {
+          "id": "e-4-3",
+          "fromNodeId": "vuln-4",
+          "toNodeId": "target-4",
+          "relation": "impacts",
+          "label": "Unauthorized Impact",
+          "riskWeight": 9
+        }
+      ],
+      "participatingFindingIds": [
+        "FND-CT59DX-006"
+      ],
+      "participatingAssets": [
+        "Source Codebase"
+      ],
+      "prerequisites": [
+        "Direct reachability of service endpoint"
+      ],
+      "impactAssessment": "Authentication bypass allowing unprivileged actors to forge admin credentials.",
+      "recommendedFixSequence": [
+        "Remediate Hardcoded cloud access token at src/config/cloud.ts:18"
+      ],
+      "remediationBottleneckFindingId": "FND-CT59DX-006",
+      "status": "active",
+      "confidence": "Confirmed",
+      "contextualScore": 100,
+      "severity": "Critical",
+      "scoreBreakdown": {
+        "exposureScore": 25,
+        "exploitabilityScore": 25,
+        "assetCriticalityScore": 25,
+        "chainImpactScore": 25,
+        "bonusPenalties": 5,
+        "totalScore": 100,
+        "explanation": "Deterministic Contextual Formula: Exposure (25/25) + Exploitability (25/25) + Asset Criticality (25/25) + Chain Pivot Impact (25/25) + Unauth Crown-Jewel Modifier (+5) = 100/100."
+      }
+    },
+    {
+      "id": "PTH-CT59DX-005",
+      "projectId": "PRJ-MTCF8DLI",
+      "scanId": "SCN-MTCT59DX",
+      "title": "Direct Exploitation: Vulnerable dependency in payment service on payment-service:latest",
+      "summary": "Direct vulnerability path targeting payment-service:latest via package-lock.json. May allow unauthorized actions or information disclosure.",
+      "nodes": [
+        {
+          "id": "threat-5",
+          "type": "threat_actor",
+          "label": "Adversary",
+          "isEntrypoint": true
+        },
+        {
+          "id": "asset-5",
+          "type": "asset",
+          "label": "payment-service:latest",
+          "subLabel": "package-lock.json",
+          "assetRef": "payment-service:latest"
+        },
+        {
+          "id": "vuln-5",
+          "type": "vulnerability",
+          "label": "Vulnerable dependency in payment service",
+          "findingRef": "FND-CT59DX-007",
+          "severity": "High"
+        },
+        {
+          "id": "target-5",
+          "type": "datastore",
+          "label": "payment-service:latest Service Resources",
+          "isTarget": true
+        }
+      ],
+      "edges": [
+        {
+          "id": "e-5-1",
+          "fromNodeId": "threat-5",
+          "toNodeId": "asset-5",
+          "relation": "reaches",
+          "label": "Network Access",
+          "riskWeight": 8
+        },
+        {
+          "id": "e-5-2",
+          "fromNodeId": "asset-5",
+          "toNodeId": "vuln-5",
+          "relation": "exploits",
+          "label": "Exploits Vulnerability",
+          "riskWeight": 10
+        },
+        {
+          "id": "e-5-3",
+          "fromNodeId": "vuln-5",
+          "toNodeId": "target-5",
+          "relation": "impacts",
+          "label": "Unauthorized Impact",
+          "riskWeight": 9
+        }
+      ],
+      "participatingFindingIds": [
+        "FND-CT59DX-007"
+      ],
+      "participatingAssets": [
+        "payment-service:latest"
+      ],
+      "prerequisites": [
+        "Direct reachability of service endpoint"
+      ],
+      "impactAssessment": "Potential security weakness on payment-service:latest.",
+      "recommendedFixSequence": [
+        "Remediate Vulnerable dependency in payment service at package-lock.json"
+      ],
+      "remediationBottleneckFindingId": "FND-CT59DX-007",
+      "status": "active",
+      "confidence": "Confirmed",
+      "contextualScore": 100,
+      "severity": "Critical",
+      "scoreBreakdown": {
+        "exposureScore": 25,
+        "exploitabilityScore": 20,
+        "assetCriticalityScore": 25,
+        "chainImpactScore": 25,
+        "bonusPenalties": 5,
+        "totalScore": 100,
+        "explanation": "Deterministic Contextual Formula: Exposure (25/25) + Exploitability (20/25) + Asset Criticality (25/25) + Chain Pivot Impact (25/25) + Unauth Crown-Jewel Modifier (+5) = 100/100."
+      }
+    },
+    {
+      "id": "PTH-CT59DX-006",
+      "projectId": "PRJ-MTCF8DLI",
+      "scanId": "SCN-MTCT59DX",
+      "title": "Direct Exploitation: Exposed database administration service on db.internal.example.test",
+      "summary": "Direct vulnerability path targeting db.internal.example.test via :5432. May allow unauthorized actions or information disclosure.",
+      "nodes": [
+        {
+          "id": "threat-6",
+          "type": "threat_actor",
+          "label": "Adversary",
+          "isEntrypoint": true
+        },
+        {
+          "id": "asset-6",
+          "type": "asset",
+          "label": "db.internal.example.test",
+          "subLabel": ":5432",
+          "assetRef": "db.internal.example.test"
+        },
+        {
+          "id": "vuln-6",
+          "type": "vulnerability",
+          "label": "Exposed database administration service",
+          "findingRef": "FND-CT59DX-008",
+          "severity": "High"
+        },
+        {
+          "id": "target-6",
+          "type": "datastore",
+          "label": "db.internal.example.test Service Resources",
+          "isTarget": true
+        }
+      ],
+      "edges": [
+        {
+          "id": "e-6-1",
+          "fromNodeId": "threat-6",
+          "toNodeId": "asset-6",
+          "relation": "reaches",
+          "label": "Network Access",
+          "riskWeight": 8
+        },
+        {
+          "id": "e-6-2",
+          "fromNodeId": "asset-6",
+          "toNodeId": "vuln-6",
+          "relation": "exploits",
+          "label": "Exploits Vulnerability",
+          "riskWeight": 10
+        },
+        {
+          "id": "e-6-3",
+          "fromNodeId": "vuln-6",
+          "toNodeId": "target-6",
+          "relation": "impacts",
+          "label": "Unauthorized Impact",
+          "riskWeight": 9
+        }
+      ],
+      "participatingFindingIds": [
+        "FND-CT59DX-008"
+      ],
+      "participatingAssets": [
+        "db.internal.example.test"
+      ],
+      "prerequisites": [
+        "Direct reachability of service endpoint"
+      ],
+      "impactAssessment": "Potential security weakness on db.internal.example.test.",
+      "recommendedFixSequence": [
+        "Remediate Exposed database administration service at :5432"
+      ],
+      "remediationBottleneckFindingId": "FND-CT59DX-008",
+      "status": "active",
+      "confidence": "Confirmed",
+      "contextualScore": 100,
+      "severity": "Critical",
+      "scoreBreakdown": {
+        "exposureScore": 25,
+        "exploitabilityScore": 20,
+        "assetCriticalityScore": 25,
+        "chainImpactScore": 25,
+        "bonusPenalties": 5,
+        "totalScore": 100,
+        "explanation": "Deterministic Contextual Formula: Exposure (25/25) + Exploitability (20/25) + Asset Criticality (25/25) + Chain Pivot Impact (25/25) + Unauth Crown-Jewel Modifier (+5) = 100/100."
+      }
+    },
+    {
+      "id": "PTH-CT59DX-003",
+      "projectId": "PRJ-MTCF8DLI",
+      "scanId": "SCN-MTCT59DX",
+      "title": "Direct Exploitation: JWT signature verification weakness on api.example.test",
+      "summary": "Direct vulnerability path targeting api.example.test via /api/auth/verify. May allow unauthorized actions or information disclosure.",
+      "nodes": [
+        {
+          "id": "threat-3",
+          "type": "threat_actor",
+          "label": "Adversary",
+          "isEntrypoint": true
+        },
+        {
+          "id": "asset-3",
+          "type": "asset",
+          "label": "api.example.test",
+          "subLabel": "/api/auth/verify",
+          "assetRef": "api.example.test"
+        },
+        {
+          "id": "vuln-3",
+          "type": "vulnerability",
+          "label": "JWT signature verification weakness",
+          "findingRef": "FND-CT59DX-004",
+          "severity": "Critical"
+        },
+        {
+          "id": "target-3",
+          "type": "datastore",
+          "label": "api.example.test Service Resources",
+          "isTarget": true
+        }
+      ],
+      "edges": [
+        {
+          "id": "e-3-1",
+          "fromNodeId": "threat-3",
+          "toNodeId": "asset-3",
+          "relation": "reaches",
+          "label": "Network Access",
+          "riskWeight": 8
+        },
+        {
+          "id": "e-3-2",
+          "fromNodeId": "asset-3",
+          "toNodeId": "vuln-3",
+          "relation": "exploits",
+          "label": "Exploits Vulnerability",
+          "riskWeight": 10
+        },
+        {
+          "id": "e-3-3",
+          "fromNodeId": "vuln-3",
+          "toNodeId": "target-3",
+          "relation": "impacts",
+          "label": "Unauthorized Impact",
+          "riskWeight": 9
+        }
+      ],
+      "participatingFindingIds": [
+        "FND-CT59DX-004"
+      ],
+      "participatingAssets": [
+        "api.example.test"
+      ],
+      "prerequisites": [
+        "Direct reachability of service endpoint"
+      ],
+      "impactAssessment": "Authentication bypass allowing unprivileged actors to forge admin credentials.",
+      "recommendedFixSequence": [
+        "Remediate JWT signature verification weakness at /api/auth/verify"
+      ],
+      "remediationBottleneckFindingId": "FND-CT59DX-004",
+      "status": "active",
+      "confidence": "Confirmed",
+      "contextualScore": 97,
+      "severity": "Critical",
+      "scoreBreakdown": {
+        "exposureScore": 25,
+        "exploitabilityScore": 22,
+        "assetCriticalityScore": 25,
+        "chainImpactScore": 25,
+        "bonusPenalties": 0,
+        "totalScore": 97,
+        "explanation": "Deterministic Contextual Formula: Exposure (25/25) + Exploitability (22/25) + Asset Criticality (25/25) + Chain Pivot Impact (25/25) = 97/100."
+      }
+    },
+    {
+      "id": "PTH-CTGVIO-001",
+      "projectId": "PRJ-MTCF8DLI",
+      "scanId": "SCN-MTCTGVIO",
+      "title": "Server-Side Request Forgery in URL preview pivoting into SQL Injection in account lookup",
+      "summary": "An attacker sends requests to the public interface (api.example.test), exploits SSRF, pivots into internal services, and executes SQL Injection in account lookup to compromise backend databases.",
+      "nodes": [
+        {
+          "id": "node-threat-1",
+          "type": "threat_actor",
+          "label": "External Attacker",
+          "subLabel": "Public Internet Ingress",
+          "isEntrypoint": true
+        },
+        {
+          "id": "node-asset-1",
+          "type": "asset",
+          "label": "api.example.test",
+          "subLabel": "/api/preview",
+          "assetRef": "api.example.test"
+        },
+        {
+          "id": "node-vuln-1",
+          "type": "vulnerability",
+          "label": "Server-Side Request Forgery in URL preview",
+          "findingRef": "FND-CTGVIO-002",
+          "severity": "High"
+        },
+        {
+          "id": "node-asset-2",
+          "type": "asset",
+          "label": "api.example.test",
+          "subLabel": "/api/accounts",
+          "assetRef": "api.example.test"
+        },
+        {
+          "id": "node-vuln-2",
+          "type": "vulnerability",
+          "label": "SQL Injection in account lookup",
+          "findingRef": "FND-CTGVIO-001",
+          "severity": "Critical"
+        },
+        {
+          "id": "node-target-1",
+          "type": "datastore",
+          "label": "Core Relational / Payments DB",
+          "subLabel": "High Sensitivity Customer Data",
+          "isTarget": true
+        }
+      ],
+      "edges": [
+        {
+          "id": "e1",
+          "fromNodeId": "node-threat-1",
+          "toNodeId": "node-asset-1",
+          "relation": "reaches",
+          "label": "Public Web Request",
+          "riskWeight": 10
+        },
+        {
+          "id": "e2",
+          "fromNodeId": "node-asset-1",
+          "toNodeId": "node-vuln-1",
+          "relation": "exploits",
+          "label": "Triggers Ingress Flaw",
+          "riskWeight": 10
+        },
+        {
+          "id": "e3",
+          "fromNodeId": "node-vuln-1",
+          "toNodeId": "node-asset-2",
+          "relation": "pivots_to",
+          "label": "Internal Pivot / Token Reuse",
+          "riskWeight": 10
+        },
+        {
+          "id": "e4",
+          "fromNodeId": "node-asset-2",
+          "toNodeId": "node-vuln-2",
+          "relation": "exploits",
+          "label": "Executes Extraction",
+          "riskWeight": 10
+        },
+        {
+          "id": "e5",
+          "fromNodeId": "node-vuln-2",
+          "toNodeId": "node-target-1",
+          "relation": "exfiltrates",
+          "label": "Customer Data Exfiltration",
+          "riskWeight": 10
+        }
+      ],
+      "participatingFindingIds": [
+        "FND-CTGVIO-002",
+        "FND-CTGVIO-001"
+      ],
+      "participatingAssets": [
+        "api.example.test",
+        "api.example.test"
+      ],
+      "prerequisites": [
+        "Internet access to public endpoint",
+        "Lack of internal network egress filtering"
+      ],
+      "impactAssessment": "High-severity breach involving internal pivot and sensitive data compromise.",
+      "recommendedFixSequence": [
+        "1. Immediately enforce strict egress firewalling & input validation on api.example.test",
+        "2. Sanitize database queries and rotate credentials on api.example.test"
+      ],
+      "remediationBottleneckFindingId": "FND-CTGVIO-002",
+      "status": "active",
+      "confidence": "Confirmed",
+      "contextualScore": 100,
+      "severity": "Critical",
+      "scoreBreakdown": {
+        "exposureScore": 25,
+        "exploitabilityScore": 25,
+        "assetCriticalityScore": 25,
+        "chainImpactScore": 25,
+        "bonusPenalties": 5,
+        "totalScore": 100,
+        "explanation": "Deterministic Contextual Formula: Exposure (25/25) + Exploitability (25/25) + Asset Criticality (25/25) + Chain Pivot Impact (25/25) + Unauth Crown-Jewel Modifier (+5) = 100/100."
+      }
+    },
+    {
+      "id": "PTH-CTGVIO-002",
+      "projectId": "PRJ-MTCF8DLI",
+      "scanId": "SCN-MTCTGVIO",
+      "title": "Direct Exploitation: Broken object-level authorization on api.example.test",
+      "summary": "Direct vulnerability path targeting api.example.test via /api/invoices/{id}. May allow unauthorized actions or information disclosure.",
+      "nodes": [
+        {
+          "id": "threat-2",
+          "type": "threat_actor",
+          "label": "Adversary",
+          "isEntrypoint": true
+        },
+        {
+          "id": "asset-2",
+          "type": "asset",
+          "label": "api.example.test",
+          "subLabel": "/api/invoices/{id}",
+          "assetRef": "api.example.test"
+        },
+        {
+          "id": "vuln-2",
+          "type": "vulnerability",
+          "label": "Broken object-level authorization",
+          "findingRef": "FND-CTGVIO-003",
+          "severity": "High"
+        },
+        {
+          "id": "target-2",
+          "type": "datastore",
+          "label": "api.example.test Service Resources",
+          "isTarget": true
+        }
+      ],
+      "edges": [
+        {
+          "id": "e-2-1",
+          "fromNodeId": "threat-2",
+          "toNodeId": "asset-2",
+          "relation": "reaches",
+          "label": "Network Access",
+          "riskWeight": 8
+        },
+        {
+          "id": "e-2-2",
+          "fromNodeId": "asset-2",
+          "toNodeId": "vuln-2",
+          "relation": "exploits",
+          "label": "Exploits Vulnerability",
+          "riskWeight": 10
+        },
+        {
+          "id": "e-2-3",
+          "fromNodeId": "vuln-2",
+          "toNodeId": "target-2",
+          "relation": "impacts",
+          "label": "Unauthorized Impact",
+          "riskWeight": 9
+        }
+      ],
+      "participatingFindingIds": [
+        "FND-CTGVIO-003"
+      ],
+      "participatingAssets": [
+        "api.example.test"
+      ],
+      "prerequisites": [
+        "Direct reachability of service endpoint"
+      ],
+      "impactAssessment": "Unauthorized cross-tenant record tampering and horizontal data leakage.",
+      "recommendedFixSequence": [
+        "Remediate Broken object-level authorization at /api/invoices/{id}"
+      ],
+      "remediationBottleneckFindingId": "FND-CTGVIO-003",
+      "status": "active",
+      "confidence": "Confirmed",
+      "contextualScore": 100,
+      "severity": "Critical",
+      "scoreBreakdown": {
+        "exposureScore": 25,
+        "exploitabilityScore": 20,
+        "assetCriticalityScore": 25,
+        "chainImpactScore": 25,
+        "bonusPenalties": 5,
+        "totalScore": 100,
+        "explanation": "Deterministic Contextual Formula: Exposure (25/25) + Exploitability (20/25) + Asset Criticality (25/25) + Chain Pivot Impact (25/25) + Unauth Crown-Jewel Modifier (+5) = 100/100."
+      }
+    },
+    {
+      "id": "PTH-CTGVIO-004",
+      "projectId": "PRJ-MTCF8DLI",
+      "scanId": "SCN-MTCTGVIO",
+      "title": "Direct Exploitation: Hardcoded cloud access token on Source Codebase",
+      "summary": "Direct vulnerability path targeting Source Codebase via src/config/cloud.ts:18. May allow unauthorized actions or information disclosure.",
+      "nodes": [
+        {
+          "id": "threat-4",
+          "type": "threat_actor",
+          "label": "Adversary",
+          "isEntrypoint": true
+        },
+        {
+          "id": "asset-4",
+          "type": "asset",
+          "label": "Source Codebase",
+          "subLabel": "src/config/cloud.ts:18",
+          "assetRef": "Source Codebase"
+        },
+        {
+          "id": "vuln-4",
+          "type": "vulnerability",
+          "label": "Hardcoded cloud access token",
+          "findingRef": "FND-CTGVIO-006",
+          "severity": "Critical"
+        },
+        {
+          "id": "target-4",
+          "type": "datastore",
+          "label": "Source Codebase Service Resources",
+          "isTarget": true
+        }
+      ],
+      "edges": [
+        {
+          "id": "e-4-1",
+          "fromNodeId": "threat-4",
+          "toNodeId": "asset-4",
+          "relation": "reaches",
+          "label": "Network Access",
+          "riskWeight": 8
+        },
+        {
+          "id": "e-4-2",
+          "fromNodeId": "asset-4",
+          "toNodeId": "vuln-4",
+          "relation": "exploits",
+          "label": "Exploits Vulnerability",
+          "riskWeight": 10
+        },
+        {
+          "id": "e-4-3",
+          "fromNodeId": "vuln-4",
+          "toNodeId": "target-4",
+          "relation": "impacts",
+          "label": "Unauthorized Impact",
+          "riskWeight": 9
+        }
+      ],
+      "participatingFindingIds": [
+        "FND-CTGVIO-006"
+      ],
+      "participatingAssets": [
+        "Source Codebase"
+      ],
+      "prerequisites": [
+        "Direct reachability of service endpoint"
+      ],
+      "impactAssessment": "Authentication bypass allowing unprivileged actors to forge admin credentials.",
+      "recommendedFixSequence": [
+        "Remediate Hardcoded cloud access token at src/config/cloud.ts:18"
+      ],
+      "remediationBottleneckFindingId": "FND-CTGVIO-006",
+      "status": "active",
+      "confidence": "Confirmed",
+      "contextualScore": 100,
+      "severity": "Critical",
+      "scoreBreakdown": {
+        "exposureScore": 25,
+        "exploitabilityScore": 25,
+        "assetCriticalityScore": 25,
+        "chainImpactScore": 25,
+        "bonusPenalties": 5,
+        "totalScore": 100,
+        "explanation": "Deterministic Contextual Formula: Exposure (25/25) + Exploitability (25/25) + Asset Criticality (25/25) + Chain Pivot Impact (25/25) + Unauth Crown-Jewel Modifier (+5) = 100/100."
+      }
+    },
+    {
+      "id": "PTH-CTGVIO-005",
+      "projectId": "PRJ-MTCF8DLI",
+      "scanId": "SCN-MTCTGVIO",
+      "title": "Direct Exploitation: Vulnerable dependency in payment service on payment-service:latest",
+      "summary": "Direct vulnerability path targeting payment-service:latest via package-lock.json. May allow unauthorized actions or information disclosure.",
+      "nodes": [
+        {
+          "id": "threat-5",
+          "type": "threat_actor",
+          "label": "Adversary",
+          "isEntrypoint": true
+        },
+        {
+          "id": "asset-5",
+          "type": "asset",
+          "label": "payment-service:latest",
+          "subLabel": "package-lock.json",
+          "assetRef": "payment-service:latest"
+        },
+        {
+          "id": "vuln-5",
+          "type": "vulnerability",
+          "label": "Vulnerable dependency in payment service",
+          "findingRef": "FND-CTGVIO-007",
+          "severity": "High"
+        },
+        {
+          "id": "target-5",
+          "type": "datastore",
+          "label": "payment-service:latest Service Resources",
+          "isTarget": true
+        }
+      ],
+      "edges": [
+        {
+          "id": "e-5-1",
+          "fromNodeId": "threat-5",
+          "toNodeId": "asset-5",
+          "relation": "reaches",
+          "label": "Network Access",
+          "riskWeight": 8
+        },
+        {
+          "id": "e-5-2",
+          "fromNodeId": "asset-5",
+          "toNodeId": "vuln-5",
+          "relation": "exploits",
+          "label": "Exploits Vulnerability",
+          "riskWeight": 10
+        },
+        {
+          "id": "e-5-3",
+          "fromNodeId": "vuln-5",
+          "toNodeId": "target-5",
+          "relation": "impacts",
+          "label": "Unauthorized Impact",
+          "riskWeight": 9
+        }
+      ],
+      "participatingFindingIds": [
+        "FND-CTGVIO-007"
+      ],
+      "participatingAssets": [
+        "payment-service:latest"
+      ],
+      "prerequisites": [
+        "Direct reachability of service endpoint"
+      ],
+      "impactAssessment": "Potential security weakness on payment-service:latest.",
+      "recommendedFixSequence": [
+        "Remediate Vulnerable dependency in payment service at package-lock.json"
+      ],
+      "remediationBottleneckFindingId": "FND-CTGVIO-007",
+      "status": "active",
+      "confidence": "Confirmed",
+      "contextualScore": 100,
+      "severity": "Critical",
+      "scoreBreakdown": {
+        "exposureScore": 25,
+        "exploitabilityScore": 20,
+        "assetCriticalityScore": 25,
+        "chainImpactScore": 25,
+        "bonusPenalties": 5,
+        "totalScore": 100,
+        "explanation": "Deterministic Contextual Formula: Exposure (25/25) + Exploitability (20/25) + Asset Criticality (25/25) + Chain Pivot Impact (25/25) + Unauth Crown-Jewel Modifier (+5) = 100/100."
+      }
+    },
+    {
+      "id": "PTH-CTGVIO-006",
+      "projectId": "PRJ-MTCF8DLI",
+      "scanId": "SCN-MTCTGVIO",
+      "title": "Direct Exploitation: Exposed database administration service on db.internal.example.test",
+      "summary": "Direct vulnerability path targeting db.internal.example.test via :5432. May allow unauthorized actions or information disclosure.",
+      "nodes": [
+        {
+          "id": "threat-6",
+          "type": "threat_actor",
+          "label": "Adversary",
+          "isEntrypoint": true
+        },
+        {
+          "id": "asset-6",
+          "type": "asset",
+          "label": "db.internal.example.test",
+          "subLabel": ":5432",
+          "assetRef": "db.internal.example.test"
+        },
+        {
+          "id": "vuln-6",
+          "type": "vulnerability",
+          "label": "Exposed database administration service",
+          "findingRef": "FND-CTGVIO-008",
+          "severity": "High"
+        },
+        {
+          "id": "target-6",
+          "type": "datastore",
+          "label": "db.internal.example.test Service Resources",
+          "isTarget": true
+        }
+      ],
+      "edges": [
+        {
+          "id": "e-6-1",
+          "fromNodeId": "threat-6",
+          "toNodeId": "asset-6",
+          "relation": "reaches",
+          "label": "Network Access",
+          "riskWeight": 8
+        },
+        {
+          "id": "e-6-2",
+          "fromNodeId": "asset-6",
+          "toNodeId": "vuln-6",
+          "relation": "exploits",
+          "label": "Exploits Vulnerability",
+          "riskWeight": 10
+        },
+        {
+          "id": "e-6-3",
+          "fromNodeId": "vuln-6",
+          "toNodeId": "target-6",
+          "relation": "impacts",
+          "label": "Unauthorized Impact",
+          "riskWeight": 9
+        }
+      ],
+      "participatingFindingIds": [
+        "FND-CTGVIO-008"
+      ],
+      "participatingAssets": [
+        "db.internal.example.test"
+      ],
+      "prerequisites": [
+        "Direct reachability of service endpoint"
+      ],
+      "impactAssessment": "Potential security weakness on db.internal.example.test.",
+      "recommendedFixSequence": [
+        "Remediate Exposed database administration service at :5432"
+      ],
+      "remediationBottleneckFindingId": "FND-CTGVIO-008",
+      "status": "active",
+      "confidence": "Confirmed",
+      "contextualScore": 100,
+      "severity": "Critical",
+      "scoreBreakdown": {
+        "exposureScore": 25,
+        "exploitabilityScore": 20,
+        "assetCriticalityScore": 25,
+        "chainImpactScore": 25,
+        "bonusPenalties": 5,
+        "totalScore": 100,
+        "explanation": "Deterministic Contextual Formula: Exposure (25/25) + Exploitability (20/25) + Asset Criticality (25/25) + Chain Pivot Impact (25/25) + Unauth Crown-Jewel Modifier (+5) = 100/100."
+      }
+    },
+    {
+      "id": "PTH-CTGVIO-003",
+      "projectId": "PRJ-MTCF8DLI",
+      "scanId": "SCN-MTCTGVIO",
+      "title": "Direct Exploitation: JWT signature verification weakness on api.example.test",
+      "summary": "Direct vulnerability path targeting api.example.test via /api/auth/verify. May allow unauthorized actions or information disclosure.",
+      "nodes": [
+        {
+          "id": "threat-3",
+          "type": "threat_actor",
+          "label": "Adversary",
+          "isEntrypoint": true
+        },
+        {
+          "id": "asset-3",
+          "type": "asset",
+          "label": "api.example.test",
+          "subLabel": "/api/auth/verify",
+          "assetRef": "api.example.test"
+        },
+        {
+          "id": "vuln-3",
+          "type": "vulnerability",
+          "label": "JWT signature verification weakness",
+          "findingRef": "FND-CTGVIO-004",
+          "severity": "Critical"
+        },
+        {
+          "id": "target-3",
+          "type": "datastore",
+          "label": "api.example.test Service Resources",
+          "isTarget": true
+        }
+      ],
+      "edges": [
+        {
+          "id": "e-3-1",
+          "fromNodeId": "threat-3",
+          "toNodeId": "asset-3",
+          "relation": "reaches",
+          "label": "Network Access",
+          "riskWeight": 8
+        },
+        {
+          "id": "e-3-2",
+          "fromNodeId": "asset-3",
+          "toNodeId": "vuln-3",
+          "relation": "exploits",
+          "label": "Exploits Vulnerability",
+          "riskWeight": 10
+        },
+        {
+          "id": "e-3-3",
+          "fromNodeId": "vuln-3",
+          "toNodeId": "target-3",
+          "relation": "impacts",
+          "label": "Unauthorized Impact",
+          "riskWeight": 9
+        }
+      ],
+      "participatingFindingIds": [
+        "FND-CTGVIO-004"
+      ],
+      "participatingAssets": [
+        "api.example.test"
+      ],
+      "prerequisites": [
+        "Direct reachability of service endpoint"
+      ],
+      "impactAssessment": "Authentication bypass allowing unprivileged actors to forge admin credentials.",
+      "recommendedFixSequence": [
+        "Remediate JWT signature verification weakness at /api/auth/verify"
+      ],
+      "remediationBottleneckFindingId": "FND-CTGVIO-004",
+      "status": "active",
+      "confidence": "Confirmed",
+      "contextualScore": 97,
+      "severity": "Critical",
+      "scoreBreakdown": {
+        "exposureScore": 25,
+        "exploitabilityScore": 22,
+        "assetCriticalityScore": 25,
+        "chainImpactScore": 25,
+        "bonusPenalties": 0,
+        "totalScore": 97,
+        "explanation": "Deterministic Contextual Formula: Exposure (25/25) + Exploitability (22/25) + Asset Criticality (25/25) + Chain Pivot Impact (25/25) = 97/100."
+      }
+    },
+    {
+      "id": "PTH-EOSP4J-001",
+      "projectId": "PRJ-MTEOSCGW",
+      "scanId": "SCN-MTEOSP4J",
+      "title": "Server-Side Request Forgery in URL preview pivoting into SQL Injection in account lookup",
+      "summary": "An attacker sends requests to the public interface (api.example.test), exploits SSRF, pivots into internal services, and executes SQL Injection in account lookup to compromise backend databases.",
+      "nodes": [
+        {
+          "id": "node-threat-1",
+          "type": "threat_actor",
+          "label": "External Attacker",
+          "subLabel": "Public Internet Ingress",
+          "isEntrypoint": true
+        },
+        {
+          "id": "node-asset-1",
+          "type": "asset",
+          "label": "api.example.test",
+          "subLabel": "/api/preview",
+          "assetRef": "api.example.test"
+        },
+        {
+          "id": "node-vuln-1",
+          "type": "vulnerability",
+          "label": "Server-Side Request Forgery in URL preview",
+          "findingRef": "FND-EOSP4J-002",
+          "severity": "High"
+        },
+        {
+          "id": "node-asset-2",
+          "type": "asset",
+          "label": "api.example.test",
+          "subLabel": "/api/accounts",
+          "assetRef": "api.example.test"
+        },
+        {
+          "id": "node-vuln-2",
+          "type": "vulnerability",
+          "label": "SQL Injection in account lookup",
+          "findingRef": "FND-EOSP4J-001",
+          "severity": "Critical"
+        },
+        {
+          "id": "node-target-1",
+          "type": "datastore",
+          "label": "Core Relational / Payments DB",
+          "subLabel": "High Sensitivity Customer Data",
+          "isTarget": true
+        }
+      ],
+      "edges": [
+        {
+          "id": "e1",
+          "fromNodeId": "node-threat-1",
+          "toNodeId": "node-asset-1",
+          "relation": "reaches",
+          "label": "Public Web Request",
+          "riskWeight": 10
+        },
+        {
+          "id": "e2",
+          "fromNodeId": "node-asset-1",
+          "toNodeId": "node-vuln-1",
+          "relation": "exploits",
+          "label": "Triggers Ingress Flaw",
+          "riskWeight": 10
+        },
+        {
+          "id": "e3",
+          "fromNodeId": "node-vuln-1",
+          "toNodeId": "node-asset-2",
+          "relation": "pivots_to",
+          "label": "Internal Pivot / Token Reuse",
+          "riskWeight": 10
+        },
+        {
+          "id": "e4",
+          "fromNodeId": "node-asset-2",
+          "toNodeId": "node-vuln-2",
+          "relation": "exploits",
+          "label": "Executes Extraction",
+          "riskWeight": 10
+        },
+        {
+          "id": "e5",
+          "fromNodeId": "node-vuln-2",
+          "toNodeId": "node-target-1",
+          "relation": "exfiltrates",
+          "label": "Customer Data Exfiltration",
+          "riskWeight": 10
+        }
+      ],
+      "participatingFindingIds": [
+        "FND-EOSP4J-002",
+        "FND-EOSP4J-001"
+      ],
+      "participatingAssets": [
+        "api.example.test",
+        "api.example.test"
+      ],
+      "prerequisites": [
+        "Internet access to public endpoint",
+        "Lack of internal network egress filtering"
+      ],
+      "impactAssessment": "High-severity breach involving internal pivot and sensitive data compromise.",
+      "recommendedFixSequence": [
+        "1. Immediately enforce strict egress firewalling & input validation on api.example.test",
+        "2. Sanitize database queries and rotate credentials on api.example.test"
+      ],
+      "remediationBottleneckFindingId": "FND-EOSP4J-002",
+      "status": "active",
+      "confidence": "Confirmed",
+      "contextualScore": 100,
+      "severity": "Critical",
+      "scoreBreakdown": {
+        "exposureScore": 25,
+        "exploitabilityScore": 25,
+        "assetCriticalityScore": 25,
+        "chainImpactScore": 25,
+        "bonusPenalties": 5,
+        "totalScore": 100,
+        "explanation": "Deterministic Contextual Formula: Exposure (25/25) + Exploitability (25/25) + Asset Criticality (25/25) + Chain Pivot Impact (25/25) + Unauth Crown-Jewel Modifier (+5) = 100/100."
+      }
+    },
+    {
+      "id": "PTH-EOSP4J-002",
+      "projectId": "PRJ-MTEOSCGW",
+      "scanId": "SCN-MTEOSP4J",
+      "title": "Direct Exploitation: Broken object-level authorization on api.example.test",
+      "summary": "Direct vulnerability path targeting api.example.test via /api/invoices/{id}. May allow unauthorized actions or information disclosure.",
+      "nodes": [
+        {
+          "id": "threat-2",
+          "type": "threat_actor",
+          "label": "Adversary",
+          "isEntrypoint": true
+        },
+        {
+          "id": "asset-2",
+          "type": "asset",
+          "label": "api.example.test",
+          "subLabel": "/api/invoices/{id}",
+          "assetRef": "api.example.test"
+        },
+        {
+          "id": "vuln-2",
+          "type": "vulnerability",
+          "label": "Broken object-level authorization",
+          "findingRef": "FND-EOSP4J-003",
+          "severity": "High"
+        },
+        {
+          "id": "target-2",
+          "type": "datastore",
+          "label": "api.example.test Service Resources",
+          "isTarget": true
+        }
+      ],
+      "edges": [
+        {
+          "id": "e-2-1",
+          "fromNodeId": "threat-2",
+          "toNodeId": "asset-2",
+          "relation": "reaches",
+          "label": "Network Access",
+          "riskWeight": 8
+        },
+        {
+          "id": "e-2-2",
+          "fromNodeId": "asset-2",
+          "toNodeId": "vuln-2",
+          "relation": "exploits",
+          "label": "Exploits Vulnerability",
+          "riskWeight": 10
+        },
+        {
+          "id": "e-2-3",
+          "fromNodeId": "vuln-2",
+          "toNodeId": "target-2",
+          "relation": "impacts",
+          "label": "Unauthorized Impact",
+          "riskWeight": 9
+        }
+      ],
+      "participatingFindingIds": [
+        "FND-EOSP4J-003"
+      ],
+      "participatingAssets": [
+        "api.example.test"
+      ],
+      "prerequisites": [
+        "Direct reachability of service endpoint"
+      ],
+      "impactAssessment": "Unauthorized cross-tenant record tampering and horizontal data leakage.",
+      "recommendedFixSequence": [
+        "Remediate Broken object-level authorization at /api/invoices/{id}"
+      ],
+      "remediationBottleneckFindingId": "FND-EOSP4J-003",
+      "status": "active",
+      "confidence": "Confirmed",
+      "contextualScore": 100,
+      "severity": "Critical",
+      "scoreBreakdown": {
+        "exposureScore": 25,
+        "exploitabilityScore": 20,
+        "assetCriticalityScore": 25,
+        "chainImpactScore": 25,
+        "bonusPenalties": 5,
+        "totalScore": 100,
+        "explanation": "Deterministic Contextual Formula: Exposure (25/25) + Exploitability (20/25) + Asset Criticality (25/25) + Chain Pivot Impact (25/25) + Unauth Crown-Jewel Modifier (+5) = 100/100."
+      }
+    },
+    {
+      "id": "PTH-EOSP4J-004",
+      "projectId": "PRJ-MTEOSCGW",
+      "scanId": "SCN-MTEOSP4J",
+      "title": "Direct Exploitation: Hardcoded cloud access token on Source Codebase",
+      "summary": "Direct vulnerability path targeting Source Codebase via src/config/cloud.ts:18. May allow unauthorized actions or information disclosure.",
+      "nodes": [
+        {
+          "id": "threat-4",
+          "type": "threat_actor",
+          "label": "Adversary",
+          "isEntrypoint": true
+        },
+        {
+          "id": "asset-4",
+          "type": "asset",
+          "label": "Source Codebase",
+          "subLabel": "src/config/cloud.ts:18",
+          "assetRef": "Source Codebase"
+        },
+        {
+          "id": "vuln-4",
+          "type": "vulnerability",
+          "label": "Hardcoded cloud access token",
+          "findingRef": "FND-EOSP4J-006",
+          "severity": "Critical"
+        },
+        {
+          "id": "target-4",
+          "type": "datastore",
+          "label": "Source Codebase Service Resources",
+          "isTarget": true
+        }
+      ],
+      "edges": [
+        {
+          "id": "e-4-1",
+          "fromNodeId": "threat-4",
+          "toNodeId": "asset-4",
+          "relation": "reaches",
+          "label": "Network Access",
+          "riskWeight": 8
+        },
+        {
+          "id": "e-4-2",
+          "fromNodeId": "asset-4",
+          "toNodeId": "vuln-4",
+          "relation": "exploits",
+          "label": "Exploits Vulnerability",
+          "riskWeight": 10
+        },
+        {
+          "id": "e-4-3",
+          "fromNodeId": "vuln-4",
+          "toNodeId": "target-4",
+          "relation": "impacts",
+          "label": "Unauthorized Impact",
+          "riskWeight": 9
+        }
+      ],
+      "participatingFindingIds": [
+        "FND-EOSP4J-006"
+      ],
+      "participatingAssets": [
+        "Source Codebase"
+      ],
+      "prerequisites": [
+        "Direct reachability of service endpoint"
+      ],
+      "impactAssessment": "Authentication bypass allowing unprivileged actors to forge admin credentials.",
+      "recommendedFixSequence": [
+        "Remediate Hardcoded cloud access token at src/config/cloud.ts:18"
+      ],
+      "remediationBottleneckFindingId": "FND-EOSP4J-006",
+      "status": "active",
+      "confidence": "Confirmed",
+      "contextualScore": 100,
+      "severity": "Critical",
+      "scoreBreakdown": {
+        "exposureScore": 25,
+        "exploitabilityScore": 25,
+        "assetCriticalityScore": 25,
+        "chainImpactScore": 25,
+        "bonusPenalties": 5,
+        "totalScore": 100,
+        "explanation": "Deterministic Contextual Formula: Exposure (25/25) + Exploitability (25/25) + Asset Criticality (25/25) + Chain Pivot Impact (25/25) + Unauth Crown-Jewel Modifier (+5) = 100/100."
+      }
+    },
+    {
+      "id": "PTH-EOSP4J-005",
+      "projectId": "PRJ-MTEOSCGW",
+      "scanId": "SCN-MTEOSP4J",
+      "title": "Direct Exploitation: Vulnerable dependency in payment service on payment-service:latest",
+      "summary": "Direct vulnerability path targeting payment-service:latest via package-lock.json. May allow unauthorized actions or information disclosure.",
+      "nodes": [
+        {
+          "id": "threat-5",
+          "type": "threat_actor",
+          "label": "Adversary",
+          "isEntrypoint": true
+        },
+        {
+          "id": "asset-5",
+          "type": "asset",
+          "label": "payment-service:latest",
+          "subLabel": "package-lock.json",
+          "assetRef": "payment-service:latest"
+        },
+        {
+          "id": "vuln-5",
+          "type": "vulnerability",
+          "label": "Vulnerable dependency in payment service",
+          "findingRef": "FND-EOSP4J-007",
+          "severity": "High"
+        },
+        {
+          "id": "target-5",
+          "type": "datastore",
+          "label": "payment-service:latest Service Resources",
+          "isTarget": true
+        }
+      ],
+      "edges": [
+        {
+          "id": "e-5-1",
+          "fromNodeId": "threat-5",
+          "toNodeId": "asset-5",
+          "relation": "reaches",
+          "label": "Network Access",
+          "riskWeight": 8
+        },
+        {
+          "id": "e-5-2",
+          "fromNodeId": "asset-5",
+          "toNodeId": "vuln-5",
+          "relation": "exploits",
+          "label": "Exploits Vulnerability",
+          "riskWeight": 10
+        },
+        {
+          "id": "e-5-3",
+          "fromNodeId": "vuln-5",
+          "toNodeId": "target-5",
+          "relation": "impacts",
+          "label": "Unauthorized Impact",
+          "riskWeight": 9
+        }
+      ],
+      "participatingFindingIds": [
+        "FND-EOSP4J-007"
+      ],
+      "participatingAssets": [
+        "payment-service:latest"
+      ],
+      "prerequisites": [
+        "Direct reachability of service endpoint"
+      ],
+      "impactAssessment": "Potential security weakness on payment-service:latest.",
+      "recommendedFixSequence": [
+        "Remediate Vulnerable dependency in payment service at package-lock.json"
+      ],
+      "remediationBottleneckFindingId": "FND-EOSP4J-007",
+      "status": "active",
+      "confidence": "Confirmed",
+      "contextualScore": 100,
+      "severity": "Critical",
+      "scoreBreakdown": {
+        "exposureScore": 25,
+        "exploitabilityScore": 20,
+        "assetCriticalityScore": 25,
+        "chainImpactScore": 25,
+        "bonusPenalties": 5,
+        "totalScore": 100,
+        "explanation": "Deterministic Contextual Formula: Exposure (25/25) + Exploitability (20/25) + Asset Criticality (25/25) + Chain Pivot Impact (25/25) + Unauth Crown-Jewel Modifier (+5) = 100/100."
+      }
+    },
+    {
+      "id": "PTH-EOSP4J-006",
+      "projectId": "PRJ-MTEOSCGW",
+      "scanId": "SCN-MTEOSP4J",
+      "title": "Direct Exploitation: Exposed database administration service on db.internal.example.test",
+      "summary": "Direct vulnerability path targeting db.internal.example.test via :5432. May allow unauthorized actions or information disclosure.",
+      "nodes": [
+        {
+          "id": "threat-6",
+          "type": "threat_actor",
+          "label": "Adversary",
+          "isEntrypoint": true
+        },
+        {
+          "id": "asset-6",
+          "type": "asset",
+          "label": "db.internal.example.test",
+          "subLabel": ":5432",
+          "assetRef": "db.internal.example.test"
+        },
+        {
+          "id": "vuln-6",
+          "type": "vulnerability",
+          "label": "Exposed database administration service",
+          "findingRef": "FND-EOSP4J-008",
+          "severity": "High"
+        },
+        {
+          "id": "target-6",
+          "type": "datastore",
+          "label": "db.internal.example.test Service Resources",
+          "isTarget": true
+        }
+      ],
+      "edges": [
+        {
+          "id": "e-6-1",
+          "fromNodeId": "threat-6",
+          "toNodeId": "asset-6",
+          "relation": "reaches",
+          "label": "Network Access",
+          "riskWeight": 8
+        },
+        {
+          "id": "e-6-2",
+          "fromNodeId": "asset-6",
+          "toNodeId": "vuln-6",
+          "relation": "exploits",
+          "label": "Exploits Vulnerability",
+          "riskWeight": 10
+        },
+        {
+          "id": "e-6-3",
+          "fromNodeId": "vuln-6",
+          "toNodeId": "target-6",
+          "relation": "impacts",
+          "label": "Unauthorized Impact",
+          "riskWeight": 9
+        }
+      ],
+      "participatingFindingIds": [
+        "FND-EOSP4J-008"
+      ],
+      "participatingAssets": [
+        "db.internal.example.test"
+      ],
+      "prerequisites": [
+        "Direct reachability of service endpoint"
+      ],
+      "impactAssessment": "Potential security weakness on db.internal.example.test.",
+      "recommendedFixSequence": [
+        "Remediate Exposed database administration service at :5432"
+      ],
+      "remediationBottleneckFindingId": "FND-EOSP4J-008",
+      "status": "active",
+      "confidence": "Confirmed",
+      "contextualScore": 100,
+      "severity": "Critical",
+      "scoreBreakdown": {
+        "exposureScore": 25,
+        "exploitabilityScore": 20,
+        "assetCriticalityScore": 25,
+        "chainImpactScore": 25,
+        "bonusPenalties": 5,
+        "totalScore": 100,
+        "explanation": "Deterministic Contextual Formula: Exposure (25/25) + Exploitability (20/25) + Asset Criticality (25/25) + Chain Pivot Impact (25/25) + Unauth Crown-Jewel Modifier (+5) = 100/100."
+      }
+    },
+    {
+      "id": "PTH-EOSP4J-003",
+      "projectId": "PRJ-MTEOSCGW",
+      "scanId": "SCN-MTEOSP4J",
+      "title": "Direct Exploitation: JWT signature verification weakness on api.example.test",
+      "summary": "Direct vulnerability path targeting api.example.test via /api/auth/verify. May allow unauthorized actions or information disclosure.",
+      "nodes": [
+        {
+          "id": "threat-3",
+          "type": "threat_actor",
+          "label": "Adversary",
+          "isEntrypoint": true
+        },
+        {
+          "id": "asset-3",
+          "type": "asset",
+          "label": "api.example.test",
+          "subLabel": "/api/auth/verify",
+          "assetRef": "api.example.test"
+        },
+        {
+          "id": "vuln-3",
+          "type": "vulnerability",
+          "label": "JWT signature verification weakness",
+          "findingRef": "FND-EOSP4J-004",
+          "severity": "Critical"
+        },
+        {
+          "id": "target-3",
+          "type": "datastore",
+          "label": "api.example.test Service Resources",
+          "isTarget": true
+        }
+      ],
+      "edges": [
+        {
+          "id": "e-3-1",
+          "fromNodeId": "threat-3",
+          "toNodeId": "asset-3",
+          "relation": "reaches",
+          "label": "Network Access",
+          "riskWeight": 8
+        },
+        {
+          "id": "e-3-2",
+          "fromNodeId": "asset-3",
+          "toNodeId": "vuln-3",
+          "relation": "exploits",
+          "label": "Exploits Vulnerability",
+          "riskWeight": 10
+        },
+        {
+          "id": "e-3-3",
+          "fromNodeId": "vuln-3",
+          "toNodeId": "target-3",
+          "relation": "impacts",
+          "label": "Unauthorized Impact",
+          "riskWeight": 9
+        }
+      ],
+      "participatingFindingIds": [
+        "FND-EOSP4J-004"
+      ],
+      "participatingAssets": [
+        "api.example.test"
+      ],
+      "prerequisites": [
+        "Direct reachability of service endpoint"
+      ],
+      "impactAssessment": "Authentication bypass allowing unprivileged actors to forge admin credentials.",
+      "recommendedFixSequence": [
+        "Remediate JWT signature verification weakness at /api/auth/verify"
+      ],
+      "remediationBottleneckFindingId": "FND-EOSP4J-004",
+      "status": "active",
+      "confidence": "Confirmed",
+      "contextualScore": 97,
+      "severity": "Critical",
+      "scoreBreakdown": {
+        "exposureScore": 25,
+        "exploitabilityScore": 22,
+        "assetCriticalityScore": 25,
+        "chainImpactScore": 25,
+        "bonusPenalties": 0,
+        "totalScore": 97,
+        "explanation": "Deterministic Contextual Formula: Exposure (25/25) + Exploitability (22/25) + Asset Criticality (25/25) + Chain Pivot Impact (25/25) = 97/100."
+      }
+    }
+  ],
+  "remediations": [
+    {
+      "id": "REM-4154-003",
+      "projectId": "PRJ-MTCT4154",
+      "title": "Enforce Cryptographic Token Verification & Auth Middleware on api.example.test",
+      "priority": "P0 - Immediate",
+      "affectedFindingIds": [
+        "FND-CT4F5Q-003",
+        "FND-CT4F5Q-004"
+      ],
+      "affectedAttackPathIds": [
+        "PTH-CT4F5Q-002",
+        "PTH-CT4F5Q-003"
+      ],
+      "pathsEliminatedCount": 2,
+      "engineeringAction": "Verify asymmetric JWT signatures (RS256) and reject unsigned / \"none\" algorithm tokens at the API gateway layer.",
+      "architecturalSafeguards": [
+        "Strict RS256 algorithm enforcement",
+        "Mandatory expiration and audience claim checks",
+        "Centralized auth middleware"
+      ],
+      "validationRequirements": "Verify via targeted security re-test and regression scan that 2 finding(s) no longer replicate.",
+      "estimatedRiskReductionPercent": 66,
+      "status": "pending"
+    },
+    {
+      "id": "REM-4154-001",
+      "projectId": "PRJ-MTCT4154",
+      "title": "Enforce Parameterized SQL Queries & Prepared Statements on api.example.test",
+      "priority": "P0 - Immediate",
+      "affectedFindingIds": [
+        "FND-CT4F5Q-001"
+      ],
+      "affectedAttackPathIds": [
+        "PTH-CT4F5Q-001"
+      ],
+      "pathsEliminatedCount": 1,
+      "engineeringAction": "Refactor dynamic SQL queries on /api/accounts to use parameterized queries/ORM with strict query parameter typing.",
+      "architecturalSafeguards": [
+        "Prepared Statements / Parameterized Queries",
+        "Database user principle of least privilege",
+        "WAF SQLi rule inspection"
+      ],
+      "validationRequirements": "Verify via targeted security re-test and regression scan that 1 finding(s) no longer replicate.",
+      "estimatedRiskReductionPercent": 33,
+      "status": "pending"
+    },
+    {
+      "id": "REM-4154-002",
+      "projectId": "PRJ-MTCT4154",
+      "title": "Harden Outbound HTTP Requests & Network Egress on api.example.test",
+      "priority": "P0 - Immediate",
+      "affectedFindingIds": [
+        "FND-CT4F5Q-002"
+      ],
+      "affectedAttackPathIds": [
+        "PTH-CT4F5Q-001"
+      ],
+      "pathsEliminatedCount": 1,
+      "engineeringAction": "Implement strict destination allowlisting, block RFC1918/link-local IP addresses (169.254.169.254), and disable HTTP redirects on /api/preview.",
+      "architecturalSafeguards": [
+        "Egress IP/Domain Allowlisting",
+        "Block cloud metadata endpoint (169.254.169.254)",
+        "Isolated outbound proxy"
+      ],
+      "validationRequirements": "Verify via targeted security re-test and regression scan that 1 finding(s) no longer replicate.",
+      "estimatedRiskReductionPercent": 33,
+      "status": "pending"
+    },
+    {
+      "id": "REM-4154-005",
+      "projectId": "PRJ-MTCT4154",
+      "title": "Enforce Cryptographic Token Verification & Auth Middleware on Source Codebase",
+      "priority": "P0 - Immediate",
+      "affectedFindingIds": [
+        "FND-CT4F5Q-006"
+      ],
+      "affectedAttackPathIds": [
+        "PTH-CT4F5Q-004"
+      ],
+      "pathsEliminatedCount": 1,
+      "engineeringAction": "Verify asymmetric JWT signatures (RS256) and reject unsigned / \"none\" algorithm tokens at the API gateway layer.",
+      "architecturalSafeguards": [
+        "Strict RS256 algorithm enforcement",
+        "Mandatory expiration and audience claim checks",
+        "Centralized auth middleware"
+      ],
+      "validationRequirements": "Verify via targeted security re-test and regression scan that 1 finding(s) no longer replicate.",
+      "estimatedRiskReductionPercent": 33,
+      "status": "pending"
+    },
+    {
+      "id": "REM-4154-006",
+      "projectId": "PRJ-MTCT4154",
+      "title": "Upgrade Vulnerable Dependencies & Packages on payment-service:latest",
+      "priority": "P0 - Immediate",
+      "affectedFindingIds": [
+        "FND-CT4F5Q-007"
+      ],
+      "affectedAttackPathIds": [
+        "PTH-CT4F5Q-005"
+      ],
+      "pathsEliminatedCount": 1,
+      "engineeringAction": "Update vulnerable packages to patched upstream versions to eliminate known CVEs.",
+      "architecturalSafeguards": [
+        "Automated software composition analysis (SCA)",
+        "Continuous dependency patch pipelines"
+      ],
+      "validationRequirements": "Verify via targeted security re-test and regression scan that 1 finding(s) no longer replicate.",
+      "estimatedRiskReductionPercent": 33,
+      "status": "pending"
+    },
+    {
+      "id": "REM-4154-007",
+      "projectId": "PRJ-MTCT4154",
+      "title": "Remediate Exposed database administration service",
+      "priority": "P0 - Immediate",
+      "affectedFindingIds": [
+        "FND-CT4F5Q-008",
+        "FND-CT4F5Q-009",
+        "FND-CT4F5Q-010"
+      ],
+      "affectedAttackPathIds": [
+        "PTH-CT4F5Q-006"
+      ],
+      "pathsEliminatedCount": 1,
+      "engineeringAction": "Apply secure coding standards and input sanitization to :5432 on db.internal.example.test.",
+      "architecturalSafeguards": [
+        "Input validation",
+        "Least privilege"
+      ],
+      "validationRequirements": "Verify via targeted security re-test and regression scan that 3 finding(s) no longer replicate.",
+      "estimatedRiskReductionPercent": 49,
+      "status": "pending"
+    },
+    {
+      "id": "REM-4154-004",
+      "projectId": "PRJ-MTCT4154",
+      "title": "Apply Context-Aware Contextual Output Encoding & CSP on web.example.test",
+      "priority": "P3 - Low",
+      "affectedFindingIds": [
+        "FND-CT4F5Q-005"
+      ],
+      "affectedAttackPathIds": [],
+      "pathsEliminatedCount": 0,
+      "engineeringAction": "Sanitize and encode all untrusted user reflections in /search and deploy a restrictive Content-Security-Policy (CSP) header.",
+      "architecturalSafeguards": [
+        "Contextual HTML/JS output encoding",
+        "Strict Content-Security-Policy",
+        "HttpOnly cookie flags"
+      ],
+      "validationRequirements": "Verify via targeted security re-test and regression scan that 1 finding(s) no longer replicate.",
+      "estimatedRiskReductionPercent": 15,
+      "status": "pending"
+    },
+    {
+      "id": "REM-8DLI-003",
+      "projectId": "PRJ-MTCF8DLI",
+      "title": "Enforce Cryptographic Token Verification & Auth Middleware on api.example.test",
+      "priority": "P0 - Immediate",
+      "affectedFindingIds": [
+        "FND-CTGVIO-003",
+        "FND-CTGVIO-004"
+      ],
+      "affectedAttackPathIds": [
+        "PTH-CTGVIO-002",
+        "PTH-CTGVIO-003"
+      ],
+      "pathsEliminatedCount": 2,
+      "engineeringAction": "Verify asymmetric JWT signatures (RS256) and reject unsigned / \"none\" algorithm tokens at the API gateway layer.",
+      "architecturalSafeguards": [
+        "Strict RS256 algorithm enforcement",
+        "Mandatory expiration and audience claim checks",
+        "Centralized auth middleware"
+      ],
+      "validationRequirements": "Verify via targeted security re-test and regression scan that 2 finding(s) no longer replicate.",
+      "estimatedRiskReductionPercent": 66,
+      "status": "pending",
+      "aiGuidance": {
+        "rootCauseExplanation": "Unsanitized input handling or architectural boundary mismatch.",
+        "impactRationale": "Implementing this fix completely neutralizes 2 attack path(s) and remediates 2 vulnerability instance(s).",
+        "remediationBlueprint": "1. Implement strict schema validation on all inputs.\n2. Enforce principle of least privilege.\n3. Apply secure coding standards for IDOR / Broken Access Control.",
+        "verificationSteps": [
+          "Execute authorized verification scan against the patched endpoint.",
+          "Send crafted payload to confirm application returns 400 Bad Request or 403 Forbidden without exposing backend errors.",
+          "Check application audit logs to confirm proper detection telemetry is recorded."
+        ],
+        "residualRiskNotes": "Ensure secondary defense-in-depth controls (such as WAF rules and network isolation) remain active."
+      }
+    },
+    {
+      "id": "REM-8DLI-001",
+      "projectId": "PRJ-MTCF8DLI",
+      "title": "Enforce Parameterized SQL Queries & Prepared Statements on api.example.test",
+      "priority": "P0 - Immediate",
+      "affectedFindingIds": [
+        "FND-CTGVIO-001"
+      ],
+      "affectedAttackPathIds": [
+        "PTH-CTGVIO-001"
+      ],
+      "pathsEliminatedCount": 1,
+      "engineeringAction": "Refactor dynamic SQL queries on /api/accounts to use parameterized queries/ORM with strict query parameter typing.",
+      "architecturalSafeguards": [
+        "Prepared Statements / Parameterized Queries",
+        "Database user principle of least privilege",
+        "WAF SQLi rule inspection"
+      ],
+      "validationRequirements": "Verify via targeted security re-test and regression scan that 1 finding(s) no longer replicate.",
+      "estimatedRiskReductionPercent": 33,
+      "status": "pending"
+    },
+    {
+      "id": "REM-8DLI-002",
+      "projectId": "PRJ-MTCF8DLI",
+      "title": "Harden Outbound HTTP Requests & Network Egress on api.example.test",
+      "priority": "P0 - Immediate",
+      "affectedFindingIds": [
+        "FND-CTGVIO-002"
+      ],
+      "affectedAttackPathIds": [
+        "PTH-CTGVIO-001"
+      ],
+      "pathsEliminatedCount": 1,
+      "engineeringAction": "Implement strict destination allowlisting, block RFC1918/link-local IP addresses (169.254.169.254), and disable HTTP redirects on /api/preview.",
+      "architecturalSafeguards": [
+        "Egress IP/Domain Allowlisting",
+        "Block cloud metadata endpoint (169.254.169.254)",
+        "Isolated outbound proxy"
+      ],
+      "validationRequirements": "Verify via targeted security re-test and regression scan that 1 finding(s) no longer replicate.",
+      "estimatedRiskReductionPercent": 33,
+      "status": "pending"
+    },
+    {
+      "id": "REM-8DLI-005",
+      "projectId": "PRJ-MTCF8DLI",
+      "title": "Enforce Cryptographic Token Verification & Auth Middleware on Source Codebase",
+      "priority": "P0 - Immediate",
+      "affectedFindingIds": [
+        "FND-CTGVIO-006"
+      ],
+      "affectedAttackPathIds": [
+        "PTH-CTGVIO-004"
+      ],
+      "pathsEliminatedCount": 1,
+      "engineeringAction": "Verify asymmetric JWT signatures (RS256) and reject unsigned / \"none\" algorithm tokens at the API gateway layer.",
+      "architecturalSafeguards": [
+        "Strict RS256 algorithm enforcement",
+        "Mandatory expiration and audience claim checks",
+        "Centralized auth middleware"
+      ],
+      "validationRequirements": "Verify via targeted security re-test and regression scan that 1 finding(s) no longer replicate.",
+      "estimatedRiskReductionPercent": 33,
+      "status": "pending"
+    },
+    {
+      "id": "REM-8DLI-006",
+      "projectId": "PRJ-MTCF8DLI",
+      "title": "Upgrade Vulnerable Dependencies & Packages on payment-service:latest",
+      "priority": "P0 - Immediate",
+      "affectedFindingIds": [
+        "FND-CTGVIO-007"
+      ],
+      "affectedAttackPathIds": [
+        "PTH-CTGVIO-005"
+      ],
+      "pathsEliminatedCount": 1,
+      "engineeringAction": "Update vulnerable packages to patched upstream versions to eliminate known CVEs.",
+      "architecturalSafeguards": [
+        "Automated software composition analysis (SCA)",
+        "Continuous dependency patch pipelines"
+      ],
+      "validationRequirements": "Verify via targeted security re-test and regression scan that 1 finding(s) no longer replicate.",
+      "estimatedRiskReductionPercent": 33,
+      "status": "pending"
+    },
+    {
+      "id": "REM-8DLI-007",
+      "projectId": "PRJ-MTCF8DLI",
+      "title": "Remediate Exposed database administration service",
+      "priority": "P0 - Immediate",
+      "affectedFindingIds": [
+        "FND-CTGVIO-008",
+        "FND-CTGVIO-009",
+        "FND-CTGVIO-010"
+      ],
+      "affectedAttackPathIds": [
+        "PTH-CTGVIO-006"
+      ],
+      "pathsEliminatedCount": 1,
+      "engineeringAction": "Apply secure coding standards and input sanitization to :5432 on db.internal.example.test.",
+      "architecturalSafeguards": [
+        "Input validation",
+        "Least privilege"
+      ],
+      "validationRequirements": "Verify via targeted security re-test and regression scan that 3 finding(s) no longer replicate.",
+      "estimatedRiskReductionPercent": 49,
+      "status": "pending"
+    },
+    {
+      "id": "REM-8DLI-004",
+      "projectId": "PRJ-MTCF8DLI",
+      "title": "Apply Context-Aware Contextual Output Encoding & CSP on web.example.test",
+      "priority": "P3 - Low",
+      "affectedFindingIds": [
+        "FND-CTGVIO-005"
+      ],
+      "affectedAttackPathIds": [],
+      "pathsEliminatedCount": 0,
+      "engineeringAction": "Sanitize and encode all untrusted user reflections in /search and deploy a restrictive Content-Security-Policy (CSP) header.",
+      "architecturalSafeguards": [
+        "Contextual HTML/JS output encoding",
+        "Strict Content-Security-Policy",
+        "HttpOnly cookie flags"
+      ],
+      "validationRequirements": "Verify via targeted security re-test and regression scan that 1 finding(s) no longer replicate.",
+      "estimatedRiskReductionPercent": 15,
+      "status": "pending"
+    },
+    {
+      "id": "REM-SCGW-003",
+      "projectId": "PRJ-MTEOSCGW",
+      "title": "Enforce Cryptographic Token Verification & Auth Middleware on api.example.test",
+      "priority": "P0 - Immediate",
+      "affectedFindingIds": [
+        "FND-EOSP4J-003",
+        "FND-EOSP4J-004"
+      ],
+      "affectedAttackPathIds": [
+        "PTH-EOSP4J-002",
+        "PTH-EOSP4J-003"
+      ],
+      "pathsEliminatedCount": 2,
+      "engineeringAction": "Verify asymmetric JWT signatures (RS256) and reject unsigned / \"none\" algorithm tokens at the API gateway layer.",
+      "architecturalSafeguards": [
+        "Strict RS256 algorithm enforcement",
+        "Mandatory expiration and audience claim checks",
+        "Centralized auth middleware"
+      ],
+      "validationRequirements": "Verify via targeted security re-test and regression scan that 2 finding(s) no longer replicate.",
+      "estimatedRiskReductionPercent": 66,
+      "status": "pending"
+    },
+    {
+      "id": "REM-SCGW-001",
+      "projectId": "PRJ-MTEOSCGW",
+      "title": "Enforce Parameterized SQL Queries & Prepared Statements on api.example.test",
+      "priority": "P0 - Immediate",
+      "affectedFindingIds": [
+        "FND-EOSP4J-001"
+      ],
+      "affectedAttackPathIds": [
+        "PTH-EOSP4J-001"
+      ],
+      "pathsEliminatedCount": 1,
+      "engineeringAction": "Refactor dynamic SQL queries on /api/accounts to use parameterized queries/ORM with strict query parameter typing.",
+      "architecturalSafeguards": [
+        "Prepared Statements / Parameterized Queries",
+        "Database user principle of least privilege",
+        "WAF SQLi rule inspection"
+      ],
+      "validationRequirements": "Verify via targeted security re-test and regression scan that 1 finding(s) no longer replicate.",
+      "estimatedRiskReductionPercent": 33,
+      "status": "pending"
+    },
+    {
+      "id": "REM-SCGW-002",
+      "projectId": "PRJ-MTEOSCGW",
+      "title": "Harden Outbound HTTP Requests & Network Egress on api.example.test",
+      "priority": "P0 - Immediate",
+      "affectedFindingIds": [
+        "FND-EOSP4J-002"
+      ],
+      "affectedAttackPathIds": [
+        "PTH-EOSP4J-001"
+      ],
+      "pathsEliminatedCount": 1,
+      "engineeringAction": "Implement strict destination allowlisting, block RFC1918/link-local IP addresses (169.254.169.254), and disable HTTP redirects on /api/preview.",
+      "architecturalSafeguards": [
+        "Egress IP/Domain Allowlisting",
+        "Block cloud metadata endpoint (169.254.169.254)",
+        "Isolated outbound proxy"
+      ],
+      "validationRequirements": "Verify via targeted security re-test and regression scan that 1 finding(s) no longer replicate.",
+      "estimatedRiskReductionPercent": 33,
+      "status": "pending"
+    },
+    {
+      "id": "REM-SCGW-005",
+      "projectId": "PRJ-MTEOSCGW",
+      "title": "Enforce Cryptographic Token Verification & Auth Middleware on Source Codebase",
+      "priority": "P0 - Immediate",
+      "affectedFindingIds": [
+        "FND-EOSP4J-006"
+      ],
+      "affectedAttackPathIds": [
+        "PTH-EOSP4J-004"
+      ],
+      "pathsEliminatedCount": 1,
+      "engineeringAction": "Verify asymmetric JWT signatures (RS256) and reject unsigned / \"none\" algorithm tokens at the API gateway layer.",
+      "architecturalSafeguards": [
+        "Strict RS256 algorithm enforcement",
+        "Mandatory expiration and audience claim checks",
+        "Centralized auth middleware"
+      ],
+      "validationRequirements": "Verify via targeted security re-test and regression scan that 1 finding(s) no longer replicate.",
+      "estimatedRiskReductionPercent": 33,
+      "status": "pending"
+    },
+    {
+      "id": "REM-SCGW-006",
+      "projectId": "PRJ-MTEOSCGW",
+      "title": "Upgrade Vulnerable Dependencies & Packages on payment-service:latest",
+      "priority": "P0 - Immediate",
+      "affectedFindingIds": [
+        "FND-EOSP4J-007"
+      ],
+      "affectedAttackPathIds": [
+        "PTH-EOSP4J-005"
+      ],
+      "pathsEliminatedCount": 1,
+      "engineeringAction": "Update vulnerable packages to patched upstream versions to eliminate known CVEs.",
+      "architecturalSafeguards": [
+        "Automated software composition analysis (SCA)",
+        "Continuous dependency patch pipelines"
+      ],
+      "validationRequirements": "Verify via targeted security re-test and regression scan that 1 finding(s) no longer replicate.",
+      "estimatedRiskReductionPercent": 33,
+      "status": "pending"
+    },
+    {
+      "id": "REM-SCGW-007",
+      "projectId": "PRJ-MTEOSCGW",
+      "title": "Remediate Exposed database administration service",
+      "priority": "P0 - Immediate",
+      "affectedFindingIds": [
+        "FND-EOSP4J-008",
+        "FND-EOSP4J-009",
+        "FND-EOSP4J-010"
+      ],
+      "affectedAttackPathIds": [
+        "PTH-EOSP4J-006"
+      ],
+      "pathsEliminatedCount": 1,
+      "engineeringAction": "Apply secure coding standards and input sanitization to :5432 on db.internal.example.test.",
+      "architecturalSafeguards": [
+        "Input validation",
+        "Least privilege"
+      ],
+      "validationRequirements": "Verify via targeted security re-test and regression scan that 3 finding(s) no longer replicate.",
+      "estimatedRiskReductionPercent": 49,
+      "status": "pending"
+    },
+    {
+      "id": "REM-SCGW-004",
+      "projectId": "PRJ-MTEOSCGW",
+      "title": "Apply Context-Aware Contextual Output Encoding & CSP on web.example.test",
+      "priority": "P3 - Low",
+      "affectedFindingIds": [
+        "FND-EOSP4J-005"
+      ],
+      "affectedAttackPathIds": [],
+      "pathsEliminatedCount": 0,
+      "engineeringAction": "Sanitize and encode all untrusted user reflections in /search and deploy a restrictive Content-Security-Policy (CSP) header.",
+      "architecturalSafeguards": [
+        "Contextual HTML/JS output encoding",
+        "Strict Content-Security-Policy",
+        "HttpOnly cookie flags"
+      ],
+      "validationRequirements": "Verify via targeted security re-test and regression scan that 1 finding(s) no longer replicate.",
+      "estimatedRiskReductionPercent": 15,
+      "status": "pending"
+    }
+  ],
+  "comparisons": [],
+  "auditLogs": [
+    {
+      "id": "LOG-1788026474055-264",
+      "timestamp": "2026-08-29T18:01:14.055Z",
+      "action": "ANALYSIS_COMPLETED",
+      "details": "AI Pipeline completed for scan sample-vulnerability-report.json: 6 attack paths prioritized.",
+      "projectId": "PRJ-MTEOSCGW"
+    },
+    {
+      "id": "LOG-1788026474041-754",
+      "timestamp": "2026-08-29T18:01:14.042Z",
+      "action": "SCAN_UPLOADED",
+      "details": "Scan sample-vulnerability-report.json parsed as generic_json (11 raw items).",
+      "projectId": "PRJ-MTEOSCGW"
+    },
+    {
+      "id": "LOG-1788026457633-991",
+      "timestamp": "2026-08-29T18:00:57.633Z",
+      "action": "PROJECT_CREATED",
+      "details": "Project dee created. Authorized scope: wdxeqdceqceceqcec.com",
+      "projectId": "PRJ-MTEOSCGW"
+    },
+    {
+      "id": "LOG-1787913388194-119",
+      "timestamp": "2026-08-28T10:36:28.194Z",
+      "action": "ANALYSIS_COMPLETED",
+      "details": "AI Pipeline completed for scan sample-vulnerability-report.json: 6 attack paths prioritized.",
+      "projectId": "PRJ-MTCF8DLI"
+    },
+    {
+      "id": "LOG-1787913388180-278",
+      "timestamp": "2026-08-28T10:36:28.180Z",
+      "action": "SCAN_UPLOADED",
+      "details": "Scan sample-vulnerability-report.json parsed as generic_json (11 raw items).",
+      "projectId": "PRJ-MTCF8DLI"
+    },
+    {
+      "id": "LOG-1787913371812-181",
+      "timestamp": "2026-08-28T10:36:11.812Z",
+      "action": "PROJECT_CREATED",
+      "details": "Project rgmcet created. Authorized scope: .com",
+      "projectId": "PRJ-MTCTGIW4"
+    },
+    {
+      "id": "LOG-1787912846293-543",
+      "timestamp": "2026-08-28T10:27:26.293Z",
+      "action": "ANALYSIS_COMPLETED",
+      "details": "AI Pipeline completed for scan sample-vulnerability-report.json: 6 attack paths prioritized.",
+      "projectId": "PRJ-MTCF8DLI"
+    },
+    {
+      "id": "LOG-1787912846280-187",
+      "timestamp": "2026-08-28T10:27:26.280Z",
+      "action": "SCAN_UPLOADED",
+      "details": "Scan sample-vulnerability-report.json parsed as generic_json (11 raw items).",
+      "projectId": "PRJ-MTCF8DLI"
+    },
+    {
+      "id": "LOG-1787912807115-882",
+      "timestamp": "2026-08-28T10:26:47.115Z",
+      "action": "ANALYSIS_COMPLETED",
+      "details": "AI Pipeline completed for scan sample-vulnerability-report.json: 6 attack paths prioritized.",
+      "projectId": "PRJ-MTCT4154"
+    },
+    {
+      "id": "LOG-1787912807105-97",
+      "timestamp": "2026-08-28T10:26:47.105Z",
+      "action": "SCAN_UPLOADED",
+      "details": "Scan sample-vulnerability-report.json parsed as generic_json (11 raw items).",
+      "projectId": "PRJ-MTCT4154"
+    },
+    {
+      "id": "LOG-1787912788940-749",
+      "timestamp": "2026-08-28T10:26:28.940Z",
+      "action": "PROJECT_CREATED",
+      "details": "Project pro2 created. Authorized scope: .com",
+      "projectId": "PRJ-MTCT4154"
+    },
+    {
+      "id": "LOG-1787889748329-569",
+      "timestamp": "2026-08-28T04:02:28.329Z",
+      "action": "PROJECT_CREATED",
+      "details": "Project pro 1 created. Authorized scope: https://ai-rural-health-care.vercel.app/",
+      "projectId": "PRJ-MTCFE6W9"
+    },
+    {
+      "id": "LOG-1787889477078-90",
+      "timestamp": "2026-08-28T03:57:57.078Z",
+      "action": "PROJECT_CREATED",
+      "details": "Project ai healthcare created. Authorized scope: aihealthcare.com",
+      "projectId": "PRJ-MTCF8DLI"
+    }
+  ]
+}
