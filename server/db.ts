@@ -27,12 +27,52 @@ declare global {
   var __ai_vuln_db__: DatabaseSchema | undefined;
 }
 
+function createInitialData(): DatabaseSchema {
+  const sampleScan: Scan = {
+    id: 'SCN-SAMPLE-01',
+    projectId: SAMPLE_PROJECT.id,
+    filename: 'owasp-zap-nuclei-semgrep-consolidated.json',
+    scannerType: 'generic_json',
+    uploadedAt: new Date().toISOString(),
+    totalRawFindings: 8,
+    deduplicatedCount: SAMPLE_FINDINGS.length,
+    status: 'completed',
+    statusMessage: `Completed analysis: ${SAMPLE_FINDINGS.length} findings, ${SAMPLE_ATTACK_PATHS.length} attack paths.`,
+    summary: {
+      critical: SAMPLE_FINDINGS.filter(f => f.severity === 'Critical').length,
+      high: SAMPLE_FINDINGS.filter(f => f.severity === 'High').length,
+      medium: SAMPLE_FINDINGS.filter(f => f.severity === 'Medium').length,
+      low: SAMPLE_FINDINGS.filter(f => f.severity === 'Low').length,
+      info: SAMPLE_FINDINGS.filter(f => f.severity === 'Info').length,
+    },
+  };
+
+  return {
+    projects: [{ ...SAMPLE_PROJECT }],
+    scans: [sampleScan],
+    findings: [...SAMPLE_FINDINGS],
+    relationships: [],
+    attackPaths: [...SAMPLE_ATTACK_PATHS],
+    remediations: [...SAMPLE_REMEDIATIONS],
+    comparisons: [],
+    auditLogs: [
+      {
+        id: 'LOG-INIT-1',
+        timestamp: new Date().toISOString(),
+        action: 'ENVIRONMENT_INITIALIZED',
+        details: `Seeded defensive assessment workspace for ${SAMPLE_PROJECT.name} (${SAMPLE_PROJECT.targetScope}).`,
+        projectId: SAMPLE_PROJECT.id,
+      },
+    ],
+  };
+}
+
 class Database {
   private get data(): DatabaseSchema {
-    if (!globalThis.__ai_vuln_db__) {
-      this.init();
+    if (!globalThis.__ai_vuln_db__ || !globalThis.__ai_vuln_db__.projects || globalThis.__ai_vuln_db__.projects.length === 0) {
+      globalThis.__ai_vuln_db__ = createInitialData();
     }
-    return globalThis.__ai_vuln_db__!;
+    return globalThis.__ai_vuln_db__;
   }
 
   private set data(val: DatabaseSchema) {
@@ -44,24 +84,18 @@ class Database {
   }
 
   private init() {
-    if (globalThis.__ai_vuln_db__ && globalThis.__ai_vuln_db__.projects?.length > 0) {
-      return;
-    }
-
-    try {
-      if (fs.existsSync(DB_FILE)) {
-        const raw = fs.readFileSync(DB_FILE, 'utf-8');
-        globalThis.__ai_vuln_db__ = JSON.parse(raw);
-        if (!globalThis.__ai_vuln_db__?.projects || globalThis.__ai_vuln_db__.projects.length === 0) {
-          this.seedInitialData();
-          this.save();
+    if (!globalThis.__ai_vuln_db__) {
+      try {
+        if (fs.existsSync(DB_FILE)) {
+          const raw = fs.readFileSync(DB_FILE, 'utf-8');
+          const parsed = JSON.parse(raw);
+          if (parsed && parsed.projects && parsed.projects.length > 0) {
+            globalThis.__ai_vuln_db__ = parsed;
+            return;
+          }
         }
-      } else {
-        this.seedInitialData();
-        this.save();
-      }
-    } catch {
-      this.seedInitialData();
+      } catch {}
+      globalThis.__ai_vuln_db__ = createInitialData();
     }
   }
 
@@ -75,43 +109,7 @@ class Database {
   }
 
   public seedInitialData() {
-    const sampleScan: Scan = {
-      id: 'SCN-SAMPLE-01',
-      projectId: SAMPLE_PROJECT.id,
-      filename: 'owasp-zap-nuclei-semgrep-consolidated.json',
-      scannerType: 'generic_json',
-      uploadedAt: new Date().toISOString(),
-      totalRawFindings: 8,
-      deduplicatedCount: SAMPLE_FINDINGS.length,
-      status: 'completed',
-      statusMessage: `Completed analysis: ${SAMPLE_FINDINGS.length} findings, ${SAMPLE_ATTACK_PATHS.length} attack paths, ${SAMPLE_REMEDIATIONS.length} remediation actions.`,
-      summary: {
-        critical: SAMPLE_FINDINGS.filter(f => f.severity === 'Critical').length,
-        high: SAMPLE_FINDINGS.filter(f => f.severity === 'High').length,
-        medium: SAMPLE_FINDINGS.filter(f => f.severity === 'Medium').length,
-        low: SAMPLE_FINDINGS.filter(f => f.severity === 'Low').length,
-        info: SAMPLE_FINDINGS.filter(f => f.severity === 'Info').length,
-      },
-    };
-
-    this.data = {
-      projects: [{ ...SAMPLE_PROJECT }],
-      scans: [sampleScan],
-      findings: [...SAMPLE_FINDINGS],
-      relationships: [],
-      attackPaths: [...SAMPLE_ATTACK_PATHS],
-      remediations: [...SAMPLE_REMEDIATIONS],
-      comparisons: [],
-      auditLogs: [
-        {
-          id: `LOG-INIT-1`,
-          timestamp: new Date().toISOString(),
-          action: 'ENVIRONMENT_INITIALIZED',
-          details: `Seeded defensive assessment workspace for ${SAMPLE_PROJECT.name} (${SAMPLE_PROJECT.targetScope}).`,
-          projectId: SAMPLE_PROJECT.id,
-        },
-      ],
-    };
+    this.data = createInitialData();
     this.save();
   }
 
