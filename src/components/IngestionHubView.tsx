@@ -33,22 +33,19 @@ export const IngestionHubView: React.FC<IngestionHubViewProps> = ({
 
   const handleFileUpload = async (file: File) => {
     setErrorMessage(null);
-    setStatusMessage(`Reading ${file.name}...`);
+    setStatusMessage(`Reading & analyzing ${file.name}...`);
     setIsProcessing(true);
 
     try {
       const text = await file.text();
-      setStatusMessage(`Parsing & normalizing ${file.name}...`);
-      const result = await onUploadScan(file.name, text);
+      setStatusMessage(`Ingesting, parsing & synthesizing attack paths for ${file.name}...`);
+      await onUploadScan(file.name, text);
 
-      setStatusMessage(`Running AI Triage and Attack-Path Correlation...`);
-      await onProcessScan(result.scan.id);
-
-      setStatusMessage(`Successfully parsed ${file.name}! Directing to triage dashboard...`);
+      setStatusMessage(`Successfully processed ${file.name}! Directing to dashboard...`);
       setTimeout(() => {
         setStatusMessage(null);
         onNavigateTab('dashboard');
-      }, 1000);
+      }, 700);
     } catch (err: any) {
       setErrorMessage(err.message || 'Failed to upload and parse scan file.');
     } finally {
@@ -60,18 +57,16 @@ export const IngestionHubView: React.FC<IngestionHubViewProps> = ({
     if (!pasteContent.trim()) return;
     setErrorMessage(null);
     setIsProcessing(true);
-    setStatusMessage('Parsing pasted scan content...');
+    setStatusMessage('Ingesting & correlating pasted scanner logs...');
 
     try {
-      const result = await onUploadScan(pasteFilename || 'pasted-scan.json', pasteContent);
-      setStatusMessage('Correlating attack paths & risk scoring...');
-      await onProcessScan(result.scan.id);
+      await onUploadScan(pasteFilename || 'pasted-scan.json', pasteContent);
       setStatusMessage('Scan parsed and prioritized successfully!');
       setPasteContent('');
       setTimeout(() => {
         setStatusMessage(null);
         onNavigateTab('dashboard');
-      }, 1000);
+      }, 700);
     } catch (err: any) {
       setErrorMessage(err.message || 'Failed to parse pasted scan.');
     } finally {
