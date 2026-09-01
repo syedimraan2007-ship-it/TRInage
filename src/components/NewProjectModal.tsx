@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Project } from '../types';
-import { FolderPlus, ShieldCheck, X, AlertCircle } from 'lucide-react';
+import { FolderPlus, ShieldCheck, X, AlertCircle, Sparkles } from 'lucide-react';
 
 interface NewProjectModalProps {
   isOpen: boolean;
@@ -21,6 +21,13 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
   const [error, setError] = useState<string | null>(null);
 
   if (!isOpen) return null;
+
+  const handleTemplate = (tmpl: { name: string; targetScope: string; authorizedBy: string; description: string }) => {
+    setName(tmpl.name);
+    setTargetScope(tmpl.targetScope);
+    setAuthorizedBy(tmpl.authorizedBy);
+    setDescription(tmpl.description);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,28 +58,65 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-lg p-6 space-y-5 shadow-2xl">
+    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-lg p-6 space-y-5 shadow-2xl">
         <div className="flex items-start justify-between">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 rounded-lg bg-cyan-950 border border-cyan-700/50 flex items-center justify-center text-cyan-400">
-              <FolderPlus className="w-4 h-4" />
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 rounded-xl bg-cyan-950 border border-cyan-700/50 flex items-center justify-center text-cyan-400">
+              <FolderPlus className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-100">Create Authorized Project</h3>
-              <p className="text-xs text-slate-400">Define defensive security assessment boundary</p>
+              <h3 className="text-base font-bold text-slate-100">Create Authorized Project Scope</h3>
+              <p className="text-xs text-slate-400">Define defensive boundary for threat intelligence & correlation</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded text-slate-400 hover:text-slate-200 hover:bg-slate-800"
+            className="p-1 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
+        {/* Starter Templates */}
+        <div className="space-y-1.5">
+          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center space-x-1">
+            <Sparkles className="w-3 h-3 text-cyan-400" />
+            <span>Quick Starter Templates:</span>
+          </span>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => handleTemplate({
+                name: 'Fintech Payments & Auth Subsystem',
+                targetScope: '*.payments.enterprise.internal',
+                authorizedBy: 'Lead SecOps Architect',
+                description: 'Payment gateway API, Redis session caching, and PostgreSQL ledger.',
+              })}
+              className="p-2 rounded-lg bg-slate-950 border border-slate-800 hover:border-cyan-500/50 text-left text-xs transition"
+            >
+              <div className="font-bold text-slate-200 truncate">Fintech Payments</div>
+              <div className="text-[10px] text-slate-400 font-mono truncate">*.payments.enterprise.internal</div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleTemplate({
+                name: 'Healthcare Patient Portal & EHR',
+                targetScope: '*.ehr.health.internal',
+                authorizedBy: 'HIPAA Security Officer',
+                description: 'Patient medical record API, FHIR endpoints, and encrypted diagnostic storage.',
+              })}
+              className="p-2 rounded-lg bg-slate-950 border border-slate-800 hover:border-cyan-500/50 text-left text-xs transition"
+            >
+              <div className="font-bold text-slate-200 truncate">Healthcare EHR</div>
+              <div className="text-[10px] text-slate-400 font-mono truncate">*.ehr.health.internal</div>
+            </button>
+          </div>
+        </div>
+
         {error && (
-          <div className="bg-rose-950/80 border border-rose-800 text-rose-200 p-3 rounded-lg flex items-center space-x-2 text-xs">
+          <div className="bg-rose-950/80 border border-rose-800 text-rose-200 p-3 rounded-xl flex items-center space-x-2 text-xs">
             <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
             <span>{error}</span>
           </div>
@@ -87,7 +131,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
               placeholder="e.g., E-Commerce Gateway & Auth Subsystem"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-cyan-500"
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-cyan-500"
             />
           </div>
 
@@ -99,7 +143,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
               placeholder="e.g., *.shop.internal, 192.168.10.0/24"
               value={targetScope}
               onChange={(e) => setTargetScope(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 font-mono focus:outline-none focus:border-cyan-500"
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 font-mono focus:outline-none focus:border-cyan-500"
             />
           </div>
 
@@ -110,7 +154,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
               placeholder="e.g., Lead AppSec Engineer / SecOps Team"
               value={authorizedBy}
               onChange={(e) => setAuthorizedBy(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-cyan-500"
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-cyan-500"
             />
           </div>
 
@@ -118,10 +162,10 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
             <label className="font-semibold text-slate-300">Description / Context</label>
             <textarea
               rows={2}
-              placeholder="Context about the architecture and testing objectives..."
+              placeholder="Context about the architecture and defensive boundary..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-cyan-500"
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-cyan-500"
             />
           </div>
 
@@ -129,14 +173,14 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg font-semibold"
+              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-semibold"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 disabled:bg-slate-800 text-white rounded-lg font-semibold transition"
+              className="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 disabled:bg-slate-800 text-white rounded-xl font-bold transition shadow-sm"
             >
               {isSubmitting ? 'Creating...' : 'Create Project'}
             </button>

@@ -1,4 +1,5 @@
-import { createSupabaseClient, getSupabaseSetupError } from '../../../lib/supabase';
+import { createSupabaseClient } from '../../../lib/supabase';
+import { getAttackPaths } from '../../../lib/vercel-store';
 
 function normalizePath(row: any) {
   return {
@@ -36,28 +37,22 @@ export default async function handler(req: any, res: any) {
   const projectId = rawProjectId || '';
   const supabase = createSupabaseClient(true) || createSupabaseClient();
 
-  if (!supabase) {
-    return res.status(503).json({ error: getSupabaseSetupError() });
-  }
-
   if (req.method === 'GET') {
     const { scanId } = req.query;
 
-    let query = supabase
-      .from('attack_paths')
-      .select('*')
-      .eq('project_id', projectId);
-
-    if (scanId) {
-      query = query.eq('scan_id', String(scanId));
+    if (supabase) {
+      try {
+        let query = supabase.from('attack_paths').select('*').eq('project_id', projectId);
+        if (scanId) query = query.eq('scan_id', String(scanId));
+        const { data, error } = await query.order('contextual_score', { ascending: false });
+        if (!error && data) {
+          return res.status(200).json(data.map(normalizePath));
+        }
+      } catch {}
     }
 
-    const { data, error } = await query.order('contextual_score', { ascending: false });
-    if (error) {
-      return res.status(500).json({ error: error.message });
-    }
-
-    return res.status(200).json((data || []).map(normalizePath));
+    const paths = getAttackPaths(projectId, scanId ? String(scanId) : undefined);
+    return res.status(200).json(paths);
   }
 
   res.setHeader('Allow', 'GET');

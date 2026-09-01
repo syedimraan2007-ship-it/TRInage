@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { Project, Scan, NormalizedFinding, FindingRelationship, AttackPath, RemediationItem, ScanComparison, DashboardMetrics } from '../src/types';
+import { SAMPLE_PROJECT, SAMPLE_FINDINGS, SAMPLE_ATTACK_PATHS, SAMPLE_REMEDIATIONS } from './sampleData';
 
 const DATA_DIR = path.join(process.cwd(), 'data');
 const DB_FILE = path.join(DATA_DIR, 'db.json');
@@ -46,6 +47,10 @@ class Database {
       if (fs.existsSync(DB_FILE)) {
         const raw = fs.readFileSync(DB_FILE, 'utf-8');
         this.data = JSON.parse(raw);
+        if (!this.data.projects || this.data.projects.length === 0) {
+          this.seedInitialData();
+          this.save();
+        }
       } else {
         this.seedInitialData();
         this.save();
@@ -64,19 +69,50 @@ class Database {
     } catch {}
   }
 
-  private seedInitialData() {
-    // Database starts completely clean with no pre-loaded example projects or scans
+  public seedInitialData() {
+    const sampleScan: Scan = {
+      id: 'SCN-SAMPLE-01',
+      projectId: SAMPLE_PROJECT.id,
+      filename: 'owasp-zap-nuclei-semgrep-consolidated.json',
+      scannerType: 'generic_json',
+      uploadedAt: new Date().toISOString(),
+      totalRawFindings: 8,
+      deduplicatedCount: SAMPLE_FINDINGS.length,
+      status: 'completed',
+      statusMessage: `Completed analysis: ${SAMPLE_FINDINGS.length} findings, ${SAMPLE_ATTACK_PATHS.length} attack paths, ${SAMPLE_REMEDIATIONS.length} remediation actions.`,
+      summary: {
+        critical: SAMPLE_FINDINGS.filter(f => f.severity === 'Critical').length,
+        high: SAMPLE_FINDINGS.filter(f => f.severity === 'High').length,
+        medium: SAMPLE_FINDINGS.filter(f => f.severity === 'Medium').length,
+        low: SAMPLE_FINDINGS.filter(f => f.severity === 'Low').length,
+        info: SAMPLE_FINDINGS.filter(f => f.severity === 'Info').length,
+      },
+    };
+
     this.data = {
-      projects: [],
-      scans: [],
-      findings: [],
+      projects: [{ ...SAMPLE_PROJECT }],
+      scans: [sampleScan],
+      findings: [...SAMPLE_FINDINGS],
       relationships: [],
-      attackPaths: [],
-      remediations: [],
+      attackPaths: [...SAMPLE_ATTACK_PATHS],
+      remediations: [...SAMPLE_REMEDIATIONS],
       comparisons: [],
-      auditLogs: [],
+      auditLogs: [
+        {
+          id: `LOG-INIT-1`,
+          timestamp: new Date().toISOString(),
+          action: 'ENVIRONMENT_INITIALIZED',
+          details: `Seeded defensive assessment workspace for ${SAMPLE_PROJECT.name} (${SAMPLE_PROJECT.targetScope}).`,
+          projectId: SAMPLE_PROJECT.id,
+        },
+      ],
     };
     this.save();
+  }
+
+  public resetCleanDemo(): Project {
+    this.seedInitialData();
+    return this.data.projects[0];
   }
 
   public logAudit(projectId: string | undefined, action: string, details: string) {
@@ -127,6 +163,23 @@ class Database {
     this.logAudit(p.id, 'PROJECT_CREATED', `Project ${p.name} created. Authorized scope: ${p.targetScope}`);
     this.save();
     return p;
+  }
+
+  public deleteProject(projectId: string): boolean {
+    const exists = this.data.projects.some(p => p.id === projectId);
+    if (!exists) return false;
+
+    this.data.projects = this.data.projects.filter(p => p.id !== projectId);
+    this.data.scans = this.data.scans.filter(s => s.projectId !== projectId);
+    this.data.findings = this.data.findings.filter(f => f.projectId !== projectId);
+    this.data.attackPaths = this.data.attackPaths.filter(a => a.projectId !== projectId);
+    this.data.remediations = this.data.remediations.filter(r => r.projectId !== projectId);
+    this.data.comparisons = this.data.comparisons.filter(c => c.projectId !== projectId);
+    this.data.relationships = this.data.relationships.filter(rel => rel.projectId !== projectId);
+    this.data.auditLogs = this.data.auditLogs.filter(l => l.projectId !== projectId);
+
+    this.save();
+    return true;
   }
 
   // --- Scans ---

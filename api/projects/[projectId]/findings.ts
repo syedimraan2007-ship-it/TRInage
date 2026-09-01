@@ -1,4 +1,5 @@
-import { createSupabaseClient, getSupabaseSetupError } from '../../../lib/supabase';
+import { createSupabaseClient } from '../../../lib/supabase';
+import { getFindings, updateFinding, getFinding } from '../../../lib/vercel-store';
 
 function normalizeFinding(row: any) {
   return {
@@ -41,41 +42,49 @@ export default async function handler(req: any, res: any) {
   const projectId = rawProjectId || '';
   const supabase = createSupabaseClient(true) || createSupabaseClient();
 
-  if (!supabase) {
-    return res.status(503).json({ error: getSupabaseSetupError() });
-  }
-
   if (req.method === 'GET') {
     const { scanId, severity, asset, status, search } = req.query;
 
-    let query = supabase
-      .from('findings')
-      .select('*')
-      .eq('project_id', projectId);
+    if (supabase) {
+      try {
+        let query = supabase.from('findings').select('*').eq('project_id', projectId);
+        if (scanId) query = query.eq('scan_id', String(scanId));
+        if (severity) query = query.eq('severity', String(severity));
+        if (status) query = query.eq('status', String(status));
 
-    if (scanId) {
-      query = query.eq('scan_id', String(scanId));
-    }
-    if (severity) {
-      query = query.eq('severity', String(severity));
-    }
-    if (status) {
-      query = query.eq('status', String(status));
+        const { data, error } = await query.order('created_at', { ascending: false });
+        if (!error && data) {
+          let rows = data.map(normalizeFinding);
+          if (asset) {
+            const target = String(asset).toLowerCase();
+            rows = rows.filter(f => String(f.asset || '').toLowerCase().includes(target));
+          }
+          if (search) {
+            const q = String(search).toLowerCase();
+            rows = rows.filter(f =>
+              (f.title || '').toLowerCase().includes(q) ||
+              (f.endpoint || '').toLowerCase().includes(q) ||
+              (f.cwe || '').toLowerCase().includes(q) ||
+              (f.cve || '').toLowerCase().includes(q) ||
+              (f.vulnerabilityCategory || '').toLowerCase().includes(q)
+            );
+          }
+          return res.status(200).json(rows);
+        }
+      } catch {}
     }
 
-    const { data, error } = await query.order('created_at', { ascending: false });
-    if (error) {
-      return res.status(500).json({ error: error.message });
-    }
-
-    let rows = (data || []).map(normalizeFinding);
+    // In-memory fallback
+    let rows = getFindings(projectId, scanId ? String(scanId) : undefined);
+    if (severity) rows = rows.filter((f: any) => f.severity === String(severity));
+    if (status) rows = rows.filter((f: any) => f.status === String(status));
     if (asset) {
       const target = String(asset).toLowerCase();
-      rows = rows.filter(f => String(f.asset || '').toLowerCase().includes(target));
+      rows = rows.filter((f: any) => String(f.asset || '').toLowerCase().includes(target));
     }
     if (search) {
       const q = String(search).toLowerCase();
-      rows = rows.filter(f =>
+      rows = rows.filter((f: any) =>
         (f.title || '').toLowerCase().includes(q) ||
         (f.endpoint || '').toLowerCase().includes(q) ||
         (f.cwe || '').toLowerCase().includes(q) ||
@@ -83,7 +92,6 @@ export default async function handler(req: any, res: any) {
         (f.vulnerabilityCategory || '').toLowerCase().includes(q)
       );
     }
-
     return res.status(200).json(rows);
   }
 
@@ -95,18 +103,24 @@ export default async function handler(req: any, res: any) {
       return res.status(400).json({ error: 'Finding id is required.' });
     }
 
-    const { data, error } = await supabase
-      .from('findings')
-      .update({ status, updated_at: new Date().toISOString() })
-      .eq('id', findingId)
-      .select('*')
-      .single();
+    if (supabase) {
+      try {
+        const { data, error } = await supabase
+          .from('findings')
+          .update({ status, updated_at: new Date().toISOString() })
+          .eq('id', findingId)
+          .select('*')
+          .single();
 
-    if (error) {
-      return res.status(500).json({ error: error.message });
+        if (!error && data) {
+          return res.status(200).json(normalizeFinding(data));
+        }
+      } catch {}
     }
 
-    return res.status(200).json(normalizeFinding(data));
+    updateFinding(String(findingId), { status });
+    const updated = getFinding(String(findingId));
+    return res.status(200).json(updated || { id: findingId, status });
   }
 
   res.setHeader('Allow', 'GET, PATCH');

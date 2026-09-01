@@ -5,7 +5,7 @@ import { calculatePathRisk } from './riskEngine';
 let aiClient: GoogleGenAI | null = null;
 
 function getAiClient(): GoogleGenAI | null {
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
   if (!apiKey || apiKey === 'MY_GEMINI_API_KEY') {
     return null;
   }

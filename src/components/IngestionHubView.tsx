@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Scan } from '../types';
-import { UploadCloud, FileText, CheckCircle2, AlertCircle, RefreshCw, Layers, ShieldCheck, Code2, Terminal, Cpu, FileSpreadsheet } from 'lucide-react';
+import { api } from '../api';
+import { UploadCloud, FileText, CheckCircle2, AlertCircle, RefreshCw, Layers, ShieldCheck, Code2, Terminal, Cpu, FileSpreadsheet, Sparkles } from 'lucide-react';
 
 interface IngestionHubViewProps {
   projectId: string;
@@ -21,8 +22,14 @@ export const IngestionHubView: React.FC<IngestionHubViewProps> = ({
   const [pasteContent, setPasteContent] = useState('');
   const [pasteFilename, setPasteFilename] = useState('custom-scan.json');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [loadingSampleId, setLoadingSampleId] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [samples, setSamples] = useState<any[]>([]);
+
+  useEffect(() => {
+    api.getSamples().then(setSamples).catch(() => {});
+  }, []);
 
   const handleFileUpload = async (file: File) => {
     setErrorMessage(null);
@@ -41,7 +48,7 @@ export const IngestionHubView: React.FC<IngestionHubViewProps> = ({
       setTimeout(() => {
         setStatusMessage(null);
         onNavigateTab('dashboard');
-      }, 1200);
+      }, 1000);
     } catch (err: any) {
       setErrorMessage(err.message || 'Failed to upload and parse scan file.');
     } finally {
@@ -64,11 +71,34 @@ export const IngestionHubView: React.FC<IngestionHubViewProps> = ({
       setTimeout(() => {
         setStatusMessage(null);
         onNavigateTab('dashboard');
-      }, 1200);
+      }, 1000);
     } catch (err: any) {
       setErrorMessage(err.message || 'Failed to parse pasted scan.');
     } finally {
       setIsProcessing(false);
+    }
+  };
+
+  const handleLoadSample = async (sampleId: string) => {
+    setErrorMessage(null);
+    setLoadingSampleId(sampleId);
+    setStatusMessage(`Loading sample scan '${sampleId}'...`);
+    setIsProcessing(true);
+
+    try {
+      const res = await api.loadSample(sampleId, projectId);
+      setStatusMessage(`Correlating attack paths and synthesizing risk scores...`);
+      await onProcessScan(res.scan.id);
+      setStatusMessage('Sample scan successfully correlated!');
+      setTimeout(() => {
+        setStatusMessage(null);
+        onNavigateTab('dashboard');
+      }, 1000);
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Failed to load sample dataset.');
+    } finally {
+      setIsProcessing(false);
+      setLoadingSampleId(null);
     }
   };
 
@@ -78,11 +108,51 @@ export const IngestionHubView: React.FC<IngestionHubViewProps> = ({
       <div>
         <h2 className="text-xl font-bold text-slate-100 flex items-center space-x-2">
           <UploadCloud className="w-5 h-5 text-cyan-400" />
-          <span>Security Scanner Ingestion</span>
+          <span>Security Scanner Ingestion Hub</span>
         </h2>
         <p className="text-xs text-slate-400 mt-0.5">
           Upload raw scan results from OWASP ZAP, Nuclei, Semgrep, Trivy, Nmap, or generic CSV/JSON logs into unified, deduplicated intelligence.
         </p>
+      </div>
+
+      {/* 1-Click Sample Scans Quick Loader */}
+      <div className="cyber-card rounded-2xl p-5 border border-cyan-900/50 bg-gradient-to-r from-cyan-950/40 via-slate-900 to-slate-900 space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2 text-cyan-300 font-bold text-xs">
+            <Sparkles className="w-4 h-4 text-cyan-400" />
+            <span>1-Click Test Scans & Threat Intelligence Scenarios</span>
+          </div>
+          <span className="text-[11px] font-mono text-slate-400">Pre-built realistic datasets</span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {[
+            { id: 'zap', name: 'OWASP ZAP API', label: 'DAST API Scan (SSRF & CORS)', icon: Terminal, color: 'text-cyan-400' },
+            { id: 'nuclei', name: 'Nuclei v3.2', label: 'Infra & Redis Scan (No-Auth Cache)', icon: Code2, color: 'text-amber-400' },
+            { id: 'semgrep', name: 'Semgrep SAST', label: 'Code Review (SQLi & JWT Secret)', icon: Cpu, color: 'text-rose-400' },
+            { id: 'postFix', name: 'Post-Remediation', label: 'Verification Scan (Patched State)', icon: ShieldCheck, color: 'text-emerald-400' },
+          ].map((s) => {
+            const Icon = s.icon;
+            const isThisLoading = loadingSampleId === s.id;
+            return (
+              <button
+                key={s.id}
+                onClick={() => handleLoadSample(s.id)}
+                disabled={isProcessing}
+                className="p-3 rounded-xl bg-slate-950/80 hover:bg-slate-950 border border-slate-800 hover:border-cyan-500/50 text-left transition space-y-1 group"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-1.5 font-bold text-xs text-slate-200 group-hover:text-cyan-300">
+                    <Icon className={`w-3.5 h-3.5 ${s.color}`} />
+                    <span>{s.name}</span>
+                  </div>
+                  {isThisLoading && <RefreshCw className="w-3 h-3 text-cyan-400 animate-spin" />}
+                </div>
+                <p className="text-[11px] text-slate-400 leading-snug">{s.label}</p>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Status or Error Notifications */}
@@ -104,10 +174,10 @@ export const IngestionHubView: React.FC<IngestionHubViewProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left 7 Cols: Upload Box & Paste Area */}
         <div className="lg:col-span-7 space-y-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-sm space-y-4">
+          <div className="cyber-card rounded-2xl p-5 border border-slate-800 shadow-sm space-y-4">
             <h3 className="text-sm font-bold text-slate-200 flex items-center space-x-2">
               <FileText className="w-4 h-4 text-cyan-400" />
-              <span>Upload Security Scan File</span>
+              <span>Upload Custom Security Scan File</span>
             </h3>
 
             {/* Dropzone */}
@@ -124,10 +194,10 @@ export const IngestionHubView: React.FC<IngestionHubViewProps> = ({
                   handleFileUpload(e.dataTransfer.files[0]);
                 }
               }}
-              className={`border-2 border-dashed rounded-xl p-8 text-center transition cursor-pointer ${
+              className={`border-2 border-dashed rounded-2xl p-8 text-center transition cursor-pointer ${
                 dragOver
                   ? 'border-cyan-500 bg-cyan-950/30'
-                  : 'border-slate-700 hover:border-slate-600 bg-slate-950/50'
+                  : 'border-slate-800 hover:border-slate-700 bg-slate-950/60'
               }`}
               onClick={() => document.getElementById('file-upload-input')?.click()}
             >
@@ -143,7 +213,7 @@ export const IngestionHubView: React.FC<IngestionHubViewProps> = ({
                 }}
               />
               <UploadCloud className="w-10 h-10 mx-auto text-cyan-400 mb-2" />
-              <p className="text-sm font-semibold text-slate-200">
+              <p className="text-sm font-bold text-slate-200">
                 Drag & Drop scanner output here, or click to browse
               </p>
               <p className="text-xs text-slate-400 mt-1 font-mono">
@@ -160,7 +230,7 @@ export const IngestionHubView: React.FC<IngestionHubViewProps> = ({
                   value={pasteFilename}
                   onChange={(e) => setPasteFilename(e.target.value)}
                   placeholder="custom-scan.json"
-                  className="bg-slate-950 border border-slate-800 text-[11px] font-mono text-slate-300 px-2 py-0.5 rounded w-40"
+                  className="bg-slate-950 border border-slate-800 text-[11px] font-mono text-slate-300 px-2 py-0.5 rounded-md w-40 focus:outline-none focus:border-cyan-500"
                 />
               </div>
               <textarea
@@ -168,13 +238,13 @@ export const IngestionHubView: React.FC<IngestionHubViewProps> = ({
                 value={pasteContent}
                 onChange={(e) => setPasteContent(e.target.value)}
                 placeholder='Paste raw JSON, JSONL, XML, or CSV scan text directly here...'
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-xs font-mono text-slate-300 focus:outline-none focus:border-cyan-500 placeholder-slate-600"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs font-mono text-slate-300 focus:outline-none focus:border-cyan-500 placeholder-slate-600"
               />
               <button
                 id="paste-submit-btn"
                 onClick={handlePasteSubmit}
                 disabled={!pasteContent.trim() || isProcessing}
-                className="w-full py-2.5 bg-cyan-600 hover:bg-cyan-500 disabled:bg-slate-800 disabled:text-slate-600 text-white rounded-lg text-xs font-bold transition shadow-sm"
+                className="w-full py-2.5 bg-cyan-600 hover:bg-cyan-500 disabled:bg-slate-800 disabled:text-slate-600 text-white rounded-xl text-xs font-bold transition shadow-sm"
               >
                 {isProcessing ? 'Processing & Correlating...' : 'Parse & Process Pasted Output'}
               </button>
@@ -184,17 +254,17 @@ export const IngestionHubView: React.FC<IngestionHubViewProps> = ({
 
         {/* Right 5 Cols: Supported Formats & Reference Guide */}
         <div className="lg:col-span-5 space-y-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-sm space-y-4">
+          <div className="cyber-card rounded-2xl p-5 border border-slate-800 shadow-sm space-y-4">
             <h3 className="text-sm font-bold text-slate-200 flex items-center space-x-2">
               <ShieldCheck className="w-4 h-4 text-emerald-400" />
               <span>Supported Scanner Formats</span>
             </h3>
             <p className="text-xs text-slate-400">
-              The ingestion engine automatically detects the scanner syntax, normalizes CWE/CVSS attributes, and executes deterministic deduplication:
+              The ingestion engine automatically detects scanner syntax, normalizes CWE/CVSS attributes, and executes deterministic deduplication:
             </p>
 
-            <div className="space-y-2.5 text-xs font-mono">
-              <div className="bg-slate-950 border border-slate-800/80 rounded-lg p-2.5 space-y-1">
+            <div className="space-y-2 text-xs font-mono">
+              <div className="bg-slate-950 border border-slate-800/80 rounded-xl p-3 space-y-1">
                 <div className="flex items-center justify-between text-slate-200 font-bold">
                   <span className="flex items-center space-x-1.5 text-cyan-300">
                     <Terminal className="w-3.5 h-3.5" />
@@ -207,7 +277,7 @@ export const IngestionHubView: React.FC<IngestionHubViewProps> = ({
                 </p>
               </div>
 
-              <div className="bg-slate-950 border border-slate-800/80 rounded-lg p-2.5 space-y-1">
+              <div className="bg-slate-950 border border-slate-800/80 rounded-xl p-3 space-y-1">
                 <div className="flex items-center justify-between text-slate-200 font-bold">
                   <span className="flex items-center space-x-1.5 text-cyan-300">
                     <Code2 className="w-3.5 h-3.5" />
@@ -220,7 +290,7 @@ export const IngestionHubView: React.FC<IngestionHubViewProps> = ({
                 </p>
               </div>
 
-              <div className="bg-slate-950 border border-slate-800/80 rounded-lg p-2.5 space-y-1">
+              <div className="bg-slate-950 border border-slate-800/80 rounded-xl p-3 space-y-1">
                 <div className="flex items-center justify-between text-slate-200 font-bold">
                   <span className="flex items-center space-x-1.5 text-cyan-300">
                     <Cpu className="w-3.5 h-3.5" />
@@ -233,20 +303,7 @@ export const IngestionHubView: React.FC<IngestionHubViewProps> = ({
                 </p>
               </div>
 
-              <div className="bg-slate-950 border border-slate-800/80 rounded-lg p-2.5 space-y-1">
-                <div className="flex items-center justify-between text-slate-200 font-bold">
-                  <span className="flex items-center space-x-1.5 text-cyan-300">
-                    <Layers className="w-3.5 h-3.5" />
-                    <span>Aqua Trivy (Container/SCA)</span>
-                  </span>
-                  <span className="text-[10px] text-slate-500">JSON</span>
-                </div>
-                <p className="text-slate-400 text-[11px] font-sans">
-                  Command: <code className="text-cyan-300">trivy fs --format json -o trivy.json .</code>
-                </p>
-              </div>
-
-              <div className="bg-slate-950 border border-slate-800/80 rounded-lg p-2.5 space-y-1">
+              <div className="bg-slate-950 border border-slate-800/80 rounded-xl p-3 space-y-1">
                 <div className="flex items-center justify-between text-slate-200 font-bold">
                   <span className="flex items-center space-x-1.5 text-cyan-300">
                     <FileSpreadsheet className="w-3.5 h-3.5" />
@@ -255,7 +312,7 @@ export const IngestionHubView: React.FC<IngestionHubViewProps> = ({
                   <span className="text-[10px] text-slate-500">CSV / JSON Array</span>
                 </div>
                 <p className="text-slate-400 text-[11px] font-sans">
-                  Standard columns: <code className="text-cyan-300">title, severity, asset, endpoint, cwe, description</code>.
+                  Columns: <code className="text-cyan-300">title, severity, asset, endpoint, cwe, description</code>.
                 </p>
               </div>
             </div>
@@ -264,47 +321,47 @@ export const IngestionHubView: React.FC<IngestionHubViewProps> = ({
       </div>
 
       {/* Imported Scans History Table */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-sm space-y-3">
+      <div className="cyber-card rounded-2xl p-5 border border-slate-800 shadow-sm space-y-3">
         <h3 className="text-sm font-bold text-slate-200 flex items-center justify-between">
           <span>Project Ingestion History ({scans.length})</span>
           <span className="text-xs font-mono text-slate-400">Audit Provenance Log</span>
         </h3>
 
         {scans.length === 0 ? (
-          <p className="text-xs text-slate-500 py-6 text-center font-mono">
-            No scans imported into this project yet. Upload or paste a scanner file above to begin.
+          <p className="text-xs text-slate-500 py-8 text-center font-mono">
+            No scans imported into this project yet. Upload or load a sample scan above to begin.
           </p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead className="text-slate-400 font-mono uppercase text-[10px] border-b border-slate-800">
                 <tr>
-                  <th className="py-2.5 px-3">Filename</th>
-                  <th className="py-2.5 px-3">Scanner Type</th>
-                  <th className="py-2.5 px-3">Raw Findings</th>
-                  <th className="py-2.5 px-3">Deduplicated</th>
-                  <th className="py-2.5 px-3">Critical / High</th>
-                  <th className="py-2.5 px-3">Status</th>
-                  <th className="py-2.5 px-3">Timestamp</th>
+                  <th className="py-3 px-3">Filename</th>
+                  <th className="py-3 px-3">Scanner Type</th>
+                  <th className="py-3 px-3">Raw Findings</th>
+                  <th className="py-3 px-3">Deduplicated</th>
+                  <th className="py-3 px-3">Critical / High</th>
+                  <th className="py-3 px-3">Status</th>
+                  <th className="py-3 px-3">Timestamp</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60 font-mono">
                 {scans.map((scan) => (
                   <tr key={scan.id} className="hover:bg-slate-800/40">
-                    <td className="py-2.5 px-3 font-semibold text-slate-200">{scan.filename}</td>
-                    <td className="py-2.5 px-3 text-cyan-300">{scan.scannerType}</td>
-                    <td className="py-2.5 px-3 text-slate-400">{scan.totalRawFindings}</td>
-                    <td className="py-2.5 px-3 text-emerald-400 font-bold">{scan.deduplicatedCount}</td>
-                    <td className="py-2.5 px-3">
+                    <td className="py-3 px-3 font-semibold text-slate-200">{scan.filename}</td>
+                    <td className="py-3 px-3 text-cyan-300">{scan.scannerType}</td>
+                    <td className="py-3 px-3 text-slate-400">{scan.totalRawFindings}</td>
+                    <td className="py-3 px-3 text-emerald-400 font-bold">{scan.deduplicatedCount}</td>
+                    <td className="py-3 px-3">
                       <span className="text-rose-400 font-bold">{scan.summary.critical} Crit</span> /{' '}
                       <span className="text-amber-400 font-bold">{scan.summary.high} High</span>
                     </td>
-                    <td className="py-2.5 px-3">
+                    <td className="py-3 px-3">
                       <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-800 uppercase">
                         {scan.status}
                       </span>
                     </td>
-                    <td className="py-2.5 px-3 text-slate-500">
+                    <td className="py-3 px-3 text-slate-500">
                       {new Date(scan.uploadedAt).toLocaleString()}
                     </td>
                   </tr>

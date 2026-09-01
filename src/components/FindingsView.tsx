@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { NormalizedFinding, Severity, FindingStatus } from '../types';
-import { Search, Filter, Layers, ShieldAlert, Sparkles, CheckCircle2, X, ExternalLink, Code2, AlertTriangle, Database } from 'lucide-react';
+import { Search, Layers, Sparkles, X, Code2, Copy, Check } from 'lucide-react';
 
 interface FindingsViewProps {
   findings: NormalizedFinding[];
@@ -17,6 +17,7 @@ export const FindingsView: React.FC<FindingsViewProps> = ({
   const [selectedAsset, setSelectedAsset] = useState<string>('ALL');
   const [viewMode, setViewMode] = useState<'canonical' | 'raw'>('canonical');
   const [selectedFinding, setSelectedFinding] = useState<NormalizedFinding | null>(null);
+  const [copiedPayload, setCopiedPayload] = useState(false);
 
   // Asset list
   const assets = useMemo(() => {
@@ -42,7 +43,13 @@ export const FindingsView: React.FC<FindingsViewProps> = ({
     });
   }, [findings, selectedSeverity, selectedStatus, selectedAsset, search]);
 
-  const rawCountTotal = findings.reduce((acc, f) => acc + f.sourceCount, 0);
+  const rawCountTotal = findings.reduce((acc, f) => acc + (f.sourceCount || 1), 0);
+
+  const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedPayload(true);
+    setTimeout(() => setCopiedPayload(false), 2000);
+  };
 
   return (
     <div className="space-y-6">
@@ -51,7 +58,7 @@ export const FindingsView: React.FC<FindingsViewProps> = ({
         <div>
           <h2 className="text-xl font-bold text-slate-100 flex items-center space-x-2">
             <Layers className="w-5 h-5 text-cyan-400" />
-            <span>Normalized Security Findings</span>
+            <span>Normalized Security Findings Matrix</span>
           </h2>
           <p className="text-xs text-slate-400 mt-0.5">
             Heterogeneous scanner findings normalized into canonical records with deterministic deduplication & calibrated AI triage.
@@ -59,36 +66,36 @@ export const FindingsView: React.FC<FindingsViewProps> = ({
         </div>
 
         {/* Canonical vs Raw Toggle */}
-        <div className="flex items-center space-x-2 bg-slate-900 border border-slate-800 p-1 rounded-lg self-start md:self-auto text-xs">
+        <div className="flex items-center space-x-1.5 bg-slate-900 border border-slate-800 p-1 rounded-xl self-start md:self-auto text-xs">
           <button
             id="view-canonical-btn"
             onClick={() => setViewMode('canonical')}
-            className={`px-3 py-1.5 rounded-md font-semibold transition ${
+            className={`px-3 py-1.5 rounded-lg font-bold transition ${
               viewMode === 'canonical'
                 ? 'bg-cyan-950 text-cyan-300 border border-cyan-800'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            Canonical Deduplicated ({findings.length})
+            Canonical ({findings.length})
           </button>
           <button
             id="view-raw-btn"
             onClick={() => setViewMode('raw')}
-            className={`px-3 py-1.5 rounded-md font-semibold transition ${
+            className={`px-3 py-1.5 rounded-lg font-bold transition ${
               viewMode === 'raw'
                 ? 'bg-cyan-950 text-cyan-300 border border-cyan-800'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            Raw Scanner Events ({rawCountTotal})
+            Raw Events ({rawCountTotal})
           </button>
         </div>
       </div>
 
       {/* Filter Bar */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-xl p-3 flex flex-wrap items-center justify-between gap-3 shadow-sm text-xs">
+      <div className="cyber-card rounded-xl p-3.5 flex flex-wrap items-center justify-between gap-3 shadow-sm border border-slate-800 text-xs">
         {/* Search */}
-        <div className="relative flex-1 min-w-[200px] max-w-md">
+        <div className="relative flex-1 min-w-[220px] max-w-md">
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
           <input
             id="findings-search"
@@ -106,7 +113,7 @@ export const FindingsView: React.FC<FindingsViewProps> = ({
           <select
             value={selectedSeverity}
             onChange={(e) => setSelectedSeverity(e.target.value)}
-            className="bg-slate-800 text-slate-200 border border-slate-700 rounded-lg px-2.5 py-1.5"
+            className="bg-slate-950 text-slate-200 border border-slate-800 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-cyan-500"
           >
             <option value="ALL">All Severities</option>
             <option value="Critical">Critical</option>
@@ -120,7 +127,7 @@ export const FindingsView: React.FC<FindingsViewProps> = ({
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="bg-slate-800 text-slate-200 border border-slate-700 rounded-lg px-2.5 py-1.5"
+            className="bg-slate-950 text-slate-200 border border-slate-800 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-cyan-500"
           >
             <option value="ALL">All Statuses</option>
             <option value="open">Open</option>
@@ -134,7 +141,7 @@ export const FindingsView: React.FC<FindingsViewProps> = ({
             <select
               value={selectedAsset}
               onChange={(e) => setSelectedAsset(e.target.value)}
-              className="bg-slate-800 text-slate-200 border border-slate-700 rounded-lg px-2.5 py-1.5 max-w-[150px] truncate"
+              className="bg-slate-950 text-slate-200 border border-slate-800 rounded-lg px-2.5 py-1.5 max-w-[150px] truncate focus:outline-none focus:border-cyan-500"
             >
               <option value="ALL">All Assets</option>
               {assets.map((a) => (
@@ -153,7 +160,7 @@ export const FindingsView: React.FC<FindingsViewProps> = ({
                 setSelectedStatus('ALL');
                 setSelectedAsset('ALL');
               }}
-              className="text-slate-400 hover:text-slate-200 underline px-1"
+              className="text-cyan-400 hover:text-cyan-300 underline px-1 font-semibold"
             >
               Clear Filters
             </button>
@@ -162,24 +169,24 @@ export const FindingsView: React.FC<FindingsViewProps> = ({
       </div>
 
       {/* Findings Table */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-xl overflow-hidden shadow-sm">
+      <div className="cyber-card rounded-2xl overflow-hidden shadow-lg border border-slate-800">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-950/80 text-slate-400 font-mono uppercase text-[11px] border-b border-slate-800">
+            <thead className="bg-slate-950/90 text-slate-400 font-mono uppercase text-[11px] border-b border-slate-800">
               <tr>
-                <th className="py-3 px-4">Severity</th>
-                <th className="py-3 px-4">Finding & Category</th>
-                <th className="py-3 px-4">Asset / Endpoint</th>
-                <th className="py-3 px-4">Identifiers</th>
-                <th className="py-3 px-4">AI Triage Confidence</th>
-                <th className="py-3 px-4">Provenance</th>
-                <th className="py-3 px-4">Status</th>
+                <th className="py-3.5 px-4 font-semibold">Severity</th>
+                <th className="py-3.5 px-4 font-semibold">Finding & Category</th>
+                <th className="py-3.5 px-4 font-semibold">Asset / Endpoint</th>
+                <th className="py-3.5 px-4 font-semibold">Identifiers</th>
+                <th className="py-3.5 px-4 font-semibold">AI Triage Confidence</th>
+                <th className="py-3.5 px-4 font-semibold">Provenance</th>
+                <th className="py-3.5 px-4 font-semibold">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60">
+            <tbody className="divide-y divide-slate-800/60 font-sans">
               {filteredFindings.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-8 text-center text-slate-500">
+                  <td colSpan={7} className="py-12 text-center text-slate-500 font-mono">
                     No security findings match your filter criteria.
                   </td>
                 </tr>
@@ -188,12 +195,12 @@ export const FindingsView: React.FC<FindingsViewProps> = ({
                   <tr
                     key={finding.id}
                     onClick={() => setSelectedFinding(finding)}
-                    className="hover:bg-slate-800/50 cursor-pointer transition"
+                    className="hover:bg-slate-800/40 cursor-pointer transition"
                   >
                     {/* Severity */}
-                    <td className="py-3 px-4 font-mono font-bold whitespace-nowrap">
+                    <td className="py-3.5 px-4 font-mono font-bold whitespace-nowrap">
                       <span
-                        className={`px-2 py-0.5 rounded text-[10px] uppercase ${
+                        className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold ${
                           finding.severity === 'Critical'
                             ? 'bg-rose-950 text-rose-300 border border-rose-800'
                             : finding.severity === 'High'
@@ -210,21 +217,21 @@ export const FindingsView: React.FC<FindingsViewProps> = ({
                     </td>
 
                     {/* Title & Category */}
-                    <td className="py-3 px-4 max-w-xs sm:max-w-sm">
-                      <div className="font-semibold text-slate-200 truncate">{finding.title}</div>
-                      <div className="text-[11px] text-slate-400 truncate">{finding.vulnerabilityCategory}</div>
+                    <td className="py-3.5 px-4 max-w-xs sm:max-w-sm">
+                      <div className="font-bold text-slate-100 truncate">{finding.title}</div>
+                      <div className="text-[11px] text-slate-400 truncate mt-0.5">{finding.vulnerabilityCategory}</div>
                     </td>
 
                     {/* Asset & Endpoint */}
-                    <td className="py-3 px-4 font-mono text-slate-300 max-w-[200px] truncate">
-                      <div className="text-slate-200">{finding.asset}</div>
+                    <td className="py-3.5 px-4 font-mono text-slate-300 max-w-[200px] truncate">
+                      <div className="text-slate-200 font-semibold truncate">{finding.asset}</div>
                       <div className="text-slate-400 text-[11px] truncate">{finding.endpoint}</div>
                     </td>
 
                     {/* Identifiers (CWE, CVE) */}
-                    <td className="py-3 px-4 font-mono text-[11px] whitespace-nowrap space-x-1">
+                    <td className="py-3.5 px-4 font-mono text-[11px] whitespace-nowrap space-x-1">
                       {finding.cwe && (
-                        <span className="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
+                        <span className="px-1.5 py-0.5 rounded bg-slate-950 text-slate-300 border border-slate-800">
                           {finding.cwe}
                         </span>
                       )}
@@ -236,9 +243,9 @@ export const FindingsView: React.FC<FindingsViewProps> = ({
                     </td>
 
                     {/* AI Calibrated Confidence */}
-                    <td className="py-3 px-4 whitespace-nowrap">
+                    <td className="py-3.5 px-4 whitespace-nowrap">
                       {finding.aiTriage ? (
-                        <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded bg-slate-950 text-cyan-300 border border-cyan-950 font-mono text-[11px]">
+                        <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded bg-slate-950 text-cyan-300 border border-cyan-900/60 font-mono text-[11px] font-semibold">
                           <Sparkles className="w-3 h-3 text-cyan-400" />
                           <span>{finding.aiTriage.calibratedConfidence}</span>
                         </span>
@@ -248,23 +255,23 @@ export const FindingsView: React.FC<FindingsViewProps> = ({
                     </td>
 
                     {/* Provenance */}
-                    <td className="py-3 px-4 font-mono text-slate-400 whitespace-nowrap">
-                      <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-300">
-                        {finding.sourceCount} {finding.sourceCount === 1 ? 'source' : 'sources'}
+                    <td className="py-3.5 px-4 font-mono text-slate-400 whitespace-nowrap">
+                      <span className="px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-300 text-[11px]">
+                        {finding.sourceCount || 1} {(finding.sourceCount || 1) === 1 ? 'source' : 'sources'}
                       </span>
                     </td>
 
                     {/* Status */}
-                    <td className="py-3 px-4 whitespace-nowrap">
+                    <td className="py-3.5 px-4 whitespace-nowrap">
                       <span
-                        className={`px-2 py-0.5 rounded text-[10px] font-mono capitalize ${
+                        className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold capitalize ${
                           finding.status === 'verified_fixed'
                             ? 'bg-emerald-950 text-emerald-300 border border-emerald-800'
                             : finding.status === 'in_progress'
                             ? 'bg-amber-950 text-amber-300 border border-amber-800'
                             : finding.status === 'false_positive'
                             ? 'bg-slate-800 text-slate-400'
-                            : 'bg-rose-950/60 text-rose-300'
+                            : 'bg-rose-950/70 text-rose-300 border border-rose-900/50'
                         }`}
                       >
                         {finding.status.replace('_', ' ')}
@@ -280,14 +287,14 @@ export const FindingsView: React.FC<FindingsViewProps> = ({
 
       {/* Finding Detail Inspection Modal */}
       {selectedFinding && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 space-y-5 shadow-2xl">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 space-y-5 shadow-2xl">
             {/* Modal Header */}
             <div className="flex items-start justify-between">
               <div>
                 <div className="flex items-center space-x-2 mb-1">
                   <span
-                    className={`px-2.5 py-0.5 rounded text-xs font-bold uppercase ${
+                    className={`px-2.5 py-0.5 rounded text-xs font-bold uppercase font-mono ${
                       selectedFinding.severity === 'Critical'
                         ? 'bg-rose-950 text-rose-300 border border-rose-800'
                         : selectedFinding.severity === 'High'
@@ -306,7 +313,7 @@ export const FindingsView: React.FC<FindingsViewProps> = ({
               </div>
               <button
                 onClick={() => setSelectedFinding(null)}
-                className="p-1 rounded text-slate-400 hover:text-slate-200 hover:bg-slate-800"
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -336,7 +343,7 @@ export const FindingsView: React.FC<FindingsViewProps> = ({
                 <p className="text-xs text-slate-300 leading-relaxed">
                   <strong>Business Blast Radius:</strong> {selectedFinding.aiTriage.businessImpact}
                 </p>
-                <p className="text-xs text-slate-400 font-mono bg-slate-900 p-2.5 rounded">
+                <p className="text-xs text-slate-400 font-mono bg-slate-900 p-2.5 rounded-lg">
                   {selectedFinding.aiTriage.reasoning}
                 </p>
               </div>
@@ -355,11 +362,20 @@ export const FindingsView: React.FC<FindingsViewProps> = ({
             {/* Captured Scanner Evidence */}
             {selectedFinding.evidence && (
               <div className="space-y-1.5">
-                <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center space-x-1.5">
-                  <Code2 className="w-4 h-4 text-cyan-400" />
-                  <span>Captured Security Evidence</span>
-                </h4>
-                <pre className="bg-slate-950 p-3 rounded-lg text-xs font-mono text-slate-300 overflow-x-auto max-h-48 border border-slate-800 whitespace-pre-wrap">
+                <div className="flex items-center justify-between text-xs">
+                  <h4 className="font-bold text-slate-200 uppercase tracking-wider flex items-center space-x-1.5">
+                    <Code2 className="w-4 h-4 text-cyan-400" />
+                    <span>Captured Security Evidence</span>
+                  </h4>
+                  <button
+                    onClick={() => handleCopy(selectedFinding.evidence?.payload || selectedFinding.evidence?.request || '')}
+                    className="text-[11px] text-cyan-400 hover:text-cyan-300 flex items-center space-x-1"
+                  >
+                    {copiedPayload ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                    <span>{copiedPayload ? 'Copied' : 'Copy Payload'}</span>
+                  </button>
+                </div>
+                <pre className="bg-slate-950 p-3.5 rounded-xl text-xs font-mono text-slate-300 overflow-x-auto max-h-48 border border-slate-800 whitespace-pre-wrap">
                   {selectedFinding.evidence.payload || selectedFinding.evidence.request || selectedFinding.evidence.rawOutput || 'No payload trace provided.'}
                 </pre>
               </div>
@@ -368,13 +384,13 @@ export const FindingsView: React.FC<FindingsViewProps> = ({
             {/* Provenance List */}
             <div className="space-y-2 pt-2 border-t border-slate-800">
               <h4 className="text-xs font-bold text-slate-200">
-                Consolidated Scanner Provenance ({selectedFinding.sourceCount} items)
+                Consolidated Scanner Provenance ({selectedFinding.sourceCount || 1} items)
               </h4>
               <div className="space-y-1 max-h-32 overflow-y-auto">
-                {selectedFinding.provenance.map((src, i) => (
+                {(selectedFinding.provenance || []).map((src, i) => (
                   <div
                     key={i}
-                    className="flex items-center justify-between text-[11px] font-mono p-2 rounded bg-slate-950 border border-slate-800/80 text-slate-300"
+                    className="flex items-center justify-between text-[11px] font-mono p-2 rounded-lg bg-slate-950 border border-slate-800/80 text-slate-300"
                   >
                     <span>Scanner: <strong>{src.scanner}</strong></span>
                     <span className="text-slate-500">{new Date(src.timestamp).toLocaleTimeString()}</span>
@@ -386,7 +402,7 @@ export const FindingsView: React.FC<FindingsViewProps> = ({
             {/* Status Switcher Footer */}
             <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-800">
               <div className="flex items-center space-x-2 text-xs">
-                <span className="text-slate-400 font-medium">Update Status:</span>
+                <span className="text-slate-400 font-semibold">Update Status:</span>
                 <select
                   value={selectedFinding.status}
                   onChange={(e) => {
@@ -394,7 +410,7 @@ export const FindingsView: React.FC<FindingsViewProps> = ({
                     onUpdateStatus(selectedFinding.id, st);
                     setSelectedFinding({ ...selectedFinding, status: st });
                   }}
-                  className="bg-slate-800 text-slate-200 border border-slate-700 rounded px-2.5 py-1 text-xs"
+                  className="bg-slate-950 text-slate-200 border border-slate-800 rounded-lg px-2.5 py-1 text-xs font-semibold focus:outline-none focus:border-cyan-500"
                 >
                   <option value="open">Open</option>
                   <option value="in_progress">In Progress</option>
@@ -405,7 +421,7 @@ export const FindingsView: React.FC<FindingsViewProps> = ({
 
               <button
                 onClick={() => setSelectedFinding(null)}
-                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-semibold"
+                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition"
               >
                 Close Inspector
               </button>

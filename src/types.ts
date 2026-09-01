@@ -164,6 +164,7 @@ export interface RemediationItem {
   projectId: string;
   title: string;
   priority: RemediationPriority;
+  affectedAsset?: string;
   affectedFindingIds: string[];
   affectedAttackPathIds: string[];
   pathsEliminatedCount: number;

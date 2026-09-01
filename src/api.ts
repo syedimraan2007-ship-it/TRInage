@@ -36,6 +36,28 @@ export const api = {
     return res.json();
   },
 
+  async deleteProject(id: string): Promise<void> {
+    const res = await fetch(`/api/projects/${id}`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || 'Failed to delete project');
+    }
+  },
+
+  async resetDemo(): Promise<Project> {
+    const res = await fetch('/api/projects/reset-demo', {
+      method: 'POST',
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || 'Failed to reset demo');
+    }
+    const data = await res.json();
+    return data.project;
+  },
+
   // Scans
   async getScans(projectId: string): Promise<Scan[]> {
     const res = await fetch(`/api/projects/${projectId}/scans`);

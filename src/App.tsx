@@ -13,7 +13,7 @@ import { IngestionHubView } from './components/IngestionHubView';
 import { ReportView } from './components/ReportView';
 import { NewProjectModal } from './components/NewProjectModal';
 import { AuditLogModal } from './components/AuditLogModal';
-import { Activity, ShieldAlert } from 'lucide-react';
+import { Activity, ShieldAlert, Sparkles, FolderPlus } from 'lucide-react';
 
 export function App() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -76,6 +76,13 @@ export function App() {
   useEffect(() => {
     if (currentProject) {
       loadProjectData(currentProject.id);
+    } else {
+      setMetrics(null);
+      setAttackPaths([]);
+      setFindings([]);
+      setRemediations([]);
+      setScans([]);
+      setComparisons([]);
     }
   }, [currentProject, loadProjectData]);
 
@@ -84,7 +91,27 @@ export function App() {
     const newProj = await api.createProject(data);
     setProjects(prev => [newProj, ...prev]);
     setCurrentProject(newProj);
+    setActiveTab('ingestion');
     return newProj;
+  };
+
+  const handleDeleteProject = async (projectId: string) => {
+    await api.deleteProject(projectId);
+    const remaining = projects.filter(p => p.id !== projectId);
+    setProjects(remaining);
+    if (remaining.length > 0) {
+      setCurrentProject(remaining[0]);
+    } else {
+      setCurrentProject(null);
+    }
+  };
+
+  const handleResetDemo = async () => {
+    const demoProj = await api.resetDemo();
+    const allProjs = await api.getProjects();
+    setProjects(allProjs);
+    setCurrentProject(demoProj);
+    setActiveTab('dashboard');
   };
 
   const handleUploadScan = async (filename: string, rawContent: string) => {
@@ -105,6 +132,7 @@ export function App() {
     if (!currentProject) return;
     await api.updateFindingStatus(currentProject.id, findingId, status);
     setFindings(prev => prev.map(f => f.id === findingId ? { ...f, status } : f));
+    await loadProjectData(currentProject.id);
   };
 
   const handleUpdateRemediation = async (id: string, status: RemediationItem['status']) => {
@@ -130,7 +158,7 @@ export function App() {
     return (
       <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-400 space-y-3">
         <Activity className="w-10 h-10 animate-spin text-cyan-400" />
-        <p className="font-mono text-sm">Initializing defensive security intelligence platform...</p>
+        <p className="font-mono text-xs">Initializing defensive security intelligence platform...</p>
       </div>
     );
   }
@@ -144,8 +172,15 @@ export function App() {
         onSelectProject={(p) => setCurrentProject(p)}
         onOpenNewProject={() => setIsNewProjectOpen(true)}
         onOpenAuditLogs={() => setIsAuditLogsOpen(true)}
+        onDeleteProject={handleDeleteProject}
+        onResetDemo={handleResetDemo}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
+        counts={{
+          findings: findings.length,
+          attackPaths: attackPaths.length,
+          remediations: remediations.filter(r => r.status !== 'verified_fixed').length,
+        }}
       />
 
       {/* Defensive Legal Scope Banner */}
@@ -157,20 +192,31 @@ export function App() {
       {/* Main View Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {!currentProject ? (
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-12 text-center text-slate-400 space-y-4 max-w-xl mx-auto my-12 shadow-xl">
-            <div className="w-14 h-14 bg-cyan-950/60 border border-cyan-500/30 rounded-2xl flex items-center justify-center mx-auto text-cyan-400">
+          <div className="cyber-card border border-slate-800 rounded-3xl p-12 text-center text-slate-400 space-y-5 max-w-xl mx-auto my-12 shadow-2xl">
+            <div className="w-14 h-14 bg-cyan-950/80 border border-cyan-500/40 rounded-2xl flex items-center justify-center mx-auto text-cyan-400 shadow-md">
               <ShieldAlert className="w-7 h-7" />
             </div>
-            <h2 className="text-xl font-bold text-slate-100">No Authorized Projects Configured</h2>
-            <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
-              Create an authorized project scope to begin ingesting vulnerability scanner logs, correlating multi-stage attack paths, and generating prioritized remediation plans.
-            </p>
-            <div className="pt-2">
+            <div className="space-y-1">
+              <h2 className="text-xl font-bold text-slate-100">No Authorized Projects Configured</h2>
+              <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
+                Create a defensive project scope or load the enterprise demo scenario to begin correlating multi-stage attack paths.
+              </p>
+            </div>
+
+            <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
               <button
                 onClick={() => setIsNewProjectOpen(true)}
-                className="px-5 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg text-xs font-bold transition shadow-md shadow-cyan-950/50"
+                className="w-full sm:w-auto px-5 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl text-xs font-bold transition shadow-md shadow-cyan-950 flex items-center justify-center space-x-1.5"
               >
-                Create New Project
+                <FolderPlus className="w-4 h-4" />
+                <span>Create New Project</span>
+              </button>
+              <button
+                onClick={handleResetDemo}
+                className="w-full sm:w-auto px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1.5"
+              >
+                <Sparkles className="w-4 h-4" />
+                <span>Load Fintech Demo Scenario</span>
               </button>
             </div>
           </div>
@@ -254,8 +300,8 @@ export function App() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-900 bg-slate-950/80 py-4 text-center text-slate-600 text-xs font-mono">
-        AI Vulnerability Triage & Attack-Path Prioritizer • Defensive Cybersecurity Intelligence & Threat Modeling
+      <footer className="border-t border-slate-900 bg-slate-950/90 py-4 text-center text-slate-500 text-xs font-mono">
+        AI Vulnerability Triage & Attack-Path Prioritizer • Defensive Threat Modeling & Remediation Intelligence
       </footer>
 
       {/* Modals */}

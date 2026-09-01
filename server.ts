@@ -3,6 +3,7 @@ import path from 'path';
 import { createServer as createViteServer } from 'vite';
 import dotenv from 'dotenv';
 import { db } from './server/db';
+import { SAMPLE_RAW_FILES } from './server/sampleData';
 import { detectAndParseScan } from './server/parsers/index';
 import { deduplicateFindings } from './server/services/deduplication';
 import { aiTriageFindings, aiCorrelateAndBuildAttackPaths, aiGenerateRemediationGuidance } from './server/services/gemini';
@@ -41,10 +42,21 @@ async function startServer() {
     res.json(project);
   });
 
+  app.post('/api/projects/reset-demo', (req, res) => {
+    const proj = db.resetCleanDemo();
+    res.json({ success: true, project: proj });
+  });
+
   app.get('/api/projects/:id', (req, res) => {
     const project = db.getProject(req.params.id);
     if (!project) return res.status(404).json({ error: 'Project not found.' });
     res.json(project);
+  });
+
+  app.delete('/api/projects/:id', (req, res) => {
+    const success = db.deleteProject(req.params.id);
+    if (!success) return res.status(404).json({ error: 'Project not found.' });
+    res.json({ success: true, message: 'Project deleted successfully.' });
   });
 
   // Scans
@@ -326,13 +338,95 @@ async function startServer() {
     res.json(report);
   });
 
-  // Sample Datasets & Lab Loader (returns empty)
+  // Sample Datasets & 1-Click Scanner Loaders
   app.get('/api/samples', (req, res) => {
-    res.json([]);
+    res.json([
+      {
+        id: 'zap',
+        name: 'OWASP ZAP API Scan',
+        format: 'JSON Report',
+        scanner: 'OWASP ZAP 2.15',
+        description: 'DAST scan finding SSRF in webhook dispatcher and permissive CORS misconfiguration.',
+        filename: 'owasp-zap-gateway-scan.json',
+      },
+      {
+        id: 'nuclei',
+        name: 'ProjectDiscovery Nuclei Scan',
+        format: 'JSON Output',
+        scanner: 'Nuclei v3.2',
+        description: 'Vulnerability scan uncovering unauthenticated Redis cache and exposed cloud metadata.',
+        filename: 'nuclei-internal-services.json',
+      },
+      {
+        id: 'semgrep',
+        name: 'Semgrep SAST Code Scan',
+        format: 'JSON Findings',
+        scanner: 'Semgrep 1.68',
+        description: 'Static code analysis detecting SQL injection in ledger reconciliation and hardcoded JWT secrets.',
+        filename: 'semgrep-auth-sast.json',
+      },
+      {
+        id: 'postFix',
+        name: 'Post-Remediation Verification Scan',
+        format: 'JSON Report',
+        scanner: 'Automated Post-Fix',
+        description: 'Follow-up scan showing resolved SSRF, SQLi, and Redis access for delta verification.',
+        filename: 'post-remediation-verification.json',
+      },
+    ]);
   });
 
   app.post('/api/load-sample', async (req, res) => {
-    res.status(404).json({ error: 'Pre-packaged sample datasets have been removed.' });
+    const { sampleId, projectId } = req.body;
+    const key = sampleId as keyof typeof SAMPLE_RAW_FILES;
+
+    if (!SAMPLE_RAW_FILES[key]) {
+      return res.status(404).json({ error: `Sample scan '${sampleId}' not found.` });
+    }
+
+    const rawContent = SAMPLE_RAW_FILES[key];
+    const filenames: Record<string, string> = {
+      zap: 'owasp-zap-gateway-scan.json',
+      nuclei: 'nuclei-internal-services.json',
+      semgrep: 'semgrep-auth-sast.json',
+      postFix: 'post-remediation-verification.json',
+    };
+
+    const filename = filenames[sampleId] || 'sample-scan.json';
+    const targetProjectId = projectId || db.getProjects()[0]?.id || db.resetCleanDemo().id;
+    const scanId = `SCN-${Date.now().toString(36).toUpperCase()}`;
+
+    try {
+      const parsed = detectAndParseScan(rawContent, filename, targetProjectId, scanId);
+      const dedup = deduplicateFindings(parsed.findings, parsed.scannerType, scanId, targetProjectId);
+
+      const newScan: Scan = {
+        id: scanId,
+        projectId: targetProjectId,
+        filename,
+        scannerType: parsed.scannerType as any,
+        uploadedAt: new Date().toISOString(),
+        totalRawFindings: dedup.rawCount,
+        deduplicatedCount: dedup.deduplicatedCount,
+        status: 'normalized',
+        statusMessage: `Normalized ${dedup.rawCount} raw findings into ${dedup.deduplicatedCount} canonical findings.`,
+        summary: {
+          critical: dedup.canonicalFindings.filter(f => f.severity === 'Critical').length,
+          high: dedup.canonicalFindings.filter(f => f.severity === 'High').length,
+          medium: dedup.canonicalFindings.filter(f => f.severity === 'Medium').length,
+          low: dedup.canonicalFindings.filter(f => f.severity === 'Low').length,
+          info: dedup.canonicalFindings.filter(f => f.severity === 'Info').length,
+        },
+      };
+
+      db.addScan(newScan);
+      db.setFindingsForScan(scanId, dedup.canonicalFindings);
+      db.logAudit(targetProjectId, 'SAMPLE_LOADED', `Sample dataset '${filename}' loaded.`);
+
+      res.json({ scan: newScan, deduplication: dedup, rawContent });
+    } catch (err: any) {
+      res.status(400).json({ error: err.message });
+    }
   });
 
   // Audit Logs

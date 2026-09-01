@@ -1,17 +1,46 @@
+import { SAMPLE_PROJECT, SAMPLE_FINDINGS, SAMPLE_ATTACK_PATHS, SAMPLE_REMEDIATIONS } from '../server/sampleData';
+
 declare global {
   var __ai_vuln_store__: any;
 }
 
 function ensureStore() {
-  if (!globalThis.__ai_vuln_store__) {
+  if (!globalThis.__ai_vuln_store__ || !globalThis.__ai_vuln_store__.projects || globalThis.__ai_vuln_store__.projects.length === 0) {
+    const sampleScan = {
+      id: 'SCN-SAMPLE-01',
+      projectId: SAMPLE_PROJECT.id,
+      filename: 'owasp-zap-nuclei-semgrep-consolidated.json',
+      scannerType: 'generic_json',
+      uploadedAt: new Date().toISOString(),
+      totalRawFindings: 8,
+      deduplicatedCount: SAMPLE_FINDINGS.length,
+      status: 'completed',
+      statusMessage: `Completed analysis: ${SAMPLE_FINDINGS.length} findings, ${SAMPLE_ATTACK_PATHS.length} attack paths.`,
+      summary: {
+        critical: SAMPLE_FINDINGS.filter(f => f.severity === 'Critical').length,
+        high: SAMPLE_FINDINGS.filter(f => f.severity === 'High').length,
+        medium: SAMPLE_FINDINGS.filter(f => f.severity === 'Medium').length,
+        low: SAMPLE_FINDINGS.filter(f => f.severity === 'Low').length,
+        info: SAMPLE_FINDINGS.filter(f => f.severity === 'Info').length,
+      },
+    };
+
     globalThis.__ai_vuln_store__ = {
-      projects: [],
-      scans: [],
-      findings: [],
-      attackPaths: [],
-      remediations: [],
+      projects: [{ ...SAMPLE_PROJECT }],
+      scans: [sampleScan],
+      findings: [...SAMPLE_FINDINGS],
+      attackPaths: [...SAMPLE_ATTACK_PATHS],
+      remediations: [...SAMPLE_REMEDIATIONS],
       comparisons: [],
-      auditLogs: [],
+      auditLogs: [
+        {
+          id: 'LOG-INIT-VERCEL',
+          timestamp: new Date().toISOString(),
+          action: 'ENVIRONMENT_INITIALIZED',
+          details: `Initialized defensive assessment workspace for ${SAMPLE_PROJECT.name}.`,
+          projectId: SAMPLE_PROJECT.id,
+        },
+      ],
     };
   }
 
@@ -62,6 +91,27 @@ export function createProject(input: { name: string; targetScope: string; author
     projectId: project.id,
   });
   return project;
+}
+
+export function deleteProject(id: string) {
+  const store = getRuntimeStore();
+  const exists = store.projects.some((p: any) => p.id === id);
+  if (!exists) return false;
+
+  store.projects = store.projects.filter((p: any) => p.id !== id);
+  store.scans = store.scans.filter((s: any) => s.projectId !== id);
+  store.findings = store.findings.filter((f: any) => f.projectId !== id);
+  store.attackPaths = store.attackPaths.filter((a: any) => a.projectId !== id);
+  store.remediations = store.remediations.filter((r: any) => r.projectId !== id);
+  store.comparisons = store.comparisons.filter((c: any) => c.projectId !== id);
+  store.auditLogs = store.auditLogs.filter((l: any) => l.projectId !== id);
+  return true;
+}
+
+export function resetCleanDemo() {
+  globalThis.__ai_vuln_store__ = null;
+  const store = ensureStore();
+  return store.projects[0];
 }
 
 export function getScans(projectId: string) {

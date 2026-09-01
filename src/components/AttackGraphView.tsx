@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useRef } from 'react';
-import { AttackPath, AttackPathNode, NormalizedFinding, Severity } from '../types';
-import { ZoomIn, ZoomOut, RotateCcw, Filter, ShieldAlert, Database, Server, User, Crosshair, Sparkles, ExternalLink, CheckCircle, X } from 'lucide-react';
+import { AttackPath, AttackPathNode, NormalizedFinding } from '../types';
+import { ZoomIn, ZoomOut, RotateCcw, Filter, ShieldAlert, Crosshair, Sparkles, ExternalLink, X, Copy, Check, Info } from 'lucide-react';
 
 interface AttackGraphViewProps {
   attackPaths: AttackPath[];
@@ -24,12 +24,13 @@ export const AttackGraphView: React.FC<AttackGraphViewProps> = ({
   onNavigateTab,
 }) => {
   const [zoom, setZoom] = useState(1);
-  const [pan, setPan] = useState({ x: 40, y: 40 });
+  const [pan, setPan] = useState({ x: 40, y: 50 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [selectedNode, setSelectedNode] = useState<AttackPathNode | null>(null);
   const [severityFilter, setSeverityFilter] = useState<string>('ALL');
   const [assetFilter, setAssetFilter] = useState<string>('ALL');
+  const [copiedPayload, setCopiedPayload] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -78,7 +79,7 @@ export const AttackGraphView: React.FC<AttackGraphViewProps> = ({
     const rawEdges = Array.from(edgeMap.values());
 
     // Layered DAG positioning
-    // Assign columns: 0 = threat_actor, 1 = ingress/asset, 2 = vulnerability, 3 = target/datastore
+    // 0 = threat_actor/entry, 1 = perimeter service/asset, 2 = vulnerability, 3 = target/datastore
     const colBuckets: AttackPathNode[][] = [[], [], [], []];
 
     rawNodes.forEach(n => {
@@ -90,16 +91,16 @@ export const AttackGraphView: React.FC<AttackGraphViewProps> = ({
 
     const positionedNodes: PositionedNode[] = [];
     const colSpacing = 280;
-    const rowSpacing = 140;
+    const rowSpacing = 130;
 
     colBuckets.forEach((bucket, colIdx) => {
       const totalHeight = (bucket.length - 1) * rowSpacing;
-      const startY = Math.max(80, 260 - totalHeight / 2);
+      const startY = Math.max(90, 260 - totalHeight / 2);
 
       bucket.forEach((node, rowIdx) => {
         positionedNodes.push({
           ...node,
-          x: 100 + colIdx * colSpacing,
+          x: 120 + colIdx * colSpacing,
           y: startY + rowIdx * rowSpacing,
           col: colIdx,
         });
@@ -134,19 +135,25 @@ export const AttackGraphView: React.FC<AttackGraphViewProps> = ({
     return findings.find(f => f.id === selectedNode.findingRef) || null;
   }, [selectedNode, findings]);
 
+  const handleCopyEvidence = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedPayload(true);
+    setTimeout(() => setCopiedPayload(false), 2000);
+  };
+
   return (
     <div className="space-y-4">
       {/* Control Toolbar */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 flex flex-wrap items-center justify-between gap-3 shadow-sm">
+      <div className="cyber-card rounded-xl p-3 flex flex-wrap items-center justify-between gap-3 shadow-sm border border-slate-800">
         {/* Path Highlight Selector */}
         <div className="flex items-center space-x-2">
           <Crosshair className="w-4 h-4 text-cyan-400 shrink-0" />
-          <span className="text-xs font-medium text-slate-300">Highlight Chain:</span>
+          <span className="text-xs font-semibold text-slate-300">Highlight Chain:</span>
           <select
             id="attack-path-select"
             value={selectedPathId || ''}
             onChange={(e) => onSelectPathId(e.target.value ? e.target.value : null)}
-            className="bg-slate-800 text-xs text-slate-200 border border-slate-700 rounded px-2.5 py-1.5 focus:outline-none focus:border-cyan-500 max-w-xs truncate"
+            className="bg-slate-950 text-xs text-slate-200 border border-slate-800 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-cyan-500 max-w-xs truncate"
           >
             <option value="">All Correlated Paths ({attackPaths.length})</option>
             {attackPaths.map((p) => (
@@ -158,7 +165,7 @@ export const AttackGraphView: React.FC<AttackGraphViewProps> = ({
           {selectedPathId && (
             <button
               onClick={() => onSelectPathId(null)}
-              className="text-[11px] text-slate-400 hover:text-slate-200 underline px-1"
+              className="text-[11px] text-cyan-400 hover:text-cyan-300 underline px-1"
             >
               Reset
             </button>
@@ -173,7 +180,7 @@ export const AttackGraphView: React.FC<AttackGraphViewProps> = ({
             <select
               value={severityFilter}
               onChange={(e) => setSeverityFilter(e.target.value)}
-              className="bg-slate-800 text-xs text-slate-200 border border-slate-700 rounded px-2 py-1"
+              className="bg-slate-950 text-xs text-slate-200 border border-slate-800 rounded-lg px-2 py-1"
             >
               <option value="ALL">All Severities</option>
               <option value="Critical">Critical Only</option>
@@ -189,7 +196,7 @@ export const AttackGraphView: React.FC<AttackGraphViewProps> = ({
               <select
                 value={assetFilter}
                 onChange={(e) => setAssetFilter(e.target.value)}
-                className="bg-slate-800 text-xs text-slate-200 border border-slate-700 rounded px-2 py-1 max-w-[140px] truncate"
+                className="bg-slate-950 text-xs text-slate-200 border border-slate-800 rounded-lg px-2 py-1 max-w-[140px] truncate"
               >
                 <option value="ALL">All Assets</option>
                 {allAssets.map((a) => (
@@ -205,7 +212,7 @@ export const AttackGraphView: React.FC<AttackGraphViewProps> = ({
           <div className="flex items-center space-x-1 border-l border-slate-800 pl-3">
             <button
               onClick={() => setZoom(z => Math.max(0.4, z - 0.15))}
-              className="p-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 transition"
+              className="p-1.5 rounded-lg bg-slate-950 hover:bg-slate-800 text-slate-300 border border-slate-800 transition"
               title="Zoom Out"
             >
               <ZoomOut className="w-3.5 h-3.5" />
@@ -215,7 +222,7 @@ export const AttackGraphView: React.FC<AttackGraphViewProps> = ({
             </span>
             <button
               onClick={() => setZoom(z => Math.min(2.0, z + 0.15))}
-              className="p-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 transition"
+              className="p-1.5 rounded-lg bg-slate-950 hover:bg-slate-800 text-slate-300 border border-slate-800 transition"
               title="Zoom In"
             >
               <ZoomIn className="w-3.5 h-3.5" />
@@ -223,9 +230,9 @@ export const AttackGraphView: React.FC<AttackGraphViewProps> = ({
             <button
               onClick={() => {
                 setZoom(1);
-                setPan({ x: 40, y: 40 });
+                setPan({ x: 40, y: 50 });
               }}
-              className="p-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 transition"
+              className="p-1.5 rounded-lg bg-slate-950 hover:bg-slate-800 text-slate-300 border border-slate-800 transition"
               title="Reset View"
             >
               <RotateCcw className="w-3.5 h-3.5" />
@@ -241,7 +248,7 @@ export const AttackGraphView: React.FC<AttackGraphViewProps> = ({
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
-        className="relative bg-slate-950 border border-slate-800 rounded-xl h-[620px] overflow-hidden cursor-grab active:cursor-grabbing select-none"
+        className="relative bg-slate-950 border border-slate-800 rounded-2xl h-[620px] overflow-hidden cursor-grab active:cursor-grabbing select-none shadow-inner"
       >
         {/* Background Grid Accent */}
         <div
@@ -253,9 +260,9 @@ export const AttackGraphView: React.FC<AttackGraphViewProps> = ({
         />
 
         {/* Stage Columns Legend */}
-        <div className="absolute top-3 left-6 right-6 flex justify-between pointer-events-none text-[11px] font-mono font-semibold uppercase tracking-wider text-slate-500 z-10">
-          <div>Stage 0: Public Ingress</div>
-          <div>Stage 1: Perimeter Assets</div>
+        <div className="absolute top-3 left-8 right-8 flex justify-between pointer-events-none text-[11px] font-mono font-bold uppercase tracking-wider text-slate-500 z-10">
+          <div>Stage 0: Ingress</div>
+          <div>Stage 1: Perimeter Asset</div>
           <div>Stage 2: Exploited Weakness</div>
           <div>Stage 3: Crown Jewel Target</div>
         </div>
@@ -269,7 +276,6 @@ export const AttackGraphView: React.FC<AttackGraphViewProps> = ({
           }}
         >
           <defs>
-            {/* Arrow marker for edges */}
             <marker
               id="arrow-marker"
               viewBox="0 0 10 10"
@@ -279,7 +285,7 @@ export const AttackGraphView: React.FC<AttackGraphViewProps> = ({
               markerHeight="6"
               orient="auto-start-reverse"
             >
-              <path d="M 0 1 L 10 5 L 0 9 z" fill="#06b6d4" opacity="0.8" />
+              <path d="M 0 1 L 10 5 L 0 9 z" fill="#0891b2" opacity="0.8" />
             </marker>
             <marker
               id="arrow-marker-crit"
@@ -290,7 +296,7 @@ export const AttackGraphView: React.FC<AttackGraphViewProps> = ({
               markerHeight="6"
               orient="auto-start-reverse"
             >
-              <path d="M 0 1 L 10 5 L 0 9 z" fill="#f43f5e" opacity="0.9" />
+              <path d="M 0 1 L 10 5 L 0 9 z" fill="#f43f5e" opacity="0.95" />
             </marker>
           </defs>
 
@@ -319,9 +325,9 @@ export const AttackGraphView: React.FC<AttackGraphViewProps> = ({
                   d={pathD}
                   fill="none"
                   stroke={isHighlighted ? '#f43f5e' : '#0891b2'}
-                  strokeWidth={isHighlighted ? 3 : 1.5}
+                  strokeWidth={isHighlighted ? 3.5 : 1.5}
                   strokeDasharray={isHighlighted ? undefined : '4 3'}
-                  opacity={isHighlighted ? 0.95 : 0.4}
+                  opacity={isHighlighted ? 0.95 : 0.45}
                   markerEnd={isHighlighted ? 'url(#arrow-marker-crit)' : 'url(#arrow-marker)'}
                 />
                 {/* Edge Label */}
@@ -345,18 +351,15 @@ export const AttackGraphView: React.FC<AttackGraphViewProps> = ({
             const isSelected = selectedNode?.id === node.id;
             const isInActivePath = activePath?.nodes.some(n => n.id === node.id);
 
-            let nodeColor = '#1e293b';
-            let strokeColor = '#475569';
-            let iconType = 'server';
+            let nodeColor = '#0f172a';
+            let strokeColor = '#334155';
 
             if (node.isEntrypoint || node.type === 'threat_actor') {
-              nodeColor = '#0f172a';
+              nodeColor = '#020617';
               strokeColor = '#06b6d4';
-              iconType = 'threat';
             } else if (node.isTarget || node.type === 'datastore') {
               nodeColor = '#4c0519';
               strokeColor = '#f43f5e';
-              iconType = 'db';
             } else if (node.type === 'vulnerability') {
               if (node.severity === 'Critical') {
                 nodeColor = '#3f0713';
@@ -365,7 +368,6 @@ export const AttackGraphView: React.FC<AttackGraphViewProps> = ({
                 nodeColor = '#331b05';
                 strokeColor = '#f59e0b';
               }
-              iconType = 'vuln';
             } else {
               nodeColor = '#082f49';
               strokeColor = '#38bdf8';
@@ -387,12 +389,12 @@ export const AttackGraphView: React.FC<AttackGraphViewProps> = ({
                   y="-32"
                   width="180"
                   height="64"
-                  rx="8"
+                  rx="10"
                   fill={nodeColor}
                   stroke={isSelected ? '#38bdf8' : strokeColor}
-                  strokeWidth={isSelected ? 2.5 : isInActivePath ? 2 : 1}
+                  strokeWidth={isSelected ? 3 : isInActivePath ? 2.2 : 1}
                   className="transition-all duration-150 group-hover:brightness-125"
-                  filter="drop-shadow(0 4px 6px rgba(0,0,0,0.4))"
+                  filter="drop-shadow(0 6px 12px rgba(0,0,0,0.6))"
                 />
 
                 {/* Node Category Badge */}
@@ -413,7 +415,7 @@ export const AttackGraphView: React.FC<AttackGraphViewProps> = ({
                 <text
                   x="-80"
                   y="4"
-                  fill="#f1f5f9"
+                  fill="#f8fafc"
                   fontSize="11"
                   fontWeight="bold"
                   className="truncate"
@@ -449,10 +451,10 @@ export const AttackGraphView: React.FC<AttackGraphViewProps> = ({
 
         {/* Interactive Side Drawer Inspector (When Node is Clicked) */}
         {selectedNode && (
-          <div className="absolute top-3 right-3 bottom-3 w-80 sm:w-96 bg-slate-900/95 backdrop-blur-md border border-slate-800 rounded-xl p-5 shadow-2xl overflow-y-auto z-20 space-y-4">
+          <div className="absolute top-3 right-3 bottom-3 w-80 sm:w-96 bg-slate-900/95 backdrop-blur-md border border-slate-800 rounded-2xl p-5 shadow-2xl overflow-y-auto z-20 space-y-4">
             <div className="flex items-start justify-between">
               <div>
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-800 text-cyan-300 border border-slate-700">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-950 text-cyan-300 border border-slate-800">
                   {selectedNode.type.replace('_', ' ')}
                 </span>
                 <h3 className="text-base font-bold text-slate-100 mt-1">{selectedNode.label}</h3>
@@ -462,7 +464,7 @@ export const AttackGraphView: React.FC<AttackGraphViewProps> = ({
               </div>
               <button
                 onClick={() => setSelectedNode(null)}
-                className="p-1 rounded text-slate-400 hover:text-slate-200 hover:bg-slate-800"
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -471,7 +473,7 @@ export const AttackGraphView: React.FC<AttackGraphViewProps> = ({
             {/* If linked to finding */}
             {inspectedFinding ? (
               <div className="space-y-3 pt-2 border-t border-slate-800">
-                <div className="flex items-center space-x-2">
+                <div className="flex flex-wrap items-center gap-1.5">
                   <span
                     className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
                       inspectedFinding.severity === 'Critical'
@@ -482,12 +484,12 @@ export const AttackGraphView: React.FC<AttackGraphViewProps> = ({
                     {inspectedFinding.severity}
                   </span>
                   {inspectedFinding.cwe && (
-                    <span className="text-xs font-mono text-slate-300 bg-slate-800 px-1.5 py-0.5 rounded">
+                    <span className="text-xs font-mono text-slate-300 bg-slate-950 px-2 py-0.5 rounded border border-slate-800">
                       {inspectedFinding.cwe}
                     </span>
                   )}
                   {inspectedFinding.cve && (
-                    <span className="text-xs font-mono text-cyan-300 bg-cyan-950 px-1.5 py-0.5 rounded">
+                    <span className="text-xs font-mono text-cyan-300 bg-cyan-950 px-2 py-0.5 rounded border border-cyan-800">
                       {inspectedFinding.cve}
                     </span>
                   )}
@@ -495,8 +497,8 @@ export const AttackGraphView: React.FC<AttackGraphViewProps> = ({
 
                 {/* AI Triage Calibrated Confidence */}
                 {inspectedFinding.aiTriage && (
-                  <div className="bg-slate-950/80 border border-cyan-950 rounded-lg p-3 space-y-1.5">
-                    <div className="flex items-center space-x-1.5 text-xs text-cyan-400 font-semibold">
+                  <div className="bg-slate-950/90 border border-cyan-900/50 rounded-xl p-3.5 space-y-2">
+                    <div className="flex items-center space-x-1.5 text-xs text-cyan-400 font-bold">
                       <Sparkles className="w-3.5 h-3.5" />
                       <span>AI Triage Assessment</span>
                     </div>
@@ -506,7 +508,7 @@ export const AttackGraphView: React.FC<AttackGraphViewProps> = ({
                         {inspectedFinding.aiTriage.calibratedConfidence}
                       </span>
                     </div>
-                    <p className="text-xs text-slate-400">
+                    <p className="text-xs text-slate-400 leading-relaxed">
                       {inspectedFinding.aiTriage.businessImpact}
                     </p>
                   </div>
@@ -514,9 +516,18 @@ export const AttackGraphView: React.FC<AttackGraphViewProps> = ({
 
                 {/* Evidence snippet */}
                 {inspectedFinding.evidence && (
-                  <div className="space-y-1">
-                    <span className="text-xs font-medium text-slate-400">Captured Scanner Evidence:</span>
-                    <pre className="bg-slate-950 p-2.5 rounded text-[11px] font-mono text-slate-300 overflow-x-auto max-h-36 border border-slate-800">
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between text-xs text-slate-400">
+                      <span className="font-semibold">Scanner Payload Evidence:</span>
+                      <button
+                        onClick={() => handleCopyEvidence(inspectedFinding.evidence?.payload || inspectedFinding.evidence?.request || '')}
+                        className="text-[11px] text-cyan-400 hover:text-cyan-300 flex items-center space-x-1"
+                      >
+                        {copiedPayload ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                        <span>{copiedPayload ? 'Copied' : 'Copy'}</span>
+                      </button>
+                    </div>
+                    <pre className="bg-slate-950 p-3 rounded-lg text-[11px] font-mono text-slate-300 overflow-x-auto max-h-36 border border-slate-800">
                       {inspectedFinding.evidence.payload || inspectedFinding.evidence.request || inspectedFinding.evidence.rawOutput || 'No raw payload captured.'}
                     </pre>
                   </div>
@@ -524,10 +535,10 @@ export const AttackGraphView: React.FC<AttackGraphViewProps> = ({
 
                 <button
                   onClick={() => onNavigateTab('findings')}
-                  className="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded text-xs font-semibold flex items-center justify-center space-x-1 transition"
+                  className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold flex items-center justify-center space-x-1.5 transition"
                 >
                   <span>Open in Findings Matrix</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
+                  <ExternalLink className="w-3.5 h-3.5 text-cyan-400" />
                 </button>
               </div>
             ) : (

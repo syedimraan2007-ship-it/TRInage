@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AttackPath, NormalizedFinding } from '../types';
-import { Route, ShieldAlert, ChevronDown, ChevronUp, Calculator, CheckCircle2, ArrowRight, Sparkles, AlertTriangle } from 'lucide-react';
+import { Route, ShieldAlert, ChevronDown, ChevronUp, Calculator, CheckCircle2, ArrowRight, AlertTriangle } from 'lucide-react';
 
 interface AttackPathsViewProps {
   attackPaths: AttackPath[];
@@ -33,11 +33,11 @@ export const AttackPathsView: React.FC<AttackPathsViewProps> = ({
       </div>
 
       {attackPaths.length === 0 ? (
-        <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-12 text-center text-slate-400">
-          <ShieldAlert className="w-12 h-12 mx-auto text-slate-600 mb-3" />
-          <h3 className="text-base font-semibold text-slate-200">No Attack Paths Generated Yet</h3>
-          <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
-            Upload security scanner outputs (JSON/CSV) or load authorized lab datasets to synthesize multi-hop vulnerability chains.
+        <div className="cyber-card rounded-2xl p-12 text-center text-slate-400 border border-slate-800 space-y-3">
+          <ShieldAlert className="w-12 h-12 mx-auto text-slate-600" />
+          <h3 className="text-base font-bold text-slate-200">No Attack Paths Generated Yet</h3>
+          <p className="text-xs text-slate-500 max-w-md mx-auto">
+            Upload security scanner outputs (JSON/CSV) or load authorized sample scans in the Ingestion Hub to synthesize multi-hop vulnerability chains.
           </p>
         </div>
       ) : (
@@ -48,17 +48,17 @@ export const AttackPathsView: React.FC<AttackPathsViewProps> = ({
             return (
               <div
                 key={path.id}
-                className="bg-slate-900/90 border border-slate-800 rounded-xl overflow-hidden shadow-sm transition hover:border-slate-700"
+                className="cyber-card rounded-2xl overflow-hidden shadow-sm transition hover:border-slate-700 border border-slate-800"
               >
                 {/* Header Row */}
                 <div
-                  className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 cursor-pointer select-none"
+                  className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 cursor-pointer select-none"
                   onClick={() => setExpandedPathId(isExpanded ? null : path.id)}
                 >
                   <div className="space-y-1.5 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <span
-                        className={`px-2.5 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider ${
+                        className={`px-2.5 py-0.5 rounded text-[11px] font-bold uppercase font-mono tracking-wider ${
                           path.severity === 'Critical'
                             ? 'bg-rose-950 text-rose-300 border border-rose-800'
                             : path.severity === 'High'
@@ -68,16 +68,16 @@ export const AttackPathsView: React.FC<AttackPathsViewProps> = ({
                       >
                         {path.severity}
                       </span>
-                      <span className="text-xs font-mono font-bold text-cyan-400 bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800/50">
+                      <span className="text-xs font-mono font-bold text-cyan-400 bg-cyan-950/60 px-2.5 py-0.5 rounded-lg border border-cyan-800/50">
                         Contextual Score: {path.contextualScore}/100
                       </span>
-                      <span className="text-xs font-mono text-slate-400">
+                      <span className="text-xs font-mono text-slate-400 bg-slate-950 px-2 py-0.5 rounded border border-slate-800">
                         Confidence: <strong className="text-slate-200">{path.confidence}</strong>
                       </span>
                     </div>
 
                     <h3 className="text-base font-bold text-slate-100">{path.title}</h3>
-                    <p className="text-xs text-slate-400 leading-relaxed">{path.summary}</p>
+                    <p className="text-xs text-slate-400 leading-relaxed max-w-4xl">{path.summary}</p>
                   </div>
 
                   <div className="flex items-center space-x-3 shrink-0 self-end sm:self-center">
@@ -87,7 +87,7 @@ export const AttackPathsView: React.FC<AttackPathsViewProps> = ({
                         onSelectAttackPath(path.id);
                         onNavigateTab('attack-graph');
                       }}
-                      className="px-3 py-1.5 bg-cyan-900/60 hover:bg-cyan-900 text-cyan-200 border border-cyan-700/50 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition"
+                      className="px-3.5 py-1.5 bg-cyan-900/60 hover:bg-cyan-900 text-cyan-200 border border-cyan-700/50 rounded-xl text-xs font-bold flex items-center space-x-1.5 transition shadow-sm"
                     >
                       <span>Interactive Graph</span>
                       <ArrowRight className="w-3.5 h-3.5" />
@@ -101,13 +101,13 @@ export const AttackPathsView: React.FC<AttackPathsViewProps> = ({
                 </div>
 
                 {/* Visual Node Sequence */}
-                <div className="px-4 sm:px-5 py-3 bg-slate-950/50 border-t border-slate-800/80 flex items-center space-x-2 overflow-x-auto text-xs font-mono scrollbar-none">
+                <div className="px-5 py-3 bg-slate-950/60 border-t border-slate-800/80 flex items-center space-x-2 overflow-x-auto text-xs font-mono scrollbar-none">
                   {path.nodes.map((n, i) => (
                     <React.Fragment key={n.id}>
                       <span
-                        className={`px-2.5 py-1 rounded whitespace-nowrap ${
+                        className={`px-2.5 py-1 rounded-lg whitespace-nowrap font-medium ${
                           n.isEntrypoint
-                            ? 'bg-slate-800 text-slate-300'
+                            ? 'bg-slate-800 text-slate-300 border border-slate-700'
                             : n.isTarget
                             ? 'bg-rose-950 text-rose-200 border border-rose-800'
                             : n.type === 'vulnerability'
@@ -128,45 +128,45 @@ export const AttackPathsView: React.FC<AttackPathsViewProps> = ({
                 {isExpanded && (
                   <div className="p-5 border-t border-slate-800 bg-slate-900/40 space-y-5 text-xs">
                     {/* Deterministic Scoring Breakdown Box */}
-                    <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-4 space-y-3">
+                    <div className="bg-slate-950 border border-slate-800 rounded-2xl p-4.5 space-y-3">
                       <div className="flex items-center space-x-2 text-cyan-400 font-bold">
                         <Calculator className="w-4 h-4" />
                         <span>Deterministic Mathematical Risk Score Breakdown</span>
                       </div>
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 font-mono text-center">
-                        <div className="bg-slate-900 p-2.5 rounded border border-slate-800">
+                        <div className="bg-slate-900 p-2.5 rounded-xl border border-slate-800">
                           <span className="text-[10px] text-slate-400 block">EXPOSURE</span>
                           <span className="text-sm font-bold text-slate-200">
                             {path.scoreBreakdown.exposureScore}/25
                           </span>
                         </div>
-                        <div className="bg-slate-900 p-2.5 rounded border border-slate-800">
+                        <div className="bg-slate-900 p-2.5 rounded-xl border border-slate-800">
                           <span className="text-[10px] text-slate-400 block">EXPLOITABILITY</span>
                           <span className="text-sm font-bold text-slate-200">
                             {path.scoreBreakdown.exploitabilityScore}/25
                           </span>
                         </div>
-                        <div className="bg-slate-900 p-2.5 rounded border border-slate-800">
+                        <div className="bg-slate-900 p-2.5 rounded-xl border border-slate-800">
                           <span className="text-[10px] text-slate-400 block">ASSET CRITICALITY</span>
                           <span className="text-sm font-bold text-slate-200">
                             {path.scoreBreakdown.assetCriticalityScore}/25
                           </span>
                         </div>
-                        <div className="bg-slate-900 p-2.5 rounded border border-slate-800">
+                        <div className="bg-slate-900 p-2.5 rounded-xl border border-slate-800">
                           <span className="text-[10px] text-slate-400 block">CHAIN IMPACT</span>
                           <span className="text-sm font-bold text-slate-200">
                             {path.scoreBreakdown.chainImpactScore}/25
                           </span>
                         </div>
                       </div>
-                      <p className="text-[11px] text-slate-400 font-mono bg-slate-900/50 p-2 rounded">
+                      <p className="text-[11px] text-slate-400 font-mono bg-slate-900 p-2.5 rounded-lg border border-slate-800/80">
                         {path.scoreBreakdown.explanation}
                       </p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {/* Prerequisites */}
-                      <div className="bg-slate-950/60 border border-slate-800 rounded-xl p-4 space-y-2">
+                      <div className="bg-slate-950/80 border border-slate-800 rounded-2xl p-4 space-y-2">
                         <h4 className="font-bold text-slate-200 flex items-center space-x-1.5">
                           <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
                           <span>Attacker Prerequisites</span>
@@ -179,7 +179,7 @@ export const AttackPathsView: React.FC<AttackPathsViewProps> = ({
                       </div>
 
                       {/* Potential Impact */}
-                      <div className="bg-slate-950/60 border border-slate-800 rounded-xl p-4 space-y-2">
+                      <div className="bg-slate-950/80 border border-slate-800 rounded-2xl p-4 space-y-2">
                         <h4 className="font-bold text-slate-200 flex items-center space-x-1.5">
                           <ShieldAlert className="w-3.5 h-3.5 text-rose-400" />
                           <span>Blast Radius & Business Impact</span>
@@ -189,21 +189,21 @@ export const AttackPathsView: React.FC<AttackPathsViewProps> = ({
                     </div>
 
                     {/* Recommended Fix Sequence */}
-                    <div className="bg-slate-950/60 border border-slate-800 rounded-xl p-4 space-y-2">
+                    <div className="bg-slate-950/80 border border-slate-800 rounded-2xl p-4 space-y-2.5">
                       <h4 className="font-bold text-slate-200 flex items-center space-x-1.5">
                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
                         <span>Recommended Remediation Sequence (Neutralize Chain)</span>
                       </h4>
-                      <div className="space-y-1.5">
+                      <div className="space-y-2">
                         {path.recommendedFixSequence.map((step, idx) => (
                           <div
                             key={idx}
-                            className="flex items-start space-x-2 text-slate-300 font-mono text-[11px]"
+                            className="flex items-start space-x-2.5 text-slate-300 font-mono text-[11px] bg-slate-900/60 p-2 rounded-lg border border-slate-800/80"
                           >
-                            <span className="px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-300 font-bold shrink-0">
+                            <span className="px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 font-bold shrink-0 border border-cyan-800/60">
                               Step {idx + 1}
                             </span>
-                            <span>{step}</span>
+                            <span className="pt-0.5">{step}</span>
                           </div>
                         ))}
                       </div>

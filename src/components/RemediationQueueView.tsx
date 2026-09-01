@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { RemediationItem, RemediationPriority } from '../types';
-import { ShieldCheck, Sparkles, CheckCircle2, Clock, Terminal, ArrowRight, Code2, AlertTriangle, X, Check, Lock } from 'lucide-react';
+import { RemediationItem } from '../types';
+import { ShieldCheck, Sparkles, CheckCircle2, Terminal, Code2, AlertTriangle, X, Check, Lock, Copy } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface RemediationQueueViewProps {
@@ -19,6 +19,7 @@ export const RemediationQueueView: React.FC<RemediationQueueViewProps> = ({
   const [selectedItemForAi, setSelectedItemForAi] = useState<RemediationItem | null>(null);
   const [isGeneratingAi, setIsGeneratingAi] = useState(false);
   const [activeTab, setActiveTab] = useState<'all' | 'P0' | 'P1' | 'P2' | 'P3'>('all');
+  const [copiedBlueprint, setCopiedBlueprint] = useState(false);
 
   const filteredItems = remediations.filter(item => {
     if (activeTab === 'all') return true;
@@ -30,8 +31,8 @@ export const RemediationQueueView: React.FC<RemediationQueueViewProps> = ({
     if (newStatus === 'verified_fixed') {
       try {
         confetti({
-          particleCount: 50,
-          spread: 60,
+          particleCount: 60,
+          spread: 70,
           origin: { y: 0.8 },
         });
       } catch {}
@@ -52,6 +53,12 @@ export const RemediationQueueView: React.FC<RemediationQueueViewProps> = ({
     }
   };
 
+  const handleCopyCode = (code: string) => {
+    navigator.clipboard.writeText(code);
+    setCopiedBlueprint(true);
+    setTimeout(() => setCopiedBlueprint(false), 2000);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -67,12 +74,12 @@ export const RemediationQueueView: React.FC<RemediationQueueViewProps> = ({
         </div>
 
         {/* Priority Filter Tabs */}
-        <div className="flex items-center space-x-1.5 bg-slate-900 border border-slate-800 p-1 rounded-lg text-xs self-start sm:self-auto">
+        <div className="flex items-center space-x-1.5 bg-slate-900 border border-slate-800 p-1 rounded-xl text-xs self-start sm:self-auto">
           {(['all', 'P0', 'P1', 'P2', 'P3'] as const).map((p) => (
             <button
               key={p}
               onClick={() => setActiveTab(p)}
-              className={`px-3 py-1.5 rounded-md font-semibold transition ${
+              className={`px-3 py-1.5 rounded-lg font-bold transition ${
                 activeTab === p
                   ? 'bg-cyan-950 text-cyan-300 border border-cyan-800'
                   : 'text-slate-400 hover:text-slate-200'
@@ -85,11 +92,11 @@ export const RemediationQueueView: React.FC<RemediationQueueViewProps> = ({
       </div>
 
       {remediations.length === 0 ? (
-        <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-12 text-center text-slate-400">
-          <ShieldCheck className="w-12 h-12 mx-auto text-emerald-500 mb-3" />
-          <h3 className="text-base font-semibold text-slate-200">No Remediation Tasks in Queue</h3>
-          <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
-            All vulnerabilities have been resolved or no security scans have been processed yet.
+        <div className="cyber-card rounded-2xl p-12 text-center text-slate-400 border border-slate-800 space-y-3">
+          <ShieldCheck className="w-12 h-12 mx-auto text-emerald-400" />
+          <h3 className="text-base font-bold text-slate-200">No Remediation Tasks in Queue</h3>
+          <p className="text-xs text-slate-500 max-w-md mx-auto">
+            All vulnerabilities have been resolved or security scan analysis is awaiting execution.
           </p>
         </div>
       ) : (
@@ -108,8 +115,8 @@ export const RemediationQueueView: React.FC<RemediationQueueViewProps> = ({
             return (
               <div
                 key={item.id}
-                className={`bg-slate-900/80 border rounded-xl p-5 transition shadow-sm ${
-                  isFixed ? 'border-emerald-900/50 opacity-75' : 'border-slate-800 hover:border-slate-700'
+                className={`cyber-card rounded-2xl p-5 transition shadow-sm border ${
+                  isFixed ? 'border-emerald-900/50 opacity-80' : 'border-slate-800 hover:border-slate-700'
                 }`}
               >
                 <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
@@ -119,14 +126,14 @@ export const RemediationQueueView: React.FC<RemediationQueueViewProps> = ({
                       <span className={`px-2.5 py-0.5 rounded text-xs font-bold font-mono border ${priorityBadge}`}>
                         {item.priority}
                       </span>
-                      <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-900/60">
+                      <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-950/60 px-2.5 py-0.5 rounded-lg border border-emerald-900/60">
                         {item.estimatedRiskReductionPercent}% Risk Reduction
                       </span>
-                      <span className="text-xs font-mono text-slate-400">
-                        Affected Findings: <strong className="text-slate-300">{item.affectedFindingIds.length}</strong>
+                      <span className="text-xs font-mono text-slate-400 bg-slate-950 px-2 py-0.5 rounded border border-slate-800">
+                        Target Asset: <strong className="text-slate-200">{item.affectedAsset}</strong>
                       </span>
-                      <span className="text-xs font-mono text-slate-400">
-                        Attack Paths Eliminated: <strong className="text-cyan-300">{item.pathsEliminatedCount}</strong>
+                      <span className="text-xs font-mono text-slate-400 bg-slate-950 px-2 py-0.5 rounded border border-slate-800">
+                        Paths Eliminated: <strong className="text-cyan-300">{item.pathsEliminatedCount}</strong>
                       </span>
                     </div>
 
@@ -139,10 +146,10 @@ export const RemediationQueueView: React.FC<RemediationQueueViewProps> = ({
 
                     {/* Safeguards Chips */}
                     {item.architecturalSafeguards && item.architecturalSafeguards.length > 0 && (
-                      <div className="pt-2 flex flex-wrap items-center gap-1.5 text-[11px] font-mono text-slate-400">
+                      <div className="pt-1 flex flex-wrap items-center gap-1.5 text-[11px] font-mono text-slate-400">
                         <span className="text-slate-500 font-semibold">Safeguards:</span>
                         {item.architecturalSafeguards.map((s, i) => (
-                          <span key={i} className="px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-cyan-300">
+                          <span key={i} className="px-2 py-0.5 rounded-md bg-slate-950 border border-slate-800 text-cyan-300">
                             {s}
                           </span>
                         ))}
@@ -151,21 +158,21 @@ export const RemediationQueueView: React.FC<RemediationQueueViewProps> = ({
                   </div>
 
                   {/* Right Actions */}
-                  <div className="flex flex-col sm:flex-row md:flex-col items-end gap-2 shrink-0">
+                  <div className="flex flex-col sm:flex-row md:flex-col items-end gap-2.5 shrink-0">
                     <button
                       id={`ai-guide-btn-${item.id}`}
                       onClick={() => handleOpenAiAssistant(item)}
-                      className="w-full sm:w-auto px-3.5 py-2 bg-gradient-to-r from-cyan-900 to-blue-900 hover:from-cyan-800 hover:to-blue-800 text-cyan-100 border border-cyan-700/60 rounded-lg text-xs font-semibold flex items-center justify-center space-x-1.5 transition shadow-sm"
+                      className="w-full sm:w-auto px-4 py-2 bg-gradient-to-r from-cyan-900 to-blue-900 hover:from-cyan-800 hover:to-blue-800 text-cyan-100 border border-cyan-700/60 rounded-xl text-xs font-bold flex items-center justify-center space-x-1.5 transition shadow-sm"
                     >
                       <Sparkles className="w-3.5 h-3.5 text-cyan-300" />
                       <span>AI Remediation Assistant</span>
                     </button>
 
                     {/* Status Toggle */}
-                    <div className="flex items-center space-x-1 bg-slate-950 p-1 rounded-lg border border-slate-800 text-xs">
+                    <div className="flex items-center space-x-1 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
                       <button
                         onClick={() => handleStatusChange(item, 'pending')}
-                        className={`px-2.5 py-1 rounded font-medium transition ${
+                        className={`px-2.5 py-1 rounded-lg font-semibold transition ${
                           item.status === 'pending' ? 'bg-slate-800 text-slate-200' : 'text-slate-500 hover:text-slate-300'
                         }`}
                       >
@@ -173,7 +180,7 @@ export const RemediationQueueView: React.FC<RemediationQueueViewProps> = ({
                       </button>
                       <button
                         onClick={() => handleStatusChange(item, 'in_progress')}
-                        className={`px-2.5 py-1 rounded font-medium transition ${
+                        className={`px-2.5 py-1 rounded-lg font-semibold transition ${
                           item.status === 'in_progress' ? 'bg-amber-950 text-amber-300 border border-amber-800' : 'text-slate-500 hover:text-slate-300'
                         }`}
                       >
@@ -181,7 +188,7 @@ export const RemediationQueueView: React.FC<RemediationQueueViewProps> = ({
                       </button>
                       <button
                         onClick={() => handleStatusChange(item, 'verified_fixed')}
-                        className={`px-2.5 py-1 rounded font-medium flex items-center space-x-1 transition ${
+                        className={`px-2.5 py-1 rounded-lg font-semibold flex items-center space-x-1 transition ${
                           item.status === 'verified_fixed' ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' : 'text-slate-500 hover:text-slate-300'
                         }`}
                       >
@@ -199,8 +206,8 @@ export const RemediationQueueView: React.FC<RemediationQueueViewProps> = ({
 
       {/* AI Remediation Guidance Modal / Drawer */}
       {selectedItemForAi && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-xl w-full max-w-4xl max-h-[92vh] overflow-y-auto p-6 space-y-6 shadow-2xl">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-4xl max-h-[92vh] overflow-y-auto p-6 space-y-6 shadow-2xl">
             {/* Header */}
             <div className="flex items-start justify-between">
               <div>
@@ -216,7 +223,7 @@ export const RemediationQueueView: React.FC<RemediationQueueViewProps> = ({
               </div>
               <button
                 onClick={() => setSelectedItemForAi(null)}
-                className="p-1 rounded text-slate-400 hover:text-slate-200 hover:bg-slate-800"
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -225,7 +232,7 @@ export const RemediationQueueView: React.FC<RemediationQueueViewProps> = ({
             {isGeneratingAi ? (
               <div className="p-12 text-center text-slate-400 space-y-3">
                 <Sparkles className="w-8 h-8 mx-auto text-cyan-400 animate-spin" />
-                <p className="font-medium text-slate-200">Synthesizing defensive code patterns & verification steps...</p>
+                <p className="font-semibold text-slate-200">Synthesizing defensive code patterns & verification steps...</p>
                 <p className="text-xs text-slate-500">Consulting defensive security blueprints & CWE catalog</p>
               </div>
             ) : selectedItemForAi.aiGuidance ? (
@@ -254,10 +261,19 @@ export const RemediationQueueView: React.FC<RemediationQueueViewProps> = ({
 
                 {/* Remediation Blueprint / Code Fix Pattern */}
                 <div className="space-y-1.5">
-                  <h4 className="font-bold text-slate-200 flex items-center space-x-1.5">
-                    <Code2 className="w-4 h-4 text-emerald-400" />
-                    <span>Defensive Code Pattern & Engineering Blueprint</span>
-                  </h4>
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-bold text-slate-200 flex items-center space-x-1.5">
+                      <Code2 className="w-4 h-4 text-emerald-400" />
+                      <span>Defensive Code Pattern & Engineering Blueprint</span>
+                    </h4>
+                    <button
+                      onClick={() => handleCopyCode(selectedItemForAi.aiGuidance?.remediationBlueprint || '')}
+                      className="text-[11px] text-cyan-400 hover:text-cyan-300 flex items-center space-x-1"
+                    >
+                      {copiedBlueprint ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                      <span>{copiedBlueprint ? 'Copied Blueprint' : 'Copy Code'}</span>
+                    </button>
+                  </div>
                   <pre className="bg-slate-950 p-4 rounded-xl font-mono text-xs text-emerald-300 border border-slate-800 overflow-x-auto whitespace-pre-wrap">
                     {selectedItemForAi.aiGuidance.remediationBlueprint}
                   </pre>
@@ -269,7 +285,7 @@ export const RemediationQueueView: React.FC<RemediationQueueViewProps> = ({
                     <Terminal className="w-4 h-4 text-cyan-400" />
                     <span>Post-Remediation Verification Protocol</span>
                   </h4>
-                  <ul className="space-y-1 text-slate-300 list-disc list-inside">
+                  <ul className="space-y-1.5 text-slate-300 list-disc list-inside">
                     {selectedItemForAi.aiGuidance.verificationSteps?.map((step, i) => (
                       <li key={i}>{step}</li>
                     ))}
@@ -296,7 +312,7 @@ export const RemediationQueueView: React.FC<RemediationQueueViewProps> = ({
             <div className="flex justify-end pt-3 border-t border-slate-800">
               <button
                 onClick={() => setSelectedItemForAi(null)}
-                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-semibold"
+                className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition"
               >
                 Done
               </button>
