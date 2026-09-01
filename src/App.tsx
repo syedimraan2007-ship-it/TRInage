@@ -75,7 +75,10 @@ export function App() {
         if (!mounted) return;
         setProjects(projs);
         if (projs && projs.length > 0) {
-          setCurrentProject(projs[0]);
+          const savedActiveId = api.getActiveProjectId();
+          const target = (savedActiveId && projs.find(p => p.id === savedActiveId)) || projs[0];
+          setCurrentProject(target);
+          api.setActiveProjectId(target.id);
         } else {
           setCurrentProject(null);
           setIsNewProjectOpen(true);
@@ -174,7 +177,10 @@ export function App() {
       <Header
         projects={projects}
         currentProject={currentProject}
-        onSelectProject={(p) => setCurrentProject(p)}
+        onSelectProject={(p) => {
+          setCurrentProject(p);
+          api.setActiveProjectId(p.id);
+        }}
         onOpenNewProject={() => setIsNewProjectOpen(true)}
         onOpenAuditLogs={() => setIsAuditLogsOpen(true)}
         onDeleteProject={handleDeleteProject}
