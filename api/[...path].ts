@@ -1,5 +1,5 @@
-import { createApiApp } from '../server/app';
+import { handleApiRequest } from '../server/router';
 
-const app = createApiApp();
-
-export default app;
+export default async function handler(req: any, res: any) {
+  return handleApiRequest(req, res);
+}
