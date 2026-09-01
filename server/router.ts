@@ -165,13 +165,13 @@ export async function handleApiRequest(req: any, res: any) {
       db.setFindingsForScan(scanId, findings);
       db.setAttackPathsForScan(scanId, paths);
       db.setRemediations(targetProjectId, remediations);
-      db.logAudit(targetProjectId, 'SAMPLE_LOADED', `Sample dataset '${filename}' loaded & correlated (${paths.length} attack paths).`);
       return sendJson(200, {
         scan: newScan,
         deduplication: dedup,
-        findingsCount: findings.length,
-        attackPathsCount: paths.length,
-        remediationsCount: remediations.length,
+        findings,
+        attackPaths: paths,
+        remediations,
+        metrics: db.getDashboardMetrics(targetProjectId),
         rawContent,
       });
     }
@@ -340,9 +340,10 @@ export async function handleApiRequest(req: any, res: any) {
           return sendJson(200, {
             scan: newScan,
             deduplication: dedup,
-            findingsCount: findings.length,
-            attackPathsCount: paths.length,
-            remediationsCount: remediations.length,
+            findings,
+            attackPaths: paths,
+            remediations,
+            metrics: db.getDashboardMetrics(projectId),
           });
         }
       }

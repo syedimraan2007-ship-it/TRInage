@@ -135,6 +135,13 @@ export function App() {
   const handleUploadScan = async (filename: string, rawContent: string) => {
     if (!currentProject) throw new Error('No active project');
     const result = await api.uploadScan(currentProject.id, filename, rawContent);
+    
+    if (result.findings && result.findings.length > 0) setFindings(result.findings);
+    if (result.attackPaths && result.attackPaths.length > 0) setAttackPaths(result.attackPaths);
+    if (result.remediations && result.remediations.length > 0) setRemediations(result.remediations);
+    if (result.scan) setScans(prev => [result.scan, ...prev.filter(s => s.id !== result.scan.id)]);
+    if (result.metrics) setMetrics(result.metrics);
+
     await loadProjectData(currentProject.id);
     return result;
   };

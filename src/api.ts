@@ -200,21 +200,25 @@ export const api = {
     return getLocalProjectData(projectId).scans;
   },
 
-  async uploadScan(projectId: string, filename: string, rawContent: string): Promise<{ scan: Scan; deduplication: any }> {
+  async uploadScan(projectId: string, filename: string, rawContent: string): Promise<any> {
     const res = await fetch(`/api/projects/${projectId}/scans`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ filename, rawContent }),
     });
-    const result = await handleResponse<{ scan: Scan; deduplication: any }>(res, 'Failed to upload scan');
+    const result = await handleResponse<any>(res, 'Failed to upload scan');
     
     // Save to local cache
     const current = getLocalProjectData(projectId);
     const newScans = [result.scan, ...current.scans.filter(s => s.id !== result.scan.id)];
-    const newFindings = [...(result.deduplication?.canonicalFindings || []), ...current.findings];
+    const newFindings = result.findings || result.deduplication?.canonicalFindings || current.findings;
+    const newAttackPaths = result.attackPaths || current.attackPaths;
+    const newRemediations = result.remediations || current.remediations;
     saveLocalProjectData(projectId, {
       scans: newScans,
       findings: newFindings,
+      attackPaths: newAttackPaths,
+      remediations: newRemediations,
     });
 
     return result;
@@ -233,6 +237,7 @@ export const api = {
 
   // Findings
   async getFindings(projectId: string, filters?: { scanId?: string; severity?: string; asset?: string; status?: string; search?: string }): Promise<NormalizedFinding[]> {
+    const local = getLocalProjectData(projectId).findings;
     try {
       const params = new URLSearchParams();
       if (filters?.scanId) params.append('scanId', filters.scanId);
@@ -248,7 +253,7 @@ export const api = {
         return findings;
       }
     } catch {}
-    return getLocalProjectData(projectId).findings;
+    return local;
   },
 
   async updateFindingStatus(projectId: string, findingId: string, status: string): Promise<NormalizedFinding> {
@@ -270,6 +275,7 @@ export const api = {
 
   // Attack Paths
   async getAttackPaths(projectId: string, scanId?: string): Promise<AttackPath[]> {
+    const local = getLocalProjectData(projectId).attackPaths;
     try {
       const url = scanId ? `/api/projects/${projectId}/attack-paths?scanId=${scanId}` : `/api/projects/${projectId}/attack-paths`;
       const res = await fetch(url);
@@ -279,11 +285,12 @@ export const api = {
         return paths;
       }
     } catch {}
-    return getLocalProjectData(projectId).attackPaths;
+    return local;
   },
 
   // Remediations
   async getRemediations(projectId: string): Promise<RemediationItem[]> {
+    const local = getLocalProjectData(projectId).remediations;
     try {
       const res = await fetch(`/api/projects/${projectId}/remediations`);
       const rems = await handleResponse<RemediationItem[]>(res, 'Failed to fetch remediations');
@@ -292,7 +299,7 @@ export const api = {
         return rems;
       }
     } catch {}
-    return getLocalProjectData(projectId).remediations;
+    return local;
   },
 
   async updateRemediation(projectId: string, id: string, updates: Partial<RemediationItem>): Promise<RemediationItem> {
@@ -445,10 +452,14 @@ export const api = {
     if (projectId && result.scan) {
       const current = getLocalProjectData(projectId);
       const newScans = [result.scan, ...current.scans.filter(s => s.id !== result.scan.id)];
-      const newFindings = [...(result.deduplication?.canonicalFindings || []), ...current.findings];
+      const newFindings = result.findings || result.deduplication?.canonicalFindings || current.findings;
+      const newAttackPaths = result.attackPaths || current.attackPaths;
+      const newRemediations = result.remediations || current.remediations;
       saveLocalProjectData(projectId, {
         scans: newScans,
         findings: newFindings,
+        attackPaths: newAttackPaths,
+        remediations: newRemediations,
       });
     }
     return result;
