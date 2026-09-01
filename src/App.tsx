@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Project, Scan, NormalizedFinding, AttackPath, RemediationItem, ScanComparison, DashboardMetrics, FindingStatus } from './types';
 import { api } from './api';
 import { Header } from './components/Header';
@@ -29,57 +29,74 @@ export function App() {
   const [comparisons, setComparisons] = useState<ScanComparison[]>([]);
   const [selectedPathId, setSelectedPathId] = useState<string | null>(null);
 
-  // Modals
+  // Modals & UI State
   const [isNewProjectOpen, setIsNewProjectOpen] = useState(false);
   const [isAuditLogsOpen, setIsAuditLogsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load projects on mount
-  const loadProjects = useCallback(async () => {
-    try {
-      const projs = await api.getProjects();
-      setProjects(projs);
-      if (projs.length > 0) {
-        if (!currentProject || !projs.some(p => p.id === currentProject.id)) {
-          setCurrentProject(projs[0]);
-        }
-      } else {
-        setCurrentProject(null);
-        setIsNewProjectOpen(true);
-      }
-    } catch {
-    } finally {
-      setIsLoading(false);
-    }
-  }, [currentProject]);
-
-  useEffect(() => {
-    loadProjects();
-  }, [loadProjects]);
+  // Prevent race conditions and double loads
+  const loadingProjectIdRef = useRef<string | null>(null);
 
   // Load project details whenever currentProject changes
   const loadProjectData = useCallback(async (projectId: string) => {
+    if (!projectId || loadingProjectIdRef.current === projectId) return;
+    loadingProjectIdRef.current = projectId;
+
     try {
       const [dashMetrics, paths, allFindings, rems, allScans, comps] = await Promise.all([
-        api.getDashboard(projectId),
-        api.getAttackPaths(projectId),
-        api.getFindings(projectId),
-        api.getRemediations(projectId),
-        api.getScans(projectId),
-        api.getComparisons(projectId),
+        api.getDashboard(projectId).catch(() => null),
+        api.getAttackPaths(projectId).catch(() => []),
+        api.getFindings(projectId).catch(() => []),
+        api.getRemediations(projectId).catch(() => []),
+        api.getScans(projectId).catch(() => []),
+        api.getComparisons(projectId).catch(() => []),
       ]);
 
       setMetrics(dashMetrics);
-      setAttackPaths(paths);
-      setFindings(allFindings);
-      setRemediations(rems);
-      setScans(allScans);
-      setComparisons(comps);
-    } catch {}
+      setAttackPaths(paths || []);
+      setFindings(allFindings || []);
+      setRemediations(rems || []);
+      setScans(allScans || []);
+      setComparisons(comps || []);
+    } catch (err) {
+      console.error('Error loading project data:', err);
+    } finally {
+      loadingProjectIdRef.current = null;
+    }
   }, []);
 
+  // Initial load on mount
   useEffect(() => {
-    if (currentProject) {
+    let mounted = true;
+
+    async function init() {
+      try {
+        const projs = await api.getProjects();
+        if (!mounted) return;
+        setProjects(projs);
+        if (projs && projs.length > 0) {
+          setCurrentProject(projs[0]);
+        } else {
+          setCurrentProject(null);
+          setIsNewProjectOpen(true);
+        }
+      } catch (err) {
+        console.error('Failed to load initial projects:', err);
+      } finally {
+        if (mounted) setIsLoading(false);
+      }
+    }
+
+    init();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  // Sync data when currentProject id changes
+  useEffect(() => {
+    if (currentProject?.id) {
       loadProjectData(currentProject.id);
     } else {
       setMetrics(null);
@@ -89,7 +106,7 @@ export function App() {
       setScans([]);
       setComparisons([]);
     }
-  }, [currentProject, loadProjectData]);
+  }, [currentProject?.id, loadProjectData]);
 
   // Handlers
   const handleCreateProject = async (data: { name: string; targetScope: string; authorizedBy: string; description: string }) => {
@@ -300,4 +317,3 @@ export function App() {
 }
 
 export default App;
-

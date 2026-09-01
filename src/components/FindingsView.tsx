@@ -21,29 +21,30 @@ export const FindingsView: React.FC<FindingsViewProps> = ({
 
   // Asset list
   const assets = useMemo(() => {
-    return Array.from(new Set(findings.map(f => f.asset)));
+    return Array.from(new Set((findings || []).map(f => f.asset)));
   }, [findings]);
 
   // Filtered findings
   const filteredFindings = useMemo(() => {
-    return findings.filter(f => {
+    return (findings || []).filter(f => {
+      if (!f) return false;
       if (selectedSeverity !== 'ALL' && f.severity !== selectedSeverity) return false;
       if (selectedStatus !== 'ALL' && f.status !== selectedStatus) return false;
       if (selectedAsset !== 'ALL' && f.asset !== selectedAsset) return false;
       if (search) {
         const q = search.toLowerCase();
-        const matchTitle = f.title.toLowerCase().includes(q);
+        const matchTitle = f.title?.toLowerCase().includes(q);
         const matchEnd = f.endpoint?.toLowerCase().includes(q);
         const matchCwe = f.cwe?.toLowerCase().includes(q);
         const matchCve = f.cve?.toLowerCase().includes(q);
-        const matchAsset = f.asset.toLowerCase().includes(q);
+        const matchAsset = f.asset?.toLowerCase().includes(q);
         if (!matchTitle && !matchEnd && !matchCwe && !matchCve && !matchAsset) return false;
       }
       return true;
     });
   }, [findings, selectedSeverity, selectedStatus, selectedAsset, search]);
 
-  const rawCountTotal = findings.reduce((acc, f) => acc + (f.sourceCount || 1), 0);
+  const rawCountTotal = (findings || []).reduce((acc, f) => acc + (f?.sourceCount || 1), 0);
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);

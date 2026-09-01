@@ -36,22 +36,22 @@ export const AttackGraphView: React.FC<AttackGraphViewProps> = ({
 
   // Filter paths
   const filteredPaths = useMemo(() => {
-    return attackPaths.filter(p => {
+    return (attackPaths || []).filter(p => {
       if (severityFilter !== 'ALL' && p.severity !== severityFilter) return false;
-      if (assetFilter !== 'ALL' && !p.participatingAssets.includes(assetFilter)) return false;
+      if (assetFilter !== 'ALL' && !(p.participatingAssets || []).includes(assetFilter)) return false;
       return true;
     });
   }, [attackPaths, severityFilter, assetFilter]);
 
   // Current active highlighted path
   const activePath = useMemo(() => {
-    return attackPaths.find(p => p.id === selectedPathId) || null;
+    return (attackPaths || []).find(p => p.id === selectedPathId) || null;
   }, [attackPaths, selectedPathId]);
 
   // Collect unique assets for filter
   const allAssets = useMemo(() => {
     const set = new Set<string>();
-    attackPaths.forEach(p => p.participatingAssets.forEach(a => set.add(a)));
+    (attackPaths || []).forEach(p => (p.participatingAssets || []).forEach(a => set.add(a)));
     return Array.from(set);
   }, [attackPaths]);
 
@@ -61,13 +61,14 @@ export const AttackGraphView: React.FC<AttackGraphViewProps> = ({
     const nodeMap = new Map<string, AttackPathNode>();
     const edgeMap = new Map<string, { id: string; fromNodeId: string; toNodeId: string; label: string; riskWeight: number }>();
 
-    pathsToRender.forEach(p => {
-      p.nodes.forEach(n => {
-        if (!nodeMap.has(n.id)) {
+    (pathsToRender || []).forEach(p => {
+      (p?.nodes || []).forEach(n => {
+        if (n && !nodeMap.has(n.id)) {
           nodeMap.set(n.id, n);
         }
       });
-      p.edges.forEach(e => {
+      (p?.edges || []).forEach(e => {
+        if (!e) return;
         const edgeKey = `${e.fromNodeId}->${e.toNodeId}`;
         if (!edgeMap.has(edgeKey)) {
           edgeMap.set(edgeKey, e);
@@ -273,6 +274,7 @@ export const AttackGraphView: React.FC<AttackGraphViewProps> = ({
           style={{
             transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
             transformOrigin: '0 0',
+            willChange: 'transform',
           }}
         >
           <defs>

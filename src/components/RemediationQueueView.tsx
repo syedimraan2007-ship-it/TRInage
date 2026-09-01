@@ -21,9 +21,10 @@ export const RemediationQueueView: React.FC<RemediationQueueViewProps> = ({
   const [activeTab, setActiveTab] = useState<'all' | 'P0' | 'P1' | 'P2' | 'P3'>('all');
   const [copiedBlueprint, setCopiedBlueprint] = useState(false);
 
-  const filteredItems = remediations.filter(item => {
+  const filteredItems = (remediations || []).filter(item => {
+    if (!item) return false;
     if (activeTab === 'all') return true;
-    return item.priority.startsWith(activeTab);
+    return item.priority?.startsWith(activeTab);
   });
 
   const handleStatusChange = (item: RemediationItem, newStatus: RemediationItem['status']) => {
