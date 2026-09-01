@@ -2162,6 +2162,10 @@ async function handleApiRequest(req, res) {
       const scanId = `SCN-${Date.now().toString(36).toUpperCase()}`;
       const parsed = detectAndParseScan(rawContent, filename, targetProjectId, scanId);
       const dedup = deduplicateFindings(parsed.findings, parsed.scannerType, scanId, targetProjectId);
+      let findings = dedup.canonicalFindings;
+      findings = await aiTriageFindings(findings);
+      const paths = await aiCorrelateAndBuildAttackPaths(findings, targetProjectId, scanId);
+      const remediations = generateRemediationQueue(findings, paths, targetProjectId);
       const newScan = {
         id: scanId,
         projectId: targetProjectId,
@@ -2170,20 +2174,29 @@ async function handleApiRequest(req, res) {
         uploadedAt: (/* @__PURE__ */ new Date()).toISOString(),
         totalRawFindings: dedup.rawCount,
         deduplicatedCount: dedup.deduplicatedCount,
-        status: "normalized",
-        statusMessage: `Normalized ${dedup.rawCount} raw findings into ${dedup.deduplicatedCount} canonical findings.`,
+        status: "completed",
+        statusMessage: `Completed analysis: ${findings.length} findings, ${paths.length} attack paths, ${remediations.length} remediation actions.`,
         summary: {
-          critical: dedup.canonicalFindings.filter((f) => f.severity === "Critical").length,
-          high: dedup.canonicalFindings.filter((f) => f.severity === "High").length,
-          medium: dedup.canonicalFindings.filter((f) => f.severity === "Medium").length,
-          low: dedup.canonicalFindings.filter((f) => f.severity === "Low").length,
-          info: dedup.canonicalFindings.filter((f) => f.severity === "Info").length
+          critical: findings.filter((f) => f.severity === "Critical").length,
+          high: findings.filter((f) => f.severity === "High").length,
+          medium: findings.filter((f) => f.severity === "Medium").length,
+          low: findings.filter((f) => f.severity === "Low").length,
+          info: findings.filter((f) => f.severity === "Info").length
         }
       };
       db.addScan(newScan);
-      db.setFindingsForScan(scanId, dedup.canonicalFindings);
-      db.logAudit(targetProjectId, "SAMPLE_LOADED", `Sample dataset '${filename}' loaded.`);
-      return sendJson(200, { scan: newScan, deduplication: dedup, rawContent });
+      db.setFindingsForScan(scanId, findings);
+      db.setAttackPathsForScan(scanId, paths);
+      db.setRemediations(targetProjectId, remediations);
+      db.logAudit(targetProjectId, "SAMPLE_LOADED", `Sample dataset '${filename}' loaded & correlated (${paths.length} attack paths).`);
+      return sendJson(200, {
+        scan: newScan,
+        deduplication: dedup,
+        findingsCount: findings.length,
+        attackPathsCount: paths.length,
+        remediationsCount: remediations.length,
+        rawContent
+      });
     }
     if (pathname === "/audit-logs" && req.method === "GET") {
       const projId = getQuery("projectId");

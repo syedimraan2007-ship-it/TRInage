@@ -82,18 +82,16 @@ export const IngestionHubView: React.FC<IngestionHubViewProps> = ({
   const handleLoadSample = async (sampleId: string) => {
     setErrorMessage(null);
     setLoadingSampleId(sampleId);
-    setStatusMessage(`Loading sample scan '${sampleId}'...`);
+    setStatusMessage(`Ingesting, triaging, and correlating '${sampleId}' scan...`);
     setIsProcessing(true);
 
     try {
-      const res = await api.loadSample(sampleId, projectId);
-      setStatusMessage(`Correlating attack paths and synthesizing risk scores...`);
-      await onProcessScan(res.scan.id);
-      setStatusMessage('Sample scan successfully correlated!');
+      await api.loadSample(sampleId, projectId);
+      setStatusMessage('Sample scan successfully ingested & prioritized!');
       setTimeout(() => {
         setStatusMessage(null);
         onNavigateTab('dashboard');
-      }, 1000);
+      }, 700);
     } catch (err: any) {
       setErrorMessage(err.message || 'Failed to load sample dataset.');
     } finally {
