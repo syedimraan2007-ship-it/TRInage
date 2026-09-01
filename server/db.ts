@@ -23,31 +23,36 @@ export interface DatabaseSchema {
   }[];
 }
 
+declare global {
+  var __ai_vuln_db__: DatabaseSchema | undefined;
+}
+
 class Database {
-  private data: DatabaseSchema = {
-    projects: [],
-    scans: [],
-    findings: [],
-    relationships: [],
-    attackPaths: [],
-    remediations: [],
-    comparisons: [],
-    auditLogs: [],
-  };
+  private get data(): DatabaseSchema {
+    if (!globalThis.__ai_vuln_db__) {
+      this.init();
+    }
+    return globalThis.__ai_vuln_db__!;
+  }
+
+  private set data(val: DatabaseSchema) {
+    globalThis.__ai_vuln_db__ = val;
+  }
 
   constructor() {
     this.init();
   }
 
   private init() {
+    if (globalThis.__ai_vuln_db__ && globalThis.__ai_vuln_db__.projects?.length > 0) {
+      return;
+    }
+
     try {
-      if (!fs.existsSync(DATA_DIR)) {
-        fs.mkdirSync(DATA_DIR, { recursive: true });
-      }
       if (fs.existsSync(DB_FILE)) {
         const raw = fs.readFileSync(DB_FILE, 'utf-8');
-        this.data = JSON.parse(raw);
-        if (!this.data.projects || this.data.projects.length === 0) {
+        globalThis.__ai_vuln_db__ = JSON.parse(raw);
+        if (!globalThis.__ai_vuln_db__?.projects || globalThis.__ai_vuln_db__.projects.length === 0) {
           this.seedInitialData();
           this.save();
         }

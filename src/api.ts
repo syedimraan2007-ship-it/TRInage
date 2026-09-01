@@ -9,18 +9,33 @@ import {
   AssessmentReport,
 } from './types';
 
+async function handleResponse<T>(res: Response, defaultErrorMsg: string): Promise<T> {
+  if (!res.ok) {
+    let errorMessage = defaultErrorMsg;
+    try {
+      const err = await res.json();
+      errorMessage = err.error || err.message || defaultErrorMsg;
+    } catch {
+      try {
+        const text = await res.text();
+        if (text && text.length < 200) errorMessage = text;
+      } catch {}
+    }
+    throw new Error(errorMessage);
+  }
+  return res.json();
+}
+
 export const api = {
   // Projects
   async getProjects(): Promise<Project[]> {
     const res = await fetch('/api/projects');
-    if (!res.ok) throw new Error('Failed to fetch projects');
-    return res.json();
+    return handleResponse<Project[]>(res, 'Failed to fetch projects');
   },
 
   async getProject(id: string): Promise<Project> {
     const res = await fetch(`/api/projects/${id}`);
-    if (!res.ok) throw new Error('Failed to fetch project');
-    return res.json();
+    return handleResponse<Project>(res, 'Failed to fetch project');
   },
 
   async createProject(data: { name: string; targetScope: string; authorizedBy: string; description: string }): Promise<Project> {
@@ -29,40 +44,28 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.error || 'Failed to create project');
-    }
-    return res.json();
+    return handleResponse<Project>(res, 'Failed to create project');
   },
 
   async deleteProject(id: string): Promise<void> {
     const res = await fetch(`/api/projects/${id}`, {
       method: 'DELETE',
     });
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.error || 'Failed to delete project');
-    }
+    return handleResponse<void>(res, 'Failed to delete project');
   },
 
   async resetDemo(): Promise<Project> {
     const res = await fetch('/api/projects/reset-demo', {
       method: 'POST',
     });
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.error || 'Failed to reset demo');
-    }
-    const data = await res.json();
+    const data = await handleResponse<{ success: boolean; project: Project }>(res, 'Failed to reset demo');
     return data.project;
   },
 
   // Scans
   async getScans(projectId: string): Promise<Scan[]> {
     const res = await fetch(`/api/projects/${projectId}/scans`);
-    if (!res.ok) throw new Error('Failed to fetch scans');
-    return res.json();
+    return handleResponse<Scan[]>(res, 'Failed to fetch scans');
   },
 
   async uploadScan(projectId: string, filename: string, rawContent: string): Promise<{ scan: Scan; deduplication: any }> {
@@ -71,22 +74,14 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ filename, rawContent }),
     });
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.error || 'Failed to upload scan');
-    }
-    return res.json();
+    return handleResponse<{ scan: Scan; deduplication: any }>(res, 'Failed to upload scan');
   },
 
   async processScan(projectId: string, scanId: string): Promise<{ success: boolean; findingsCount: number; attackPathsCount: number; remediationsCount: number }> {
     const res = await fetch(`/api/projects/${projectId}/scans/${scanId}/process`, {
       method: 'POST',
     });
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.error || 'Failed to process scan pipeline');
-    }
-    return res.json();
+    return handleResponse<{ success: boolean; findingsCount: number; attackPathsCount: number; remediationsCount: number }>(res, 'Failed to process scan pipeline');
   },
 
   // Findings
@@ -99,8 +94,7 @@ export const api = {
     if (filters?.search) params.append('search', filters.search);
 
     const res = await fetch(`/api/projects/${projectId}/findings?${params.toString()}`);
-    if (!res.ok) throw new Error('Failed to fetch findings');
-    return res.json();
+    return handleResponse<NormalizedFinding[]>(res, 'Failed to fetch findings');
   },
 
   async updateFindingStatus(projectId: string, findingId: string, status: string): Promise<NormalizedFinding> {
@@ -109,23 +103,20 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status }),
     });
-    if (!res.ok) throw new Error('Failed to update finding status');
-    return res.json();
+    return handleResponse<NormalizedFinding>(res, 'Failed to update finding status');
   },
 
   // Attack Paths
   async getAttackPaths(projectId: string, scanId?: string): Promise<AttackPath[]> {
     const url = scanId ? `/api/projects/${projectId}/attack-paths?scanId=${scanId}` : `/api/projects/${projectId}/attack-paths`;
     const res = await fetch(url);
-    if (!res.ok) throw new Error('Failed to fetch attack paths');
-    return res.json();
+    return handleResponse<AttackPath[]>(res, 'Failed to fetch attack paths');
   },
 
   // Remediations
   async getRemediations(projectId: string): Promise<RemediationItem[]> {
     const res = await fetch(`/api/projects/${projectId}/remediations`);
-    if (!res.ok) throw new Error('Failed to fetch remediations');
-    return res.json();
+    return handleResponse<RemediationItem[]>(res, 'Failed to fetch remediations');
   },
 
   async updateRemediation(projectId: string, id: string, updates: Partial<RemediationItem>): Promise<RemediationItem> {
@@ -134,16 +125,14 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updates),
     });
-    if (!res.ok) throw new Error('Failed to update remediation');
-    return res.json();
+    return handleResponse<RemediationItem>(res, 'Failed to update remediation');
   },
 
   async getAiRemediationGuide(projectId: string, id: string): Promise<RemediationItem['aiGuidance']> {
     const res = await fetch(`/api/projects/${projectId}/remediations/${id}/ai-guide`, {
       method: 'POST',
     });
-    if (!res.ok) throw new Error('Failed to generate AI remediation guide');
-    return res.json();
+    return handleResponse<RemediationItem['aiGuidance']>(res, 'Failed to generate AI remediation guide');
   },
 
   // Scan Comparison
@@ -153,37 +142,29 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ scan1Id, scan2Id }),
     });
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.error || 'Failed to compare scans');
-    }
-    return res.json();
+    return handleResponse<ScanComparison>(res, 'Failed to compare scans');
   },
 
   async getComparisons(projectId: string): Promise<ScanComparison[]> {
     const res = await fetch(`/api/projects/${projectId}/comparisons`);
-    if (!res.ok) throw new Error('Failed to fetch comparisons');
-    return res.json();
+    return handleResponse<ScanComparison[]>(res, 'Failed to fetch comparisons');
   },
 
   // Dashboard & Reports
   async getDashboard(projectId: string): Promise<DashboardMetrics> {
     const res = await fetch(`/api/projects/${projectId}/dashboard`);
-    if (!res.ok) throw new Error('Failed to fetch dashboard metrics');
-    return res.json();
+    return handleResponse<DashboardMetrics>(res, 'Failed to fetch dashboard metrics');
   },
 
   async getReport(projectId: string): Promise<AssessmentReport> {
     const res = await fetch(`/api/projects/${projectId}/report`);
-    if (!res.ok) throw new Error('Failed to fetch assessment report');
-    return res.json();
+    return handleResponse<AssessmentReport>(res, 'Failed to fetch assessment report');
   },
 
   // Samples
   async getSamples(): Promise<any[]> {
     const res = await fetch('/api/samples');
-    if (!res.ok) throw new Error('Failed to fetch sample datasets');
-    return res.json();
+    return handleResponse<any[]>(res, 'Failed to fetch sample datasets');
   },
 
   async loadSample(sampleId: string, projectId?: string): Promise<any> {
@@ -192,18 +173,13 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ sampleId, projectId }),
     });
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.error || 'Failed to load sample dataset');
-    }
-    return res.json();
+    return handleResponse<any>(res, 'Failed to load sample dataset');
   },
 
   // Audit Logs
   async getAuditLogs(projectId?: string): Promise<any[]> {
     const url = projectId ? `/api/audit-logs?projectId=${projectId}` : '/api/audit-logs';
     const res = await fetch(url);
-    if (!res.ok) throw new Error('Failed to fetch audit logs');
-    return res.json();
+    return handleResponse<any[]>(res, 'Failed to fetch audit logs');
   },
 };

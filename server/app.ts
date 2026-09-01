@@ -13,25 +13,26 @@ dotenv.config();
 
 export function createApiApp() {
   const app = express();
+  const router = express.Router();
 
   // JSON Body Parser with 50mb limit for large scanner logs
   app.use(express.json({ limit: '50mb' }));
   app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-  // --- API Routes ---
+  // --- API Routes on Router ---
 
   // Health
-  app.get('/api/health', (req, res) => {
+  router.get('/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
   });
 
   // Projects
-  app.get('/api/projects', (req, res) => {
+  router.get('/projects', (req, res) => {
     res.json(db.getProjects());
   });
 
-  app.post('/api/projects', (req, res) => {
-    const { name, targetScope, authorizedBy, description } = req.body;
+  router.post('/projects', (req, res) => {
+    const { name, targetScope, authorizedBy, description } = req.body || {};
     if (!name || !targetScope) {
       return res.status(400).json({ error: 'Project name and authorized target scope are required.' });
     }
@@ -39,32 +40,32 @@ export function createApiApp() {
     res.json(project);
   });
 
-  app.post('/api/projects/reset-demo', (req, res) => {
+  router.post('/projects/reset-demo', (req, res) => {
     const proj = db.resetCleanDemo();
     res.json({ success: true, project: proj });
   });
 
-  app.get('/api/projects/:id', (req, res) => {
+  router.get('/projects/:id', (req, res) => {
     const project = db.getProject(req.params.id);
     if (!project) return res.status(404).json({ error: 'Project not found.' });
     res.json(project);
   });
 
-  app.delete('/api/projects/:id', (req, res) => {
+  router.delete('/projects/:id', (req, res) => {
     const success = db.deleteProject(req.params.id);
     if (!success) return res.status(404).json({ error: 'Project not found.' });
     res.json({ success: true, message: 'Project deleted successfully.' });
   });
 
   // Scans
-  app.get('/api/projects/:projectId/scans', (req, res) => {
+  router.get('/projects/:projectId/scans', (req, res) => {
     res.json(db.getScans(req.params.projectId));
   });
 
   // Upload Scan Content
-  app.post('/api/projects/:projectId/scans', async (req, res) => {
+  router.post('/projects/:projectId/scans', async (req, res) => {
     const { projectId } = req.params;
-    const { filename, rawContent } = req.body;
+    const { filename, rawContent } = req.body || {};
 
     if (!rawContent || !filename) {
       return res.status(400).json({ error: 'File content and filename are required.' });
@@ -73,10 +74,7 @@ export function createApiApp() {
     const scanId = `SCN-${Date.now().toString(36).toUpperCase()}`;
 
     try {
-      // 1. Validate & Parse
       const parsed = detectAndParseScan(rawContent, filename, projectId, scanId);
-
-      // 2. Deduplicate
       const dedup = deduplicateFindings(parsed.findings, parsed.scannerType, scanId, projectId);
 
       const newScan: Scan = {
@@ -108,8 +106,8 @@ export function createApiApp() {
     }
   });
 
-  // Process / Pipeline Trigger (AI Triage + Attack Graph + Prioritization)
-  app.post('/api/projects/:projectId/scans/:scanId/process', async (req, res) => {
+  // Process / Pipeline Trigger
+  router.post('/projects/:projectId/scans/:scanId/process', async (req, res) => {
     const { projectId, scanId } = req.params;
     const scan = db.getScan(scanId);
     if (!scan) return res.status(404).json({ error: 'Scan not found.' });
@@ -120,22 +118,18 @@ export function createApiApp() {
     }
 
     try {
-      // Step 1: AI Triage
       db.updateScan(scanId, { status: 'analyzing', statusMessage: 'Performing contextual AI triage & evidence analysis...' });
       findings = await aiTriageFindings(findings);
       db.setFindingsForScan(scanId, findings);
 
-      // Step 2: Correlate & Build Attack Paths
       db.updateScan(scanId, { status: 'correlating', statusMessage: 'Synthesizing multi-stage attack paths & privilege chains...' });
       const paths = await aiCorrelateAndBuildAttackPaths(findings, projectId, scanId);
       db.setAttackPathsForScan(scanId, paths);
 
-      // Step 3: Prioritize Remediations
       db.updateScan(scanId, { status: 'building_paths', statusMessage: 'Calculating high-leverage remediation priorities...' });
       const remediations = generateRemediationQueue(findings, paths, projectId);
       db.setRemediations(projectId, remediations);
 
-      // Step 4: Finalize
       db.updateScan(scanId, {
         status: 'completed',
         statusMessage: `Completed analysis: ${findings.length} findings, ${paths.length} attack paths, ${remediations.length} remediation actions.`,
@@ -163,7 +157,7 @@ export function createApiApp() {
   });
 
   // Findings
-  app.get('/api/projects/:projectId/findings', (req, res) => {
+  router.get('/projects/:projectId/findings', (req, res) => {
     const { scanId, severity, asset, status, search } = req.query;
     let findings = db.getFindings(req.params.projectId, scanId as string | undefined);
 
@@ -190,46 +184,46 @@ export function createApiApp() {
     res.json(findings);
   });
 
-  app.get('/api/projects/:projectId/findings/:id', (req, res) => {
+  router.get('/projects/:projectId/findings/:id', (req, res) => {
     const finding = db.getFinding(req.params.id);
     if (!finding) return res.status(404).json({ error: 'Finding not found.' });
     res.json(finding);
   });
 
-  app.patch('/api/projects/:projectId/findings/:id', (req, res) => {
-    const { status } = req.body;
+  router.patch('/projects/:projectId/findings/:id', (req, res) => {
+    const { status } = req.body || {};
     db.updateFinding(req.params.id, { status });
     db.logAudit(req.params.projectId, 'FINDING_UPDATED', `Finding ${req.params.id} marked as ${status}`);
     res.json(db.getFinding(req.params.id));
   });
 
   // Attack Paths
-  app.get('/api/projects/:projectId/attack-paths', (req, res) => {
+  router.get('/projects/:projectId/attack-paths', (req, res) => {
     const { scanId } = req.query;
     const paths = db.getAttackPaths(req.params.projectId, scanId as string | undefined);
     res.json(paths);
   });
 
-  app.get('/api/projects/:projectId/attack-paths/:id', (req, res) => {
+  router.get('/projects/:projectId/attack-paths/:id', (req, res) => {
     const pathItem = db.getAttackPath(req.params.id);
     if (!pathItem) return res.status(404).json({ error: 'Attack path not found.' });
     res.json(pathItem);
   });
 
   // Remediations
-  app.get('/api/projects/:projectId/remediations', (req, res) => {
+  router.get('/projects/:projectId/remediations', (req, res) => {
     res.json(db.getRemediations(req.params.projectId));
   });
 
-  app.patch('/api/projects/:projectId/remediations/:id', (req, res) => {
-    const { status, assignedTo } = req.body;
+  router.patch('/projects/:projectId/remediations/:id', (req, res) => {
+    const { status, assignedTo } = req.body || {};
     db.updateRemediation(req.params.id, { status, assignedTo });
     db.logAudit(req.params.projectId, 'REMEDIATION_UPDATED', `Remediation ${req.params.id} updated (status: ${status})`);
     res.json(db.getRemediations(req.params.projectId).find(r => r.id === req.params.id));
   });
 
   // AI Remediation Guide
-  app.post('/api/projects/:projectId/remediations/:id/ai-guide', async (req, res) => {
+  router.post('/projects/:projectId/remediations/:id/ai-guide', async (req, res) => {
     const items = db.getRemediations(req.params.projectId);
     const item = items.find(r => r.id === req.params.id);
     if (!item) return res.status(404).json({ error: 'Remediation item not found.' });
@@ -245,13 +239,13 @@ export function createApiApp() {
   });
 
   // Scan Comparison
-  app.get('/api/projects/:projectId/comparisons', (req, res) => {
+  router.get('/projects/:projectId/comparisons', (req, res) => {
     res.json(db.getComparisons(req.params.projectId));
   });
 
-  app.post('/api/projects/:projectId/compare', async (req, res) => {
+  router.post('/projects/:projectId/compare', async (req, res) => {
     const { projectId } = req.params;
-    const { scan1Id, scan2Id } = req.body;
+    const { scan1Id, scan2Id } = req.body || {};
 
     const scan1 = db.getScan(scan1Id);
     const scan2 = db.getScan(scan2Id);
@@ -276,12 +270,12 @@ export function createApiApp() {
   });
 
   // Dashboard Metrics
-  app.get('/api/projects/:projectId/dashboard', (req, res) => {
+  router.get('/projects/:projectId/dashboard', (req, res) => {
     res.json(db.getDashboardMetrics(req.params.projectId));
   });
 
   // Comprehensive Report
-  app.get('/api/projects/:projectId/report', (req, res) => {
+  router.get('/projects/:projectId/report', (req, res) => {
     const { projectId } = req.params;
     const project = db.getProject(projectId);
     if (!project) return res.status(404).json({ error: 'Project not found.' });
@@ -293,7 +287,6 @@ export function createApiApp() {
     const remediations = db.getRemediations(projectId);
     const findings = db.getFindings(projectId);
 
-    // High risk assets summary
     const assetMap = new Map<string, { count: number; maxSev: string; critPaths: number }>();
     findings.forEach(f => {
       if (!assetMap.has(f.asset)) {
@@ -336,7 +329,7 @@ export function createApiApp() {
   });
 
   // Sample Datasets & 1-Click Scanner Loaders
-  app.get('/api/samples', (req, res) => {
+  router.get('/samples', (req, res) => {
     res.json([
       {
         id: 'zap',
@@ -373,8 +366,8 @@ export function createApiApp() {
     ]);
   });
 
-  app.post('/api/load-sample', async (req, res) => {
-    const { sampleId, projectId } = req.body;
+  router.post('/load-sample', async (req, res) => {
+    const { sampleId, projectId } = req.body || {};
     const key = sampleId as keyof typeof SAMPLE_RAW_FILES;
 
     if (!SAMPLE_RAW_FILES[key]) {
@@ -399,7 +392,7 @@ export function createApiApp() {
 
       const newScan: Scan = {
         id: scanId,
-        projectId: targetProjectId,
+        projectId,
         filename,
         scannerType: parsed.scannerType as any,
         uploadedAt: new Date().toISOString(),
@@ -427,9 +420,19 @@ export function createApiApp() {
   });
 
   // Audit Logs
-  app.get('/api/audit-logs', (req, res) => {
+  router.get('/audit-logs', (req, res) => {
     const { projectId } = req.query;
     res.json(db.getAuditLogs(projectId as string | undefined));
+  });
+
+  // Mount router at both '/api' and '/'
+  app.use('/api', router);
+  app.use('/', router);
+
+  // Global JSON Error Handler
+  app.use((err: any, req: any, res: any, next: any) => {
+    console.error('API Error:', err);
+    res.status(500).json({ error: err.message || 'Internal Server Error' });
   });
 
   return app;
