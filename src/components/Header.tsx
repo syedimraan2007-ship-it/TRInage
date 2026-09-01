@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Project } from '../types';
-import { Shield, Plus, FolderKanban, FileCheck, Trash2, RotateCcw, AlertCircle } from 'lucide-react';
+import { Shield, Plus, FolderKanban, FileCheck, Trash2, AlertCircle } from 'lucide-react';
 
 interface HeaderProps {
   projects: Project[];
@@ -9,7 +9,6 @@ interface HeaderProps {
   onOpenNewProject: () => void;
   onOpenAuditLogs: () => void;
   onDeleteProject?: (id: string) => Promise<void>;
-  onResetDemo?: () => Promise<void>;
   activeTab: string;
   setActiveTab: (tab: string) => void;
   counts?: {
@@ -26,14 +25,12 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenNewProject,
   onOpenAuditLogs,
   onDeleteProject,
-  onResetDemo,
   activeTab,
   setActiveTab,
   counts,
 }) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [isResetting, setIsResetting] = useState(false);
 
   const handleDelete = async () => {
     if (!currentProject || !onDeleteProject) return;
@@ -44,17 +41,6 @@ export const Header: React.FC<HeaderProps> = ({
     } catch {
     } finally {
       setIsDeleting(false);
-    }
-  };
-
-  const handleResetDemo = async () => {
-    if (!onResetDemo) return;
-    setIsResetting(true);
-    try {
-      await onResetDemo();
-    } catch {
-    } finally {
-      setIsResetting(false);
     }
   };
 
@@ -131,19 +117,6 @@ export const Header: React.FC<HeaderProps> = ({
             )}
 
             {/* Reset Demo Button */}
-            {onResetDemo && (
-              <button
-                id="reset-demo-btn"
-                onClick={handleResetDemo}
-                disabled={isResetting}
-                className="hidden sm:flex items-center space-x-1 px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700 transition"
-                title="Reset to clean Demo Environment"
-              >
-                <RotateCcw className={`w-3.5 h-3.5 ${isResetting ? 'animate-spin' : ''}`} />
-                <span>{isResetting ? 'Resetting...' : 'Reset Demo'}</span>
-              </button>
-            )}
-
             {/* New Project Button */}
             <button
               id="new-project-btn"

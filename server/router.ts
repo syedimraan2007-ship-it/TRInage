@@ -182,13 +182,7 @@ export async function handleApiRequest(req: any, res: any) {
       return sendJson(200, db.getAuditLogs(projId || undefined));
     }
 
-    // 5. Projects Reset Demo
-    if (pathname === '/projects/reset-demo' && req.method === 'POST') {
-      const proj = db.resetCleanDemo();
-      return sendJson(200, { success: true, project: proj });
-    }
-
-    // 6. Projects Collection
+    // 5. Projects Collection
     if (pathname === '/projects') {
       if (req.method === 'GET') {
         return sendJson(200, db.getProjects());

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Project } from '../types';
-import { FolderPlus, ShieldCheck, X, AlertCircle, Sparkles } from 'lucide-react';
+import { FolderPlus, ShieldCheck, X, AlertCircle } from 'lucide-react';
 
 interface NewProjectModalProps {
   isOpen: boolean;
@@ -21,13 +21,6 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
   const [error, setError] = useState<string | null>(null);
 
   if (!isOpen) return null;
-
-  const handleTemplate = (tmpl: { name: string; targetScope: string; authorizedBy: string; description: string }) => {
-    setName(tmpl.name);
-    setTargetScope(tmpl.targetScope);
-    setAuthorizedBy(tmpl.authorizedBy);
-    setDescription(tmpl.description);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,43 +69,6 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
           >
             <X className="w-5 h-5" />
           </button>
-        </div>
-
-        {/* Starter Templates */}
-        <div className="space-y-1.5">
-          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center space-x-1">
-            <Sparkles className="w-3 h-3 text-cyan-400" />
-            <span>Quick Starter Templates:</span>
-          </span>
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={() => handleTemplate({
-                name: 'Fintech Payments & Auth Subsystem',
-                targetScope: '*.payments.enterprise.internal',
-                authorizedBy: 'Lead SecOps Architect',
-                description: 'Payment gateway API, Redis session caching, and PostgreSQL ledger.',
-              })}
-              className="p-2 rounded-lg bg-slate-950 border border-slate-800 hover:border-cyan-500/50 text-left text-xs transition"
-            >
-              <div className="font-bold text-slate-200 truncate">Fintech Payments</div>
-              <div className="text-[10px] text-slate-400 font-mono truncate">*.payments.enterprise.internal</div>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handleTemplate({
-                name: 'Healthcare Patient Portal & EHR',
-                targetScope: '*.ehr.health.internal',
-                authorizedBy: 'HIPAA Security Officer',
-                description: 'Patient medical record API, FHIR endpoints, and encrypted diagnostic storage.',
-              })}
-              className="p-2 rounded-lg bg-slate-950 border border-slate-800 hover:border-cyan-500/50 text-left text-xs transition"
-            >
-              <div className="font-bold text-slate-200 truncate">Healthcare EHR</div>
-              <div className="text-[10px] text-slate-400 font-mono truncate">*.ehr.health.internal</div>
-            </button>
-          </div>
         </div>
 
         {error && (

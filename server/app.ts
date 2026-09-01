@@ -51,11 +51,6 @@ export function createApiApp() {
     res.json(project);
   });
 
-  router.post('/projects/reset-demo', (req, res) => {
-    const proj = db.resetCleanDemo();
-    res.json({ success: true, project: proj });
-  });
-
   router.get('/projects/:id', (req, res) => {
     const project = db.getProject(req.params.id);
     if (!project) return res.status(404).json({ error: 'Project not found.' });

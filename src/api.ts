@@ -54,14 +54,6 @@ export const api = {
     return handleResponse<void>(res, 'Failed to delete project');
   },
 
-  async resetDemo(): Promise<Project> {
-    const res = await fetch('/api/projects/reset-demo', {
-      method: 'POST',
-    });
-    const data = await handleResponse<{ success: boolean; project: Project }>(res, 'Failed to reset demo');
-    return data.project;
-  },
-
   // Scans
   async getScans(projectId: string): Promise<Scan[]> {
     const res = await fetch(`/api/projects/${projectId}/scans`);

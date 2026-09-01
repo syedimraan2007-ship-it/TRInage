@@ -1,6 +1,240 @@
 // server/db.ts
 import fs from "fs";
 import path from "path";
+var DATA_DIR = path.join(process.cwd(), "data");
+var DB_FILE = path.join(DATA_DIR, "db.json");
+function createInitialData() {
+  return {
+    projects: [],
+    scans: [],
+    findings: [],
+    relationships: [],
+    attackPaths: [],
+    remediations: [],
+    comparisons: [],
+    auditLogs: []
+  };
+}
+var Database = class {
+  get data() {
+    if (!globalThis.__ai_vuln_db__) {
+      globalThis.__ai_vuln_db__ = createInitialData();
+    }
+    return globalThis.__ai_vuln_db__;
+  }
+  set data(val) {
+    globalThis.__ai_vuln_db__ = val;
+  }
+  constructor() {
+    this.init();
+  }
+  init() {
+    if (!globalThis.__ai_vuln_db__) {
+      try {
+        if (fs.existsSync(DB_FILE)) {
+          const raw = fs.readFileSync(DB_FILE, "utf-8");
+          const parsed = JSON.parse(raw);
+          if (parsed && Array.isArray(parsed.projects)) {
+            globalThis.__ai_vuln_db__ = parsed;
+            return;
+          }
+        }
+      } catch {
+      }
+      globalThis.__ai_vuln_db__ = createInitialData();
+    }
+  }
+  save() {
+    try {
+      if (!fs.existsSync(DATA_DIR)) {
+        fs.mkdirSync(DATA_DIR, { recursive: true });
+      }
+      fs.writeFileSync(DB_FILE, JSON.stringify(this.data, null, 2), "utf-8");
+    } catch {
+    }
+  }
+  seedInitialData() {
+    this.data = createInitialData();
+    this.save();
+  }
+  resetCleanDemo() {
+    this.seedInitialData();
+    return this.data.projects[0];
+  }
+  logAudit(projectId, action, details) {
+    this.data.auditLogs.unshift({
+      id: `LOG-${Date.now()}-${Math.floor(Math.random() * 1e3)}`,
+      timestamp: (/* @__PURE__ */ new Date()).toISOString(),
+      action,
+      details,
+      projectId
+    });
+    if (this.data.auditLogs.length > 500) {
+      this.data.auditLogs = this.data.auditLogs.slice(0, 500);
+    }
+    this.save();
+  }
+  // --- Projects ---
+  getProjects() {
+    return this.data.projects.map((p) => {
+      const scans = this.data.scans.filter((s) => s.projectId === p.id);
+      const findings = this.data.findings.filter((f) => f.projectId === p.id && f.status !== "verified_fixed");
+      const paths = this.data.attackPaths.filter((a) => a.projectId === p.id && a.status === "active");
+      return {
+        ...p,
+        scanCount: scans.length,
+        openFindingCount: findings.length,
+        attackPathCount: paths.length
+      };
+    });
+  }
+  getProject(id) {
+    return this.getProjects().find((p) => p.id === id);
+  }
+  createProject(input) {
+    const p = {
+      id: `PRJ-${Date.now().toString(36).toUpperCase()}`,
+      name: input.name.trim(),
+      targetScope: input.targetScope.trim(),
+      authorizedBy: input.authorizedBy.trim() || "Authorized Security Engineer",
+      description: input.description.trim(),
+      createdAt: (/* @__PURE__ */ new Date()).toISOString(),
+      updatedAt: (/* @__PURE__ */ new Date()).toISOString()
+    };
+    this.data.projects.push(p);
+    this.logAudit(p.id, "PROJECT_CREATED", `Project ${p.name} created. Authorized scope: ${p.targetScope}`);
+    this.save();
+    return p;
+  }
+  deleteProject(projectId) {
+    const exists = this.data.projects.some((p) => p.id === projectId);
+    if (!exists) return false;
+    this.data.projects = this.data.projects.filter((p) => p.id !== projectId);
+    this.data.scans = this.data.scans.filter((s) => s.projectId !== projectId);
+    this.data.findings = this.data.findings.filter((f) => f.projectId !== projectId);
+    this.data.attackPaths = this.data.attackPaths.filter((a) => a.projectId !== projectId);
+    this.data.remediations = this.data.remediations.filter((r) => r.projectId !== projectId);
+    this.data.comparisons = this.data.comparisons.filter((c) => c.projectId !== projectId);
+    this.data.relationships = this.data.relationships.filter((rel) => rel.projectId !== projectId);
+    this.data.auditLogs = this.data.auditLogs.filter((l) => l.projectId !== projectId);
+    this.save();
+    return true;
+  }
+  // --- Scans ---
+  getScans(projectId) {
+    return this.data.scans.filter((s) => s.projectId === projectId);
+  }
+  getScan(id) {
+    return this.data.scans.find((s) => s.id === id);
+  }
+  addScan(scan) {
+    this.data.scans.push(scan);
+    this.save();
+  }
+  updateScan(id, updates) {
+    const idx = this.data.scans.findIndex((s) => s.id === id);
+    if (idx !== -1) {
+      this.data.scans[idx] = { ...this.data.scans[idx], ...updates };
+      this.save();
+    }
+  }
+  // --- Findings ---
+  getFindings(projectId, scanId) {
+    return this.data.findings.filter((f) => f.projectId === projectId && (!scanId || f.scanId === scanId));
+  }
+  getFinding(id) {
+    return this.data.findings.find((f) => f.id === id);
+  }
+  setFindingsForScan(scanId, findings) {
+    this.data.findings = this.data.findings.filter((f) => f.scanId !== scanId);
+    this.data.findings.push(...findings);
+    this.save();
+  }
+  updateFinding(id, updates) {
+    const idx = this.data.findings.findIndex((f) => f.id === id);
+    if (idx !== -1) {
+      this.data.findings[idx] = { ...this.data.findings[idx], ...updates };
+      this.save();
+    }
+  }
+  // --- Attack Paths ---
+  getAttackPaths(projectId, scanId) {
+    return this.data.attackPaths.filter((p) => p.projectId === projectId && (!scanId || p.scanId === scanId));
+  }
+  setAttackPathsForScan(scanId, paths) {
+    this.data.attackPaths = this.data.attackPaths.filter((p) => p.scanId !== scanId);
+    this.data.attackPaths.push(...paths);
+    this.save();
+  }
+  getAttackPath(id) {
+    return this.data.attackPaths.find((p) => p.id === id);
+  }
+  // --- Remediations ---
+  getRemediations(projectId) {
+    return this.data.remediations.filter((r) => r.projectId === projectId);
+  }
+  setRemediations(projectId, items) {
+    this.data.remediations = this.data.remediations.filter((r) => r.projectId !== projectId);
+    this.data.remediations.push(...items);
+    this.save();
+  }
+  updateRemediation(id, updates) {
+    const idx = this.data.remediations.findIndex((r) => r.id === id);
+    if (idx !== -1) {
+      this.data.remediations[idx] = { ...this.data.remediations[idx], ...updates };
+      this.save();
+    }
+  }
+  // --- Comparisons ---
+  getComparisons(projectId) {
+    return this.data.comparisons.filter((c) => c.projectId === projectId);
+  }
+  addComparison(comparison) {
+    this.data.comparisons = this.data.comparisons.filter((c) => c.id !== comparison.id);
+    this.data.comparisons.unshift(comparison);
+    this.save();
+  }
+  // --- Metrics ---
+  getDashboardMetrics(projectId) {
+    const findings = this.data.findings.filter((f) => f.projectId === projectId);
+    const activePaths = this.data.attackPaths.filter((p) => p.projectId === projectId && p.status === "active");
+    const remediations = this.data.remediations.filter((r) => r.projectId === projectId);
+    const criticalFindings = findings.filter((f) => f.severity === "Critical" && f.status !== "verified_fixed").length;
+    const highFindings = findings.filter((f) => f.severity === "High" && f.status !== "verified_fixed").length;
+    const mediumFindings = findings.filter((f) => f.severity === "Medium" && f.status !== "verified_fixed").length;
+    const lowFindings = findings.filter((f) => f.severity === "Low" && f.status !== "verified_fixed").length;
+    const infoFindings = findings.filter((f) => f.severity === "Info" && f.status !== "verified_fixed").length;
+    const criticalAttackPaths = activePaths.filter((p) => p.severity === "Critical").length;
+    const assets = Array.from(new Set(findings.map((f) => f.asset)));
+    const unresolved = remediations.filter((r) => r.status !== "verified_fixed").length;
+    const resolved = remediations.filter((r) => r.status === "verified_fixed").length;
+    const avgRisk = activePaths.length > 0 ? Math.round(activePaths.reduce((acc, p) => acc + p.contextualScore, 0) / activePaths.length) : criticalFindings > 0 ? 75 : highFindings > 0 ? 55 : 20;
+    let posture = "SECURE POSTURE";
+    if (criticalAttackPaths > 0 || criticalFindings > 0) posture = "CRITICAL RISK";
+    else if (activePaths.length > 0 || highFindings > 0) posture = "ELEVATED RISK";
+    else if (mediumFindings > 0) posture = "MODERATE RISK";
+    return {
+      totalFindings: findings.length,
+      uniqueFindings: findings.length,
+      criticalFindings,
+      highFindings,
+      mediumFindings,
+      lowFindings,
+      infoFindings,
+      activeAttackPaths: activePaths.length,
+      criticalAttackPaths,
+      affectedAssets: assets,
+      unresolvedRemediations: unresolved,
+      resolvedRemediations: resolved,
+      averageContextualRisk: avgRisk,
+      postureRating: posture
+    };
+  }
+  getAuditLogs(projectId) {
+    return projectId ? this.data.auditLogs.filter((l) => l.projectId === projectId || !l.projectId) : this.data.auditLogs;
+  }
+};
+var db = new Database();
 
 // server/sampleData.ts
 var SAMPLE_PROJECT = {
@@ -223,228 +457,6 @@ var SAMPLE_FINDINGS = [
     }
   }
 ];
-var SAMPLE_ATTACK_PATHS = [
-  {
-    id: "PATH-01-CRIT",
-    scanId: "SCN-SAMPLE-01",
-    projectId: "PRJ-FINTECH-CORE",
-    title: "Public SSRF \u2192 Internal Redis Compromise \u2192 Ledger SQLi Extraction",
-    summary: "An unauthenticated attacker exploits SSRF on the public webhook API to reach the unauthenticated Redis cache, acquires internal service credentials, and pivots to the settlement ledger database via SQL injection.",
-    severity: "Critical",
-    confidence: "Strongly Indicated",
-    contextualScore: 94,
-    scoreBreakdown: {
-      exposureScore: 24,
-      exploitabilityScore: 24,
-      assetCriticalityScore: 25,
-      chainImpactScore: 21,
-      bonusPenalties: 0,
-      totalScore: 94,
-      explanation: "Formula: Exposure (24/25) + Exploitability (24/25) + Asset Criticality (25/25) + Chain Multiplier (21/25) = 94/100."
-    },
-    nodes: [
-      { id: "node-0", label: "Internet Threat Actor", type: "threat_actor", isEntrypoint: true },
-      { id: "node-1", label: "Public Webhook API", subLabel: "api.payments.enterprise.internal", type: "service", isEntrypoint: true },
-      { id: "node-2", label: "SSRF in Webhook Dispatcher", subLabel: "CWE-918 / CVE-2024-38856", type: "vulnerability", findingRef: "FND-SSRF-01", severity: "Critical" },
-      { id: "node-3", label: "Unauthenticated Redis Cache", subLabel: "redis.payments.internal:6379", type: "asset", findingRef: "FND-REDIS-02", severity: "High" },
-      { id: "node-4", label: "SQL Injection in Ledger", subLabel: "CWE-89 (LedgerRepository)", type: "vulnerability", findingRef: "FND-SQLI-03", severity: "Critical" },
-      { id: "node-5", label: "Customer Transaction Ledger DB", subLabel: "PostgreSQL Production Data", type: "datastore", isTarget: true }
-    ],
-    edges: [
-      { id: "e1", fromNodeId: "node-0", toNodeId: "node-1", relation: "accesses", label: "HTTP POST /subscribe", riskWeight: 20 },
-      { id: "e2", fromNodeId: "node-1", toNodeId: "node-2", relation: "triggers", label: "Inject SSRF Payload", riskWeight: 30 },
-      { id: "e3", fromNodeId: "node-2", toNodeId: "node-3", relation: "pivots_to", label: "Pivot to Internal Redis (Port 6379)", riskWeight: 25 },
-      { id: "e4", fromNodeId: "node-3", toNodeId: "node-4", relation: "leaks_credential_for", label: "Steal Ledger Auth Token", riskWeight: 20 },
-      { id: "e5", fromNodeId: "node-4", toNodeId: "node-5", relation: "compromises", label: "Dump Cardholder Table", riskWeight: 35 }
-    ],
-    participatingFindingIds: ["FND-SSRF-01", "FND-REDIS-02", "FND-SQLI-03"],
-    prerequisites: [
-      "Public network access to api.payments.enterprise.internal",
-      "Unauthenticated webhook registration endpoint reachable",
-      "Flat internal subnet routing between API and Redis cluster"
-    ],
-    impactAssessment: "Total compromise of cardholder transaction history, bank routing numbers, and payment audit logs.",
-    recommendedFixSequence: [
-      "Implement strict URL whitelist validation and block internal RFC1918 & metadata IPs on WebhookService (Neutralizes Stage 1)",
-      "Enable Redis requirepass authentication and restrict Redis subnet ingress (Neutralizes Stage 2)",
-      "Convert LedgerRepository raw SQL concatenation to parameterized PreparedStatements (Neutralizes Stage 3)"
-    ],
-    status: "active",
-    participatingAssets: [
-      "api.payments.enterprise.internal",
-      "redis.payments.internal",
-      "ledger.payments.internal"
-    ]
-  },
-  {
-    id: "PATH-02-HIGH",
-    scanId: "SCN-SAMPLE-01",
-    projectId: "PRJ-FINTECH-CORE",
-    title: "Hardcoded JWT Secret \u2192 Admin Token Forgery \u2192 Microservice Takeover",
-    summary: "An attacker leveraging code leaks or decompiled binaries utilizes the hardcoded HMAC secret to forge administrative JWTs, bypassing API authorization checks.",
-    severity: "High",
-    confidence: "Strongly Indicated",
-    contextualScore: 82,
-    scoreBreakdown: {
-      exposureScore: 18,
-      exploitabilityScore: 23,
-      assetCriticalityScore: 22,
-      chainImpactScore: 19,
-      bonusPenalties: 0,
-      totalScore: 82,
-      explanation: "Formula: Exposure (18/25) + Exploitability (23/25) + Asset Criticality (22/25) + Chain Multiplier (19/25) = 82/100."
-    },
-    nodes: [
-      { id: "node-jwt-0", label: "External Actor", type: "threat_actor", isEntrypoint: true },
-      { id: "node-jwt-1", label: "Hardcoded JWT Secret", subLabel: "CWE-798 in jwt.ts", type: "vulnerability", findingRef: "FND-JWT-05", severity: "High" },
-      { id: "node-jwt-2", label: "Auth Subsystem API", subLabel: "auth.payments.enterprise.internal", type: "service" },
-      { id: "node-jwt-3", label: "Admin Management Gateway", subLabel: "Full Tenant Controls", type: "datastore", isTarget: true }
-    ],
-    edges: [
-      { id: "ej1", fromNodeId: "node-jwt-0", toNodeId: "node-jwt-1", relation: "discovers", label: "Decompile / Read Hardcoded Key", riskWeight: 20 },
-      { id: "ej2", fromNodeId: "node-jwt-1", toNodeId: "node-jwt-2", relation: "forges_token_for", label: "Forge Admin JWT Claim", riskWeight: 35 },
-      { id: "ej3", fromNodeId: "node-jwt-2", toNodeId: "node-jwt-3", relation: "escalates_to", label: "Gain Superadmin API Access", riskWeight: 30 }
-    ],
-    participatingFindingIds: ["FND-JWT-05"],
-    prerequisites: ["Knowledge of hardcoded JWT fallback string"],
-    impactAssessment: "Unauthorized generation of valid administrative tokens for all internal payment microservices.",
-    recommendedFixSequence: [
-      "Rotate signing keys and enforce mandatory KMS / Vault secret injection at runtime",
-      "Remove fallback strings from codebase and add CI SAST blocking rule"
-    ],
-    status: "active",
-    participatingAssets: [
-      "auth.payments.enterprise.internal",
-      "api.payments.enterprise.internal"
-    ]
-  }
-];
-var SAMPLE_REMEDIATIONS = [
-  {
-    id: "REM-01-SSRF",
-    projectId: "PRJ-FINTECH-CORE",
-    title: "Implement Egress URL Whitelisting & Block Private IP Ranges in Webhook Dispatcher",
-    priority: "P0 - Immediate",
-    affectedAsset: "api.payments.enterprise.internal",
-    engineeringAction: "Add DNS pre-resolution and validate target IP against RFC1918, RFC6598, loopback, and AWS metadata (169.254.169.254). Disallow HTTP redirects to private hosts.",
-    architecturalSafeguards: [
-      "DNS Pinning / Safe HTTP Client",
-      "Egress Firewall NetworkPolicy",
-      "IMDSv2 Enforcement with Hop Limit = 1"
-    ],
-    validationRequirements: "Verify unauthenticated requests to 169.254.169.254 and 127.0.0.1 return 400 Bad Request.",
-    estimatedRiskReductionPercent: 45,
-    affectedFindingIds: ["FND-SSRF-01"],
-    affectedAttackPathIds: ["PATH-01-CRIT"],
-    pathsEliminatedCount: 1,
-    status: "pending",
-    assignedTo: "Lead Backend Engineer",
-    aiGuidance: {
-      rootCauseExplanation: "The WebhookService directly issues outbound HTTP requests to user-supplied URLs without resolving the destination IP or verifying it against private network boundaries.",
-      impactRationale: "Resolving this bottleneck breaks the initial ingress stage of the highest-rated multi-hop attack path (PATH-01-CRIT), preventing pivot into Redis and Postgres.",
-      remediationBlueprint: `// Safe Webhook Dispatcher with IP Resolution Guard
-import dns from 'dns/promises';
-import ipaddr from 'ipaddr.js';
-
-export async function validateWebhookUrl(rawUrl: string): Promise<boolean> {
-  const parsed = new URL(rawUrl);
-  if (!['http:', 'https:'].includes(parsed.protocol)) {
-    throw new Error('Unsupported protocol');
-  }
-
-  // Resolve hostname to IP before request
-  const addresses = await dns.lookup(parsed.hostname, { all: true });
-  for (const { address } of addresses) {
-    const addr = ipaddr.parse(address);
-    if (addr.range() !== 'unicast' || address === '169.254.169.254') {
-      throw new Error('Access to private/internal network addresses is forbidden');
-    }
-  }
-  return true;
-}`,
-      verificationSteps: [
-        "Attempt to register http://169.254.169.254/ and verify immediate 400 rejection",
-        "Attempt to register http://127.0.0.1:6379/ and verify socket blocked",
-        "Verify legitimate external webhooks (e.g. https://api.merchant.com/webhook) succeed"
-      ],
-      residualRiskNotes: "Ensure DNS rebinding protection by performing request connection directly to resolved IP with SNI header."
-    }
-  },
-  {
-    id: "REM-02-SQLI",
-    projectId: "PRJ-FINTECH-CORE",
-    title: "Migrate Settlement Reconciliation Queries to Parameterized PreparedStatements",
-    priority: "P0 - Immediate",
-    affectedAsset: "ledger.payments.internal",
-    engineeringAction: "Refactor string-interpolated SQL statements in LedgerRepository to use typed Prisma/TypeORM parameterized queries.",
-    architecturalSafeguards: [
-      "ORM Parameterization",
-      "Database Least-Privilege Role",
-      "WAF SQLi Signature Rule"
-    ],
-    validationRequirements: "Verify single-quote SQL payload does not alter database execution tree.",
-    estimatedRiskReductionPercent: 35,
-    affectedFindingIds: ["FND-SQLI-03"],
-    affectedAttackPathIds: ["PATH-01-CRIT"],
-    pathsEliminatedCount: 1,
-    status: "pending",
-    assignedTo: "Data Engineering Lead",
-    aiGuidance: {
-      rootCauseExplanation: "Dynamic string concatenation was used in LedgerRepository.ts:88 to concatenate batch_id parameter directly into SQL string.",
-      impactRationale: "Completely eliminates extraction and modification risks on the customer transaction database.",
-      remediationBlueprint: `// Parameterized Database Query Pattern
-import { pool } from '../db/client';
-
-export async function getSettlementBatch(batchId: string) {
-  // Use parameterized placeholders ($1) instead of template literals
-  const query = 'SELECT * FROM settlement_batches WHERE batch_id = $1 AND deleted_at IS NULL';
-  const { rows } = await pool.query(query, [batchId]);
-  return rows[0] || null;
-}`,
-      verificationSteps: [
-        `Send batch_id="1' OR '1'='1" and verify database returns 0 rows without syntax error`,
-        "Run automated Semgrep SAST scan to verify CWE-89 rule passes with 0 findings"
-      ],
-      residualRiskNotes: "Ensure all surrounding repositories also undergo static audit to prevent duplicate patterns."
-    }
-  },
-  {
-    id: "REM-03-REDIS",
-    projectId: "PRJ-FINTECH-CORE",
-    title: "Enforce Strong Redis Authentication (requirepass) & TLS Encryption",
-    priority: "P1 - High",
-    affectedAsset: "redis.payments.internal",
-    engineeringAction: "Configure redis.conf with strong 256-bit password, enable ACLs, and restrict bind interface to dedicated VPC peering subnet.",
-    architecturalSafeguards: [
-      "Redis AUTH / ACLs",
-      "TLS in Transit",
-      "VPC Security Group Isolation"
-    ],
-    validationRequirements: "Verify unauthenticated redis-cli ping returns NOAUTH Authentication required.",
-    estimatedRiskReductionPercent: 20,
-    affectedFindingIds: ["FND-REDIS-02"],
-    affectedAttackPathIds: ["PATH-01-CRIT"],
-    pathsEliminatedCount: 1,
-    status: "pending",
-    assignedTo: "DevOps / Infrastructure"
-  },
-  {
-    id: "REM-04-JWT",
-    projectId: "PRJ-FINTECH-CORE",
-    title: "Rotate JWT Signing Secret to AWS KMS / HashiCorp Vault Managed Key",
-    priority: "P1 - High",
-    affectedAsset: "auth.payments.enterprise.internal",
-    engineeringAction: "Remove hardcoded secret fallback from code. Configure KMS asymmetric signing (RS256) with automatic key rotation.",
-    architecturalSafeguards: ["Asymmetric RS256 JWTs", "Secrets Manager Key Injection"],
-    validationRequirements: "Verify missing environment variable fails fast on startup rather than using fallback.",
-    estimatedRiskReductionPercent: 18,
-    affectedFindingIds: ["FND-JWT-05"],
-    affectedAttackPathIds: ["PATH-02-HIGH"],
-    pathsEliminatedCount: 1,
-    status: "pending",
-    assignedTo: "Auth Platform Team"
-  }
-];
 var SAMPLE_RAW_FILES = {
   zap: JSON.stringify({
     "@programName": "OWASP ZAP",
@@ -562,268 +574,6 @@ var SAMPLE_RAW_FILES = {
     ]
   }, null, 2)
 };
-
-// server/db.ts
-var DATA_DIR = path.join(process.cwd(), "data");
-var DB_FILE = path.join(DATA_DIR, "db.json");
-function createInitialData() {
-  const sampleScan = {
-    id: "SCN-SAMPLE-01",
-    projectId: SAMPLE_PROJECT.id,
-    filename: "owasp-zap-nuclei-semgrep-consolidated.json",
-    scannerType: "generic_json",
-    uploadedAt: (/* @__PURE__ */ new Date()).toISOString(),
-    totalRawFindings: 8,
-    deduplicatedCount: SAMPLE_FINDINGS.length,
-    status: "completed",
-    statusMessage: `Completed analysis: ${SAMPLE_FINDINGS.length} findings, ${SAMPLE_ATTACK_PATHS.length} attack paths.`,
-    summary: {
-      critical: SAMPLE_FINDINGS.filter((f) => f.severity === "Critical").length,
-      high: SAMPLE_FINDINGS.filter((f) => f.severity === "High").length,
-      medium: SAMPLE_FINDINGS.filter((f) => f.severity === "Medium").length,
-      low: SAMPLE_FINDINGS.filter((f) => f.severity === "Low").length,
-      info: SAMPLE_FINDINGS.filter((f) => f.severity === "Info").length
-    }
-  };
-  return {
-    projects: [{ ...SAMPLE_PROJECT }],
-    scans: [sampleScan],
-    findings: [...SAMPLE_FINDINGS],
-    relationships: [],
-    attackPaths: [...SAMPLE_ATTACK_PATHS],
-    remediations: [...SAMPLE_REMEDIATIONS],
-    comparisons: [],
-    auditLogs: [
-      {
-        id: "LOG-INIT-1",
-        timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-        action: "ENVIRONMENT_INITIALIZED",
-        details: `Seeded defensive assessment workspace for ${SAMPLE_PROJECT.name} (${SAMPLE_PROJECT.targetScope}).`,
-        projectId: SAMPLE_PROJECT.id
-      }
-    ]
-  };
-}
-var Database = class {
-  get data() {
-    if (!globalThis.__ai_vuln_db__ || !globalThis.__ai_vuln_db__.projects || globalThis.__ai_vuln_db__.projects.length === 0) {
-      globalThis.__ai_vuln_db__ = createInitialData();
-    }
-    return globalThis.__ai_vuln_db__;
-  }
-  set data(val) {
-    globalThis.__ai_vuln_db__ = val;
-  }
-  constructor() {
-    this.init();
-  }
-  init() {
-    if (!globalThis.__ai_vuln_db__) {
-      try {
-        if (fs.existsSync(DB_FILE)) {
-          const raw = fs.readFileSync(DB_FILE, "utf-8");
-          const parsed = JSON.parse(raw);
-          if (parsed && parsed.projects && parsed.projects.length > 0) {
-            globalThis.__ai_vuln_db__ = parsed;
-            return;
-          }
-        }
-      } catch {
-      }
-      globalThis.__ai_vuln_db__ = createInitialData();
-    }
-  }
-  save() {
-    try {
-      if (!fs.existsSync(DATA_DIR)) {
-        fs.mkdirSync(DATA_DIR, { recursive: true });
-      }
-      fs.writeFileSync(DB_FILE, JSON.stringify(this.data, null, 2), "utf-8");
-    } catch {
-    }
-  }
-  seedInitialData() {
-    this.data = createInitialData();
-    this.save();
-  }
-  resetCleanDemo() {
-    this.seedInitialData();
-    return this.data.projects[0];
-  }
-  logAudit(projectId, action, details) {
-    this.data.auditLogs.unshift({
-      id: `LOG-${Date.now()}-${Math.floor(Math.random() * 1e3)}`,
-      timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-      action,
-      details,
-      projectId
-    });
-    if (this.data.auditLogs.length > 500) {
-      this.data.auditLogs = this.data.auditLogs.slice(0, 500);
-    }
-    this.save();
-  }
-  // --- Projects ---
-  getProjects() {
-    return this.data.projects.map((p) => {
-      const scans = this.data.scans.filter((s) => s.projectId === p.id);
-      const findings = this.data.findings.filter((f) => f.projectId === p.id && f.status !== "verified_fixed");
-      const paths = this.data.attackPaths.filter((a) => a.projectId === p.id && a.status === "active");
-      return {
-        ...p,
-        scanCount: scans.length,
-        openFindingCount: findings.length,
-        attackPathCount: paths.length
-      };
-    });
-  }
-  getProject(id) {
-    return this.getProjects().find((p) => p.id === id);
-  }
-  createProject(input) {
-    const p = {
-      id: `PRJ-${Date.now().toString(36).toUpperCase()}`,
-      name: input.name.trim(),
-      targetScope: input.targetScope.trim(),
-      authorizedBy: input.authorizedBy.trim() || "Authorized Security Engineer",
-      description: input.description.trim(),
-      createdAt: (/* @__PURE__ */ new Date()).toISOString(),
-      updatedAt: (/* @__PURE__ */ new Date()).toISOString()
-    };
-    this.data.projects.push(p);
-    this.logAudit(p.id, "PROJECT_CREATED", `Project ${p.name} created. Authorized scope: ${p.targetScope}`);
-    this.save();
-    return p;
-  }
-  deleteProject(projectId) {
-    const exists = this.data.projects.some((p) => p.id === projectId);
-    if (!exists) return false;
-    this.data.projects = this.data.projects.filter((p) => p.id !== projectId);
-    this.data.scans = this.data.scans.filter((s) => s.projectId !== projectId);
-    this.data.findings = this.data.findings.filter((f) => f.projectId !== projectId);
-    this.data.attackPaths = this.data.attackPaths.filter((a) => a.projectId !== projectId);
-    this.data.remediations = this.data.remediations.filter((r) => r.projectId !== projectId);
-    this.data.comparisons = this.data.comparisons.filter((c) => c.projectId !== projectId);
-    this.data.relationships = this.data.relationships.filter((rel) => rel.projectId !== projectId);
-    this.data.auditLogs = this.data.auditLogs.filter((l) => l.projectId !== projectId);
-    this.save();
-    return true;
-  }
-  // --- Scans ---
-  getScans(projectId) {
-    return this.data.scans.filter((s) => s.projectId === projectId);
-  }
-  getScan(id) {
-    return this.data.scans.find((s) => s.id === id);
-  }
-  addScan(scan) {
-    this.data.scans.push(scan);
-    this.save();
-  }
-  updateScan(id, updates) {
-    const idx = this.data.scans.findIndex((s) => s.id === id);
-    if (idx !== -1) {
-      this.data.scans[idx] = { ...this.data.scans[idx], ...updates };
-      this.save();
-    }
-  }
-  // --- Findings ---
-  getFindings(projectId, scanId) {
-    return this.data.findings.filter((f) => f.projectId === projectId && (!scanId || f.scanId === scanId));
-  }
-  getFinding(id) {
-    return this.data.findings.find((f) => f.id === id);
-  }
-  setFindingsForScan(scanId, findings) {
-    this.data.findings = this.data.findings.filter((f) => f.scanId !== scanId);
-    this.data.findings.push(...findings);
-    this.save();
-  }
-  updateFinding(id, updates) {
-    const idx = this.data.findings.findIndex((f) => f.id === id);
-    if (idx !== -1) {
-      this.data.findings[idx] = { ...this.data.findings[idx], ...updates };
-      this.save();
-    }
-  }
-  // --- Attack Paths ---
-  getAttackPaths(projectId, scanId) {
-    return this.data.attackPaths.filter((p) => p.projectId === projectId && (!scanId || p.scanId === scanId));
-  }
-  setAttackPathsForScan(scanId, paths) {
-    this.data.attackPaths = this.data.attackPaths.filter((p) => p.scanId !== scanId);
-    this.data.attackPaths.push(...paths);
-    this.save();
-  }
-  getAttackPath(id) {
-    return this.data.attackPaths.find((p) => p.id === id);
-  }
-  // --- Remediations ---
-  getRemediations(projectId) {
-    return this.data.remediations.filter((r) => r.projectId === projectId);
-  }
-  setRemediations(projectId, items) {
-    this.data.remediations = this.data.remediations.filter((r) => r.projectId !== projectId);
-    this.data.remediations.push(...items);
-    this.save();
-  }
-  updateRemediation(id, updates) {
-    const idx = this.data.remediations.findIndex((r) => r.id === id);
-    if (idx !== -1) {
-      this.data.remediations[idx] = { ...this.data.remediations[idx], ...updates };
-      this.save();
-    }
-  }
-  // --- Comparisons ---
-  getComparisons(projectId) {
-    return this.data.comparisons.filter((c) => c.projectId === projectId);
-  }
-  addComparison(comparison) {
-    this.data.comparisons = this.data.comparisons.filter((c) => c.id !== comparison.id);
-    this.data.comparisons.unshift(comparison);
-    this.save();
-  }
-  // --- Metrics ---
-  getDashboardMetrics(projectId) {
-    const findings = this.data.findings.filter((f) => f.projectId === projectId);
-    const activePaths = this.data.attackPaths.filter((p) => p.projectId === projectId && p.status === "active");
-    const remediations = this.data.remediations.filter((r) => r.projectId === projectId);
-    const criticalFindings = findings.filter((f) => f.severity === "Critical" && f.status !== "verified_fixed").length;
-    const highFindings = findings.filter((f) => f.severity === "High" && f.status !== "verified_fixed").length;
-    const mediumFindings = findings.filter((f) => f.severity === "Medium" && f.status !== "verified_fixed").length;
-    const lowFindings = findings.filter((f) => f.severity === "Low" && f.status !== "verified_fixed").length;
-    const infoFindings = findings.filter((f) => f.severity === "Info" && f.status !== "verified_fixed").length;
-    const criticalAttackPaths = activePaths.filter((p) => p.severity === "Critical").length;
-    const assets = Array.from(new Set(findings.map((f) => f.asset)));
-    const unresolved = remediations.filter((r) => r.status !== "verified_fixed").length;
-    const resolved = remediations.filter((r) => r.status === "verified_fixed").length;
-    const avgRisk = activePaths.length > 0 ? Math.round(activePaths.reduce((acc, p) => acc + p.contextualScore, 0) / activePaths.length) : criticalFindings > 0 ? 75 : highFindings > 0 ? 55 : 20;
-    let posture = "SECURE POSTURE";
-    if (criticalAttackPaths > 0 || criticalFindings > 0) posture = "CRITICAL RISK";
-    else if (activePaths.length > 0 || highFindings > 0) posture = "ELEVATED RISK";
-    else if (mediumFindings > 0) posture = "MODERATE RISK";
-    return {
-      totalFindings: findings.length,
-      uniqueFindings: findings.length,
-      criticalFindings,
-      highFindings,
-      mediumFindings,
-      lowFindings,
-      infoFindings,
-      activeAttackPaths: activePaths.length,
-      criticalAttackPaths,
-      affectedAssets: assets,
-      unresolvedRemediations: unresolved,
-      resolvedRemediations: resolved,
-      averageContextualRisk: avgRisk,
-      postureRating: posture
-    };
-  }
-  getAuditLogs(projectId) {
-    return projectId ? this.data.auditLogs.filter((l) => l.projectId === projectId || !l.projectId) : this.data.auditLogs;
-  }
-};
-var db = new Database();
 
 // server/parsers/index.ts
 function sanitizeUntrustedText(text, maxLen = 3e3) {
@@ -2201,10 +1951,6 @@ async function handleApiRequest(req, res) {
     if (pathname === "/audit-logs" && req.method === "GET") {
       const projId = getQuery("projectId");
       return sendJson(200, db.getAuditLogs(projId || void 0));
-    }
-    if (pathname === "/projects/reset-demo" && req.method === "POST") {
-      const proj = db.resetCleanDemo();
-      return sendJson(200, { success: true, project: proj });
     }
     if (pathname === "/projects") {
       if (req.method === "GET") {

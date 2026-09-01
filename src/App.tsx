@@ -13,7 +13,7 @@ import { IngestionHubView } from './components/IngestionHubView';
 import { ReportView } from './components/ReportView';
 import { NewProjectModal } from './components/NewProjectModal';
 import { AuditLogModal } from './components/AuditLogModal';
-import { Activity, ShieldAlert, Sparkles, FolderPlus } from 'lucide-react';
+import { Activity, ShieldAlert, FolderPlus } from 'lucide-react';
 
 export function App() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -39,8 +39,13 @@ export function App() {
     try {
       const projs = await api.getProjects();
       setProjects(projs);
-      if (projs.length > 0 && !currentProject) {
-        setCurrentProject(projs[0]);
+      if (projs.length > 0) {
+        if (!currentProject || !projs.some(p => p.id === currentProject.id)) {
+          setCurrentProject(projs[0]);
+        }
+      } else {
+        setCurrentProject(null);
+        setIsNewProjectOpen(true);
       }
     } catch {
     } finally {
@@ -103,15 +108,8 @@ export function App() {
       setCurrentProject(remaining[0]);
     } else {
       setCurrentProject(null);
+      setIsNewProjectOpen(true);
     }
-  };
-
-  const handleResetDemo = async () => {
-    const demoProj = await api.resetDemo();
-    const allProjs = await api.getProjects();
-    setProjects(allProjs);
-    setCurrentProject(demoProj);
-    setActiveTab('dashboard');
   };
 
   const handleUploadScan = async (filename: string, rawContent: string) => {
@@ -142,30 +140,20 @@ export function App() {
     await loadProjectData(currentProject.id);
   };
 
-  const handleGenerateAiGuide = async (id: string) => {
-    if (!currentProject) throw new Error('No active project');
-    return api.getAiRemediationGuide(currentProject.id, id);
-  };
-
-  const handleCompareScans = async (scan1Id: string, scan2Id: string) => {
-    if (!currentProject) throw new Error('No active project');
-    const comp = await api.compareScans(currentProject.id, scan1Id, scan2Id);
-    setComparisons(prev => [comp, ...prev.filter(c => c.id !== comp.id)]);
-    return comp;
-  };
-
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-400 space-y-3">
-        <Activity className="w-10 h-10 animate-spin text-cyan-400" />
-        <p className="font-mono text-xs">Initializing defensive security intelligence platform...</p>
+      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center space-y-4 text-cyan-400">
+        <Activity className="w-8 h-8 animate-pulse text-cyan-400" />
+        <span className="text-xs tracking-widest font-mono text-slate-400 uppercase">
+          Initializing Defensive Security Platform...
+        </span>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-cyan-500 selection:text-black">
-      {/* Top Header */}
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-cyan-500/20 selection:text-cyan-200">
+      {/* Platform Header */}
       <Header
         projects={projects}
         currentProject={currentProject}
@@ -173,7 +161,6 @@ export function App() {
         onOpenNewProject={() => setIsNewProjectOpen(true)}
         onOpenAuditLogs={() => setIsAuditLogsOpen(true)}
         onDeleteProject={handleDeleteProject}
-        onResetDemo={handleResetDemo}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         counts={{
@@ -199,24 +186,17 @@ export function App() {
             <div className="space-y-1">
               <h2 className="text-xl font-bold text-slate-100">No Authorized Projects Configured</h2>
               <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
-                Create a defensive project scope or load the enterprise demo scenario to begin correlating multi-stage attack paths.
+                Define an authorized defensive target scope to begin ingesting security scan reports and prioritizing attack paths.
               </p>
             </div>
 
-            <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <div className="pt-2 flex items-center justify-center">
               <button
                 onClick={() => setIsNewProjectOpen(true)}
-                className="w-full sm:w-auto px-5 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl text-xs font-bold transition shadow-md shadow-cyan-950 flex items-center justify-center space-x-1.5"
+                className="px-6 py-3 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl text-xs font-bold transition shadow-lg shadow-cyan-950/60 flex items-center justify-center space-x-2"
               >
                 <FolderPlus className="w-4 h-4" />
                 <span>Create New Project</span>
-              </button>
-              <button
-                onClick={handleResetDemo}
-                className="w-full sm:w-auto px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1.5"
-              >
-                <Sparkles className="w-4 h-4" />
-                <span>Load Fintech Demo Scenario</span>
               </button>
             </div>
           </div>
@@ -250,11 +230,10 @@ export function App() {
               <AttackPathsView
                 attackPaths={attackPaths}
                 findings={findings}
-                onSelectAttackPath={(pId) => {
+                onSelectPathId={(pId) => {
                   setSelectedPathId(pId);
                   setActiveTab('attack-graph');
                 }}
-                onNavigateTab={(tab) => setActiveTab(tab)}
               />
             )}
 
@@ -268,9 +247,10 @@ export function App() {
             {activeTab === 'remediation' && (
               <RemediationQueueView
                 remediations={remediations}
+                findings={findings}
+                attackPaths={attackPaths}
                 projectId={currentProject.id}
                 onUpdateStatus={handleUpdateRemediation}
-                onGenerateAiGuide={handleGenerateAiGuide}
               />
             )}
 
@@ -278,7 +258,8 @@ export function App() {
               <ScanComparisonView
                 scans={scans}
                 comparisons={comparisons}
-                onCompareScans={handleCompareScans}
+                projectId={currentProject.id}
+                onScanCompared={() => loadProjectData(currentProject.id)}
               />
             )}
 
@@ -293,24 +274,22 @@ export function App() {
             )}
 
             {activeTab === 'report' && (
-              <ReportView projectId={currentProject.id} />
+              <ReportView
+                projectId={currentProject.id}
+              />
             )}
           </>
         )}
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-900 bg-slate-950/90 py-4 text-center text-slate-500 text-xs font-mono">
-        AI Vulnerability Triage & Attack-Path Prioritizer • Defensive Threat Modeling & Remediation Intelligence
-      </footer>
-
-      {/* Modals */}
+      {/* New Project Scope Modal */}
       <NewProjectModal
         isOpen={isNewProjectOpen}
         onClose={() => setIsNewProjectOpen(false)}
         onCreateProject={handleCreateProject}
       />
 
+      {/* Audit Log Modal */}
       <AuditLogModal
         isOpen={isAuditLogsOpen}
         onClose={() => setIsAuditLogsOpen(false)}
@@ -321,3 +300,4 @@ export function App() {
 }
 
 export default App;
+
