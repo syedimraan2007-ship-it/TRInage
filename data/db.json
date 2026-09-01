@@ -26,6 +26,15 @@
       "description": "Direct scope",
       "createdAt": "2026-09-01T09:01:24.949Z",
       "updatedAt": "2026-09-01T09:01:24.949Z"
+    },
+    {
+      "id": "PRJ-MTIFYL76",
+      "name": "Fintech Payments & Auth Subsystem",
+      "targetScope": "*.payments.enterprise.internal",
+      "authorizedBy": "Lead SecOps Architect",
+      "description": "Payment gateway API",
+      "createdAt": "2026-09-01T09:04:57.042Z",
+      "updatedAt": "2026-09-01T09:04:57.042Z"
     }
   ],
   "scans": [
@@ -1242,6 +1251,13 @@
   ],
   "comparisons": [],
   "auditLogs": [
+    {
+      "id": "LOG-1788253497042-966",
+      "timestamp": "2026-09-01T09:04:57.042Z",
+      "action": "PROJECT_CREATED",
+      "details": "Project Fintech Payments & Auth Subsystem created. Authorized scope: *.payments.enterprise.internal",
+      "projectId": "PRJ-MTIFYL76"
+    },
     {
       "id": "LOG-1788253284949-188",
       "timestamp": "2026-09-01T09:01:24.949Z",

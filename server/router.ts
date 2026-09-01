@@ -17,16 +17,49 @@ export async function handleApiRequest(req: any, res: any) {
     return res.status(200).end();
   }
 
-  const urlObj = new URL(req.url || '/', 'http://localhost');
-  let pathname = urlObj.pathname;
+  // Universal JSON sender compatible with Vercel and Node.js
+  const sendJson = (code: number, data: any) => {
+    res.setHeader('Content-Type', 'application/json');
+    if (typeof res.status === 'function') {
+      res.status(code);
+    } else {
+      res.statusCode = code;
+    }
+    if (typeof res.json === 'function') {
+      return res.json(data);
+    }
+    return res.end(JSON.stringify(data));
+  };
 
-  // Normalize /api prefix if present
-  if (pathname.startsWith('/api')) {
-    pathname = pathname.slice(4) || '/';
+  // Determine path from Vercel catch-all query or standard URL
+  let pathname = '';
+  if (req.query && req.query.path) {
+    const rawPath = Array.isArray(req.query.path) ? req.query.path.join('/') : String(req.query.path);
+    pathname = '/' + rawPath.replace(/^\/+/, '');
+  } else {
+    try {
+      const urlObj = new URL(req.url || '/', 'http://localhost');
+      pathname = urlObj.pathname;
+      if (pathname.startsWith('/api')) {
+        pathname = pathname.slice(4) || '/';
+      }
+    } catch {
+      pathname = '/';
+    }
   }
 
-  // Helper to get query param
-  const getQuery = (param: string) => urlObj.searchParams.get(param);
+  // Helper to get query param from req.query or url search params
+  const getQuery = (param: string): string | null => {
+    if (req.query && req.query[param] !== undefined) {
+      return String(req.query[param]);
+    }
+    try {
+      const urlObj = new URL(req.url || '/', 'http://localhost');
+      return urlObj.searchParams.get(param);
+    } catch {
+      return null;
+    }
+  };
 
   // Helper to parse JSON body
   let body = req.body;
@@ -39,13 +72,13 @@ export async function handleApiRequest(req: any, res: any) {
 
   try {
     // 1. Health
-    if (pathname === '/health' || pathname === '') {
-      return res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+    if (pathname === '/health' || pathname === '' || pathname === '/') {
+      return sendJson(200, { status: 'ok', timestamp: new Date().toISOString() });
     }
 
     // 2. Samples
     if (pathname === '/samples' && req.method === 'GET') {
-      return res.status(200).json([
+      return sendJson(200, [
         {
           id: 'zap',
           name: 'OWASP ZAP API Scan',
@@ -86,7 +119,7 @@ export async function handleApiRequest(req: any, res: any) {
       const { sampleId, projectId } = body;
       const key = sampleId as keyof typeof SAMPLE_RAW_FILES;
       if (!SAMPLE_RAW_FILES[key]) {
-        return res.status(404).json({ error: `Sample scan '${sampleId}' not found.` });
+        return sendJson(404, { error: `Sample scan '${sampleId}' not found.` });
       }
 
       const rawContent = SAMPLE_RAW_FILES[key];
@@ -125,33 +158,33 @@ export async function handleApiRequest(req: any, res: any) {
       db.addScan(newScan);
       db.setFindingsForScan(scanId, dedup.canonicalFindings);
       db.logAudit(targetProjectId, 'SAMPLE_LOADED', `Sample dataset '${filename}' loaded.`);
-      return res.status(200).json({ scan: newScan, deduplication: dedup, rawContent });
+      return sendJson(200, { scan: newScan, deduplication: dedup, rawContent });
     }
 
     // 4. Audit Logs
     if (pathname === '/audit-logs' && req.method === 'GET') {
       const projId = getQuery('projectId');
-      return res.status(200).json(db.getAuditLogs(projId || undefined));
+      return sendJson(200, db.getAuditLogs(projId || undefined));
     }
 
     // 5. Projects Reset Demo
     if (pathname === '/projects/reset-demo' && req.method === 'POST') {
       const proj = db.resetCleanDemo();
-      return res.status(200).json({ success: true, project: proj });
+      return sendJson(200, { success: true, project: proj });
     }
 
     // 6. Projects Collection
     if (pathname === '/projects') {
       if (req.method === 'GET') {
-        return res.status(200).json(db.getProjects());
+        return sendJson(200, db.getProjects());
       }
       if (req.method === 'POST') {
         const { name, targetScope, authorizedBy, description } = body;
         if (!name || !targetScope) {
-          return res.status(400).json({ error: 'Project name and authorized target scope are required.' });
+          return sendJson(400, { error: 'Project name and authorized target scope are required.' });
         }
         const project = db.createProject({ name, targetScope, authorizedBy, description: description || '' });
-        return res.status(200).json(project);
+        return sendJson(200, project);
       }
     }
 
@@ -165,25 +198,25 @@ export async function handleApiRequest(req: any, res: any) {
       if (!subpath || subpath === '/') {
         if (req.method === 'GET') {
           const p = db.getProject(projectId);
-          if (!p) return res.status(404).json({ error: 'Project not found.' });
-          return res.status(200).json(p);
+          if (!p) return sendJson(404, { error: 'Project not found.' });
+          return sendJson(200, p);
         }
         if (req.method === 'DELETE') {
           const success = db.deleteProject(projectId);
-          if (!success) return res.status(404).json({ error: 'Project not found.' });
-          return res.status(200).json({ success: true });
+          if (!success) return sendJson(404, { error: 'Project not found.' });
+          return sendJson(200, { success: true });
         }
       }
 
       // /projects/:projectId/dashboard
       if (subpath === '/dashboard' && req.method === 'GET') {
-        return res.status(200).json(db.getDashboardMetrics(projectId));
+        return sendJson(200, db.getDashboardMetrics(projectId));
       }
 
       // /projects/:projectId/report
       if (subpath === '/report' && req.method === 'GET') {
         const project = db.getProject(projectId);
-        if (!project) return res.status(404).json({ error: 'Project not found.' });
+        if (!project) return sendJson(404, { error: 'Project not found.' });
 
         const scans = db.getScans(projectId);
         const latestScan = scans[scans.length - 1] || { id: 'N/A', filename: 'None' };
@@ -230,18 +263,18 @@ export async function handleApiRequest(req: any, res: any) {
           generatedAt: new Date().toISOString(),
         };
 
-        return res.status(200).json(report);
+        return sendJson(200, report);
       }
 
       // /projects/:projectId/scans
       if (subpath === '/scans') {
         if (req.method === 'GET') {
-          return res.status(200).json(db.getScans(projectId));
+          return sendJson(200, db.getScans(projectId));
         }
         if (req.method === 'POST') {
           const { filename, rawContent } = body;
           if (!rawContent || !filename) {
-            return res.status(400).json({ error: 'File content and filename are required.' });
+            return sendJson(400, { error: 'File content and filename are required.' });
           }
           const scanId = `SCN-${Date.now().toString(36).toUpperCase()}`;
           const parsed = detectAndParseScan(rawContent, filename, projectId, scanId);
@@ -269,7 +302,7 @@ export async function handleApiRequest(req: any, res: any) {
           db.addScan(newScan);
           db.setFindingsForScan(scanId, dedup.canonicalFindings);
           db.logAudit(projectId, 'SCAN_UPLOADED', `Scan ${filename} parsed as ${parsed.scannerType} (${dedup.rawCount} raw items).`);
-          return res.status(200).json({ scan: newScan, deduplication: dedup });
+          return sendJson(200, { scan: newScan, deduplication: dedup });
         }
       }
 
@@ -278,11 +311,11 @@ export async function handleApiRequest(req: any, res: any) {
       if (processMatch && req.method === 'POST') {
         const scanId = processMatch[1];
         const scan = db.getScan(scanId);
-        if (!scan) return res.status(404).json({ error: 'Scan not found.' });
+        if (!scan) return sendJson(404, { error: 'Scan not found.' });
 
         let findings = db.getFindings(projectId, scanId);
         if (findings.length === 0) {
-          return res.status(400).json({ error: 'No findings available to process.' });
+          return sendJson(400, { error: 'No findings available to process.' });
         }
 
         db.updateScan(scanId, { status: 'analyzing', statusMessage: 'Performing contextual AI triage & evidence analysis...' });
@@ -310,7 +343,7 @@ export async function handleApiRequest(req: any, res: any) {
         });
 
         db.logAudit(projectId, 'ANALYSIS_COMPLETED', `AI Pipeline completed for scan ${scan.filename}: ${paths.length} attack paths prioritized.`);
-        return res.status(200).json({
+        return sendJson(200, {
           success: true,
           findingsCount: findings.length,
           attackPathsCount: paths.length,
@@ -340,7 +373,7 @@ export async function handleApiRequest(req: any, res: any) {
             f.vulnerabilityCategory.toLowerCase().includes(q)
           );
         }
-        return res.status(200).json(findings);
+        return sendJson(200, findings);
       }
 
       // /projects/:projectId/findings/:id
@@ -349,26 +382,26 @@ export async function handleApiRequest(req: any, res: any) {
         const findingId = findingItemMatch[1];
         if (req.method === 'GET') {
           const f = db.getFinding(findingId);
-          if (!f) return res.status(404).json({ error: 'Finding not found.' });
-          return res.status(200).json(f);
+          if (!f) return sendJson(404, { error: 'Finding not found.' });
+          return sendJson(200, f);
         }
         if (req.method === 'PATCH') {
           const { status } = body;
           db.updateFinding(findingId, { status });
           db.logAudit(projectId, 'FINDING_UPDATED', `Finding ${findingId} marked as ${status}`);
-          return res.status(200).json(db.getFinding(findingId));
+          return sendJson(200, db.getFinding(findingId));
         }
       }
 
       // /projects/:projectId/attack-paths
       if (subpath === '/attack-paths' && req.method === 'GET') {
         const scanId = getQuery('scanId');
-        return res.status(200).json(db.getAttackPaths(projectId, scanId || undefined));
+        return sendJson(200, db.getAttackPaths(projectId, scanId || undefined));
       }
 
       // /projects/:projectId/remediations
       if (subpath === '/remediations' && req.method === 'GET') {
-        return res.status(200).json(db.getRemediations(projectId));
+        return sendJson(200, db.getRemediations(projectId));
       }
 
       // /projects/:projectId/remediations/:id/ai-guide
@@ -377,12 +410,12 @@ export async function handleApiRequest(req: any, res: any) {
         const remId = aiGuideMatch[1];
         const items = db.getRemediations(projectId);
         const item = items.find(r => r.id === remId);
-        if (!item) return res.status(404).json({ error: 'Remediation item not found.' });
+        if (!item) return sendJson(404, { error: 'Remediation item not found.' });
 
         const findings = db.getFindings(projectId);
         const guidance = await aiGenerateRemediationGuidance(item, findings);
         db.updateRemediation(remId, { aiGuidance: guidance });
-        return res.status(200).json(guidance);
+        return sendJson(200, guidance);
       }
 
       // /projects/:projectId/remediations/:id
@@ -392,12 +425,12 @@ export async function handleApiRequest(req: any, res: any) {
         const { status, assignedTo } = body;
         db.updateRemediation(remId, { status, assignedTo });
         db.logAudit(projectId, 'REMEDIATION_UPDATED', `Remediation ${remId} updated (status: ${status})`);
-        return res.status(200).json(db.getRemediations(projectId).find(r => r.id === remId));
+        return sendJson(200, db.getRemediations(projectId).find(r => r.id === remId));
       }
 
       // /projects/:projectId/comparisons
       if (subpath === '/comparisons' && req.method === 'GET') {
-        return res.status(200).json(db.getComparisons(projectId));
+        return sendJson(200, db.getComparisons(projectId));
       }
 
       // /projects/:projectId/compare
@@ -406,7 +439,7 @@ export async function handleApiRequest(req: any, res: any) {
         const scan1 = db.getScan(scan1Id);
         const scan2 = db.getScan(scan2Id);
         if (!scan1 || !scan2) {
-          return res.status(400).json({ error: 'Both baseline and comparison scans must exist.' });
+          return sendJson(400, { error: 'Both baseline and comparison scans must exist.' });
         }
         const scan1Findings = db.getFindings(projectId, scan1Id);
         const scan2Findings = db.getFindings(projectId, scan2Id);
@@ -416,13 +449,13 @@ export async function handleApiRequest(req: any, res: any) {
         const comparison = await compareScans(scan1, scan1Findings, scan1Paths, scan2, scan2Findings, scan2Paths);
         db.addComparison(comparison);
         db.logAudit(projectId, 'SCANS_COMPARED', `Compared ${scan1.filename} with ${scan2.filename}. Eliminated ${comparison.eliminatedPathIds.length} attack paths.`);
-        return res.status(200).json(comparison);
+        return sendJson(200, comparison);
       }
     }
 
-    return res.status(404).json({ error: `Not found: ${req.method} ${req.url}` });
+    return sendJson(404, { error: `Not found: ${req.method} ${req.url}` });
   } catch (err: any) {
     console.error('API Handler Error:', err);
-    return res.status(500).json({ error: err.message || 'Internal Server Error' });
+    return sendJson(500, { error: err.message || 'Internal Server Error' });
   }
 }
