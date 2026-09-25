@@ -1,14 +1,18 @@
 import path from 'path';
 import express from 'express';
-import { createServer as createViteServer } from 'vite';
-import { createApiApp } from './server/app';
 
 async function startServer() {
+  try {
+    await import('tsx/esm');
+  } catch {}
+
+  const { createApiApp } = await import('./server/app');
   const app = createApiApp();
   const PORT = 3000;
 
   // Vite middleware for development vs static production serving
   if (process.env.NODE_ENV !== 'production') {
+    const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',

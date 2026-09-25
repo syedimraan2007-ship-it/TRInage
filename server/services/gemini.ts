@@ -1,3 +1,4 @@
+import { GoogleGenAI } from '@google/genai';
 import { NormalizedFinding, AttackPath, AttackPathNode, AttackPathEdge, RemediationItem } from '../../src/types';
 import { calculatePathRisk } from './riskEngine';
 
@@ -21,45 +22,18 @@ async function callGemini(prompt: string, systemInstruction = SYSTEM_INSTRUCTION
     throw new Error('No valid Gemini API key configured.');
   }
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-
-  const payload: any = {
-    contents: [
-      {
-        parts: [{ text: prompt }],
-      },
-    ],
-    generationConfig: {
+  const ai = new GoogleGenAI({ apiKey });
+  const response = await ai.models.generateContent({
+    model: 'gemini-2.5-flash',
+    contents: prompt,
+    config: {
       temperature: 0.1,
+      systemInstruction: systemInstruction || undefined,
+      responseMimeType: jsonMode ? 'application/json' : undefined,
     },
-  };
-
-  if (jsonMode) {
-    payload.generationConfig.responseMimeType = 'application/json';
-  }
-
-  if (systemInstruction) {
-    payload.systemInstruction = {
-      parts: [{ text: systemInstruction }],
-    };
-  }
-
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'User-Agent': 'aistudio-build',
-    },
-    body: JSON.stringify(payload),
   });
 
-  if (!res.ok) {
-    const errText = await res.text();
-    throw new Error(`Gemini API returned ${res.status}: ${errText}`);
-  }
-
-  const data = await res.json();
-  return data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  return response.text || '';
 }
 
 /**
