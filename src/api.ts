@@ -477,6 +477,69 @@ export const api = {
   },
 
   // Gemini Multi-Turn Chat
+  async streamChatMessage(
+    messages: { role: 'user' | 'model'; content: string }[],
+    options: {
+      model?: 'gemini-3.1-pro-preview' | 'gemini-3.5-flash' | 'gemini-3.1-flash-lite';
+      roleId?: 'threat_analyst' | 'defensive_advisor' | 'remediation_engineer';
+      projectId?: string;
+      contextSummary?: string;
+    },
+    onChunk: (chunk: string, meta: { modelUsed?: string; done?: boolean }) => void,
+    signal?: AbortSignal
+  ): Promise<void> {
+    const res = await fetch('/api/chat/stream', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messages,
+        model: options.model,
+        roleId: options.roleId,
+        projectId: options.projectId,
+        contextSummary: options.contextSummary,
+      }),
+      signal,
+    });
+
+    if (!res.ok) {
+      throw new Error(`Chat stream failed with status ${res.status}`);
+    }
+
+    if (!res.body) {
+      throw new Error('ReadableStream not supported by browser.');
+    }
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder('utf-8');
+    let buffer = '';
+
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+
+      const lines = buffer.split('\n\n');
+      buffer = lines.pop() || '';
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (trimmed.startsWith('data: ')) {
+          try {
+            const data = JSON.parse(trimmed.slice(6));
+            if (data.error) {
+              throw new Error(data.error);
+            }
+            onChunk(data.chunk || '', { modelUsed: data.modelUsed, done: data.done });
+          } catch (e: any) {
+            if (e.message && e.message !== 'Unexpected end of JSON input') {
+              console.warn('SSE parse error:', e);
+            }
+          }
+        }
+      }
+    }
+  },
+
   async sendChatMessage(
     messages: { role: 'user' | 'model'; content: string }[],
     options: {

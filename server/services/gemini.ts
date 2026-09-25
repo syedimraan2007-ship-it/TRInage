@@ -16,6 +16,14 @@ function getApiKey(): string | null {
   return apiKey.trim();
 }
 
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number, msg = 'Operation timed out'): Promise<T> {
+  let timer: NodeJS.Timeout;
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new Error(msg)), timeoutMs);
+  });
+  return Promise.race([promise, timeoutPromise]).finally(() => clearTimeout(timer));
+}
+
 async function callGemini(prompt: string, systemInstruction = SYSTEM_INSTRUCTION_BASE, jsonMode = true): Promise<string> {
   const apiKey = getApiKey();
   if (!apiKey) {
@@ -30,17 +38,42 @@ async function callGemini(prompt: string, systemInstruction = SYSTEM_INSTRUCTION
       },
     },
   });
-  const response = await ai.models.generateContent({
-    model: 'gemini-3.5-flash',
-    contents: prompt,
-    config: {
-      temperature: 0.1,
-      systemInstruction: systemInstruction || undefined,
-      responseMimeType: jsonMode ? 'application/json' : undefined,
-    },
-  });
 
-  return response.text || '';
+  // Fast primary with gemini-3.1-flash-lite
+  try {
+    const callPromise = ai.models.generateContent({
+      model: 'gemini-3.1-flash-lite',
+      contents: prompt,
+      config: {
+        temperature: 0.1,
+        systemInstruction: systemInstruction || undefined,
+        responseMimeType: jsonMode ? 'application/json' : undefined,
+      },
+    });
+
+    const response = await withTimeout(callPromise, 8000, 'gemini-3.1-flash-lite timed out');
+    if (response.text) return response.text;
+  } catch (err: any) {
+    console.warn('Fast Gemini generation attempt failed or timed out:', err.message);
+  }
+
+  // Backup attempt with gemini-3.5-flash
+  try {
+    const backupPromise = ai.models.generateContent({
+      model: 'gemini-3.5-flash',
+      contents: prompt,
+      config: {
+        temperature: 0.1,
+        systemInstruction: systemInstruction || undefined,
+        responseMimeType: jsonMode ? 'application/json' : undefined,
+      },
+    });
+
+    const backupResponse = await withTimeout(backupPromise, 7000, 'gemini-3.5-flash timed out');
+    return backupResponse.text || '';
+  } catch (err: any) {
+    throw new Error(`Gemini call error: ${err.message}`);
+  }
 }
 
 /**
@@ -564,7 +597,7 @@ export async function chatWithGemini(
   
   let targetModel = options.model || roleConfig.defaultModel;
   if (!['gemini-3.1-pro-preview', 'gemini-3.5-flash', 'gemini-3.1-flash-lite'].includes(targetModel)) {
-    targetModel = 'gemini-3.5-flash';
+    targetModel = 'gemini-3.1-flash-lite';
   }
 
   let fullSystemInstruction = options.systemInstruction || roleConfig.instruction;
@@ -575,7 +608,7 @@ export async function chatWithGemini(
   if (!apiKey) {
     const lastUserMessage = [...messages].reverse().find(m => m.role === 'user')?.content || 'Security query';
     return {
-      reply: `[Defensive Intelligence Response (${roleConfig.title})]\n\nBased on your query: "${lastUserMessage.slice(0, 100)}..."\n\n1. Threat Assessment: Analyzing vulnerability chaining and asset isolation.\n2. Recommended Safeguard: Apply defense-in-depth perimeter boundary validation and audit token lifecycles.\n3. Verification: Execute targeted non-destructive regression verification tests against authorized endpoints.\n\n(Tip: Attach GEMINI_API_KEY in environment to unlock full dynamic model reasoning).`,
+      reply: `[Defensive Intelligence Response (${roleConfig.title})]\n\nBased on your query: "${lastUserMessage.slice(0, 100)}..."\n\n1. Threat Assessment: Analyzing vulnerability chaining and asset isolation.\n2. Recommended Safeguard: Apply defense-in-depth perimeter boundary validation and audit token lifecycles.\n3. Verification: Execute targeted non-destructive regression verification tests against authorized endpoints.`,
       modelUsed: 'heuristic-rule-engine',
     };
   }
@@ -594,9 +627,10 @@ export async function chatWithGemini(
     parts: [{ text: m.content }],
   }));
 
-  // Primary attempt with targetModel
+  // Primary attempt with targetModel and tight timeout
+  const primaryTimeout = targetModel === 'gemini-3.1-pro-preview' ? 4500 : targetModel === 'gemini-3.5-flash' ? 7000 : 8000;
   try {
-    const response = await ai.models.generateContent({
+    const genPromise = ai.models.generateContent({
       model: targetModel,
       contents: formattedContents,
       config: {
@@ -605,18 +639,127 @@ export async function chatWithGemini(
       },
     });
 
+    const response = await withTimeout(genPromise, primaryTimeout, `${targetModel} request timed out`);
     return {
       reply: response.text || 'I analyzed the defensive evidence and found no active blockers.',
       modelUsed: targetModel,
     };
   } catch (err: any) {
-    console.warn(`Gemini model ${targetModel} encountered error: ${err.message}. Attempting alternate model...`);
+    console.warn(`Gemini model ${targetModel} encountered error/timeout: ${err.message}. Attempting fast model gemini-3.1-flash-lite...`);
 
-    // Try alternate model (gemini-3.1-flash-lite if flash failed, or gemini-3.5-flash if pro/lite failed)
-    const alternateModel = targetModel === 'gemini-3.1-flash-lite' ? 'gemini-3.5-flash' : 'gemini-3.1-flash-lite';
+    if (targetModel !== 'gemini-3.1-flash-lite') {
+      try {
+        const fallbackPromise = ai.models.generateContent({
+          model: 'gemini-3.1-flash-lite',
+          contents: formattedContents,
+          config: {
+            systemInstruction: fullSystemInstruction,
+            temperature: 0.3,
+          },
+        });
+
+        const fallbackResponse = await withTimeout(fallbackPromise, 6500, 'gemini-3.1-flash-lite timed out');
+        return {
+          reply: fallbackResponse.text || 'Analysis completed.',
+          modelUsed: 'gemini-3.1-flash-lite',
+          fallbackOccurred: true,
+        };
+      } catch (fallbackErr: any) {
+        console.warn(`Fast model also unavailable: ${fallbackErr.message}. Utilizing context-calibrated defensive response.`);
+      }
+    }
+
+    return generateContextualDefensiveResponse(messages, roleConfig.title, options.contextSummary);
+  }
+}
+
+/**
+ * Real-Time Streaming Chat Generator
+ */
+export async function* streamChatWithGemini(
+  messages: ChatMessagePayload[],
+  options: ChatRequestOptions = {}
+): AsyncGenerator<{ chunk: string; modelUsed: string; done?: boolean; fallbackOccurred?: boolean }> {
+  const apiKey = getApiKey();
+  const roleConfig = ROLE_SYSTEM_INSTRUCTIONS[options.roleId || 'defensive_advisor'] || ROLE_SYSTEM_INSTRUCTIONS.defensive_advisor;
+
+  let targetModel = options.model || roleConfig.defaultModel;
+  if (!['gemini-3.1-pro-preview', 'gemini-3.5-flash', 'gemini-3.1-flash-lite'].includes(targetModel)) {
+    targetModel = 'gemini-3.1-flash-lite';
+  }
+
+  let fullSystemInstruction = options.systemInstruction || roleConfig.instruction;
+  if (options.contextSummary) {
+    fullSystemInstruction += `\n\n<<<CURRENT_AUTHORIZED_PROJECT_DEFENSIVE_STATE>>>\n${options.contextSummary}\n<<<END_PROJECT_STATE>>>`;
+  }
+
+  // Fallback simulator for offline or error conditions
+  const yieldSimulatedResponse = async function* (text: string, model: string, fallback = true) {
+    const words = text.split(' ');
+    for (let i = 0; i < words.length; i += 3) {
+      const chunk = words.slice(i, i + 3).join(' ') + (i + 3 < words.length ? ' ' : '');
+      yield { chunk, modelUsed: model, fallbackOccurred: fallback };
+      await new Promise(r => setTimeout(r, 20));
+    }
+    yield { chunk: '', modelUsed: model, done: true, fallbackOccurred: fallback };
+  };
+
+  if (!apiKey) {
+    const contextual = generateContextualDefensiveResponse(messages, roleConfig.title, options.contextSummary);
+    yield* yieldSimulatedResponse(contextual.reply, 'heuristic-rule-engine', true);
+    return;
+  }
+
+  const ai = new GoogleGenAI({
+    apiKey,
+    httpOptions: {
+      headers: {
+        'User-Agent': 'aistudio-build',
+      },
+    },
+  });
+
+  const formattedContents = messages.map(m => ({
+    role: m.role,
+    parts: [{ text: m.content }],
+  }));
+
+  // Attempt streaming with targetModel
+  let streamOpened = false;
+  let activeModel = targetModel;
+  try {
+    // If targetModel is pro-preview, try fast or switch if quota limited
+    const streamPromise = ai.models.generateContentStream({
+      model: targetModel,
+      contents: formattedContents,
+      config: {
+        systemInstruction: fullSystemInstruction,
+        temperature: targetModel === 'gemini-3.1-pro-preview' ? 0.2 : 0.4,
+      },
+    });
+
+    const stream = await withTimeout(streamPromise, targetModel === 'gemini-3.1-pro-preview' ? 4000 : 6000, `${targetModel} stream timeout`);
+    for await (const chunk of stream) {
+      if (chunk.text) {
+        streamOpened = true;
+        yield { chunk: chunk.text, modelUsed: activeModel };
+      }
+    }
+
+    if (streamOpened) {
+      yield { chunk: '', modelUsed: activeModel, done: true };
+      return;
+    }
+  } catch (err: any) {
+    console.warn(`Stream with ${targetModel} failed: ${err.message}. Switching to fast streaming with gemini-3.1-flash-lite...`);
+  }
+
+  // Backup stream with gemini-3.1-flash-lite
+  if (targetModel !== 'gemini-3.1-flash-lite') {
+    activeModel = 'gemini-3.1-flash-lite';
     try {
-      const fallbackResponse = await ai.models.generateContent({
-        model: alternateModel,
+      const fallbackStreamPromise = ai.models.generateContentStream({
+        model: 'gemini-3.1-flash-lite',
         contents: formattedContents,
         config: {
           systemInstruction: fullSystemInstruction,
@@ -624,16 +767,26 @@ export async function chatWithGemini(
         },
       });
 
-      return {
-        reply: fallbackResponse.text || 'Analysis completed.',
-        modelUsed: alternateModel,
-        fallbackOccurred: true,
-      };
+      const fallbackStream = await withTimeout(fallbackStreamPromise, 6000, 'gemini-3.1-flash-lite stream timeout');
+      for await (const chunk of fallbackStream) {
+        if (chunk.text) {
+          streamOpened = true;
+          yield { chunk: chunk.text, modelUsed: activeModel, fallbackOccurred: true };
+        }
+      }
+
+      if (streamOpened) {
+        yield { chunk: '', modelUsed: activeModel, done: true, fallbackOccurred: true };
+        return;
+      }
     } catch (fallbackErr: any) {
-      console.warn(`Alternate model ${alternateModel} also unavailable: ${fallbackErr.message}. Utilizing context-calibrated defensive response.`);
-      return generateContextualDefensiveResponse(messages, roleConfig.title, options.contextSummary);
+      console.warn(`Fast backup stream also failed: ${fallbackErr.message}`);
     }
   }
+
+  // Final rock-solid fallback: stream synthesized contextual response
+  const contextual = generateContextualDefensiveResponse(messages, roleConfig.title, options.contextSummary);
+  yield* yieldSimulatedResponse(contextual.reply, 'defensive-security-engine', true);
 }
 
 /**

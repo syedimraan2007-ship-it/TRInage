@@ -4,7 +4,7 @@ import { db } from './db';
 import { SAMPLE_RAW_FILES } from './sampleData';
 import { detectAndParseScan } from './parsers/index';
 import { deduplicateFindings } from './services/deduplication';
-import { aiTriageFindings, aiCorrelateAndBuildAttackPaths, aiGenerateRemediationGuidance, chatWithGemini } from './services/gemini';
+import { aiTriageFindings, aiCorrelateAndBuildAttackPaths, aiGenerateRemediationGuidance, chatWithGemini, streamChatWithGemini } from './services/gemini';
 import { generateRemediationQueue } from './services/remediationEngine';
 import { compareScans } from './services/comparisonEngine';
 import { AssessmentReport, Scan } from '../src/types';
@@ -463,6 +463,47 @@ export function createApiApp() {
   });
 
   // Gemini Multi-Turn Chatbot
+  router.post('/chat/stream', async (req, res) => {
+    const { messages, model, roleId, systemInstruction, contextSummary, projectId } = req.body || {};
+
+    if (!Array.isArray(messages) || messages.length === 0) {
+      return res.status(400).json({ error: 'Conversation messages array is required.' });
+    }
+
+    let dynamicContext = contextSummary || '';
+    if (!dynamicContext && projectId) {
+      const metrics = db.getDashboardMetrics(projectId);
+      const paths = db.getAttackPaths(projectId);
+      const findings = db.getFindings(projectId);
+      dynamicContext = `Active Project ID: ${projectId}. Total canonical findings: ${findings.length} (Critical: ${metrics.criticalFindings}, High: ${metrics.highFindings}). Active Attack Paths: ${paths.length}. Crown Jewel Datastores / Assets: ${metrics.affectedAssets.slice(0, 5).join(', ')}.`;
+    }
+
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.setHeader('X-Accel-Buffering', 'no');
+    if (typeof (res as any).flushHeaders === 'function') {
+      (res as any).flushHeaders();
+    }
+
+    try {
+      const stream = streamChatWithGemini(messages, {
+        model,
+        roleId,
+        systemInstruction,
+        contextSummary: dynamicContext,
+      });
+
+      for await (const chunkObj of stream) {
+        res.write(`data: ${JSON.stringify(chunkObj)}\n\n`);
+      }
+      res.end();
+    } catch (err: any) {
+      res.write(`data: ${JSON.stringify({ error: err.message, done: true })}\n\n`);
+      res.end();
+    }
+  });
+
   router.post('/chat', async (req, res) => {
     const { messages, model, roleId, systemInstruction, contextSummary, projectId } = req.body || {};
 

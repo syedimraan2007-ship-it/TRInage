@@ -1,49 +1,22 @@
 {
   "projects": [
     {
-      "id": "PRJ-FINTECH-CORE",
-      "name": "Fintech Payments & Auth Subsystem",
-      "targetScope": "*.payments.enterprise.internal",
-      "authorizedBy": "SecOps Threat Modeling Team (Lead Architect)",
-      "description": "Production-grade defensive threat modeling for payment gateway, microservices API, Redis session caching, and backend customer ledger.",
-      "createdAt": "2026-09-25T09:07:57.090Z",
-      "updatedAt": "2026-09-25T09:07:57.091Z"
-    },
-    {
-      "id": "PRJ-MUGQQQ6D",
-      "name": "53gtre",
-      "targetScope": "h5h5",
-      "authorizedBy": "h45h",
-      "description": "h45",
-      "createdAt": "2026-09-25T09:10:56.005Z",
-      "updatedAt": "2026-09-25T09:10:56.005Z"
+      "id": "PRJ-MUGR1B0I",
+      "name": "4g45g",
+      "targetScope": "regergt",
+      "authorizedBy": "r3g35g",
+      "description": "3g35g",
+      "createdAt": "2026-09-25T09:19:09.570Z",
+      "updatedAt": "2026-09-25T09:19:09.570Z"
     }
   ],
   "scans": [
     {
-      "id": "SCN-SAMPLE-01",
-      "projectId": "PRJ-FINTECH-CORE",
-      "filename": "owasp-zap-gateway-scan.json",
-      "scannerType": "zap",
-      "uploadedAt": "2026-09-25T09:07:57.091Z",
-      "totalRawFindings": 5,
-      "deduplicatedCount": 5,
-      "status": "completed",
-      "statusMessage": "Completed analysis: 5 findings, 2 attack paths, 4 remediation actions.",
-      "summary": {
-        "critical": 2,
-        "high": 2,
-        "medium": 1,
-        "low": 0,
-        "info": 0
-      }
-    },
-    {
-      "id": "SCN-MUGQN5B6",
-      "projectId": "PRJ-FINTECH-CORE",
-      "filename": "post-remediation-verification.json",
+      "id": "SCN-MUGR1G2S",
+      "projectId": "PRJ-MUGR1B0I",
+      "filename": "security-report-fintech-payments-&-auth-subsystem-2026-09-25.json",
       "scannerType": "generic_json",
-      "uploadedAt": "2026-09-25T09:08:09.667Z",
+      "uploadedAt": "2026-09-25T09:19:57.530Z",
       "totalRawFindings": 1,
       "deduplicatedCount": 1,
       "status": "completed",
@@ -57,291 +30,47 @@
       }
     },
     {
-      "id": "SCN-MUGQQVV9",
-      "projectId": "PRJ-MUGQQQ6D",
-      "filename": "sample-vulnerability-report.json",
+      "id": "SCN-MUGR29PH",
+      "projectId": "PRJ-MUGR1B0I",
+      "filename": "security-report-fintech-payments-&-auth-subsystem-2026-09-25.json",
       "scannerType": "generic_json",
-      "uploadedAt": "2026-09-25T09:11:04.089Z",
-      "totalRawFindings": 11,
+      "uploadedAt": "2026-09-25T09:20:52.836Z",
+      "totalRawFindings": 1,
+      "deduplicatedCount": 1,
+      "status": "completed",
+      "statusMessage": "Completed analysis: 1 findings, 1 attack paths, 1 remediation actions.",
+      "summary": {
+        "critical": 0,
+        "high": 0,
+        "medium": 1,
+        "low": 0,
+        "info": 0
+      }
+    },
+    {
+      "id": "SCN-MUGR2SN7",
+      "projectId": "PRJ-MUGR1B0I",
+      "filename": "demo-critical-scan.json",
+      "scannerType": "generic_json",
+      "uploadedAt": "2026-09-25T09:21:32.430Z",
+      "totalRawFindings": 10,
       "deduplicatedCount": 10,
       "status": "completed",
-      "statusMessage": "Completed analysis: 10 findings, 2 attack paths, 7 remediation actions.",
+      "statusMessage": "Completed analysis: 10 findings, 1 attack paths, 8 remediation actions.",
       "summary": {
-        "critical": 3,
-        "high": 4,
-        "medium": 2,
-        "low": 1,
+        "critical": 10,
+        "high": 0,
+        "medium": 0,
+        "low": 0,
         "info": 0
       }
     }
   ],
   "findings": [
     {
-      "id": "FND-SSRF-01",
-      "scanId": "SCN-SAMPLE-01",
-      "projectId": "PRJ-FINTECH-CORE",
-      "title": "Server-Side Request Forgery (SSRF) in Webhook Dispatcher",
-      "vulnerabilityCategory": "Server-Side Request Forgery",
-      "cwe": "CWE-918",
-      "cve": "CVE-2024-38856",
-      "severity": "Critical",
-      "confidence": "Confirmed",
-      "asset": "api.payments.enterprise.internal",
-      "hostname": "api.payments.enterprise.internal",
-      "endpoint": "/api/v2/webhooks/subscribe",
-      "httpMethod": "POST",
-      "parameter": "callback_url",
-      "description": "The webhook registration endpoint allows unauthenticated callers to specify arbitrary destination URLs, permitting internal network pivoting to cloud metadata and private microservices.",
-      "affectedComponent": "WebhookService.ts",
-      "evidence": {
-        "request": "POST /api/v2/webhooks/subscribe HTTP/1.1\nHost: api.payments.enterprise.internal\nContent-Type: application/json\n\n{\"callback_url\": \"http://169.254.169.254/latest/meta-data/iam/security-credentials/\"}",
-        "response": "HTTP/1.1 200 OK\nContent-Type: application/json\n\n{\"status\": \"active\", \"reflected_response\": \"role-arn: payments-core-worker\"}",
-        "payload": "http://169.254.169.254/latest/meta-data/"
-      },
-      "authContext": "Unauthenticated",
-      "dataSensitivity": "Confidential",
-      "status": "open",
-      "dedupGroupId": "DEDUP-SSRF-01",
-      "sourceCount": 2,
-      "createdAt": "2026-09-25T09:07:57.091Z",
-      "provenance": [
-        {
-          "scanner": "OWASP ZAP 2.15",
-          "scannerFindingId": "ZAP-918-01",
-          "timestamp": "2026-09-25T09:07:57.091Z",
-          "scanId": "SCN-SAMPLE-01"
-        },
-        {
-          "scanner": "Nuclei v3.2",
-          "scannerFindingId": "nuclei-ssrf-meta",
-          "timestamp": "2026-09-25T09:07:57.091Z",
-          "scanId": "SCN-SAMPLE-01"
-        }
-      ],
-      "aiTriage": {
-        "relevance": "High",
-        "calibratedConfidence": "confirmed by evidence",
-        "contextualSeverity": "Critical",
-        "businessImpact": "Unauthenticated attackers can query cloud metadata service (IMDSv1) and pivot to internal payment databases.",
-        "exploitabilityAssessment": "Directly exploitable without prior authentication via public webhook subscription endpoint.",
-        "evidenceQuality": "High",
-        "manualVerificationRecommended": false,
-        "reasoning": "Scanner evidence confirmed IAM credential reflection in response body.",
-        "keyRiskFactors": [
-          "Unauthenticated Ingress",
-          "Cloud Metadata Access",
-          "Lateral Pivot Gateway"
-        ]
-      }
-    },
-    {
-      "id": "FND-REDIS-02",
-      "scanId": "SCN-SAMPLE-01",
-      "projectId": "PRJ-FINTECH-CORE",
-      "title": "Unauthenticated Redis Cache Exposed on Internal Subnet",
-      "vulnerabilityCategory": "Broken Access Control",
-      "cwe": "CWE-306",
-      "cve": "CVE-2023-36824",
-      "severity": "High",
-      "confidence": "Confirmed",
-      "asset": "redis.payments.internal",
-      "hostname": "redis.payments.internal",
-      "endpoint": ":6379",
-      "description": "Internal Redis cluster instance lacks authentication requirement (requirepass disabled), allowing arbitrary read and write of session tokens and payment nonce caches.",
-      "affectedComponent": "redis-cache:6379",
-      "evidence": {
-        "rawOutput": "INFO Server\nredis_version: 7.0.11\nrole: master\nkeyspace: db0:keys=14205,expires=8920",
-        "payload": "redis-cli -h redis.payments.internal INFO"
-      },
-      "authContext": "Internal Service",
-      "dataSensitivity": "Credentials/Secrets",
-      "status": "open",
-      "dedupGroupId": "DEDUP-REDIS-02",
-      "sourceCount": 1,
-      "createdAt": "2026-09-25T09:07:57.091Z",
-      "provenance": [
-        {
-          "scanner": "Nuclei v3.2",
-          "scannerFindingId": "nuclei-redis-unauth",
-          "timestamp": "2026-09-25T09:07:57.091Z",
-          "scanId": "SCN-SAMPLE-01"
-        }
-      ],
-      "aiTriage": {
-        "relevance": "High",
-        "calibratedConfidence": "confirmed by evidence",
-        "contextualSeverity": "High",
-        "businessImpact": "Complete compromise of active session keys and merchant authentication tokens stored in volatile cache.",
-        "exploitabilityAssessment": "Exploitable once perimeter access or internal network pivot (e.g. via SSRF) is established.",
-        "evidenceQuality": "High",
-        "manualVerificationRecommended": false,
-        "reasoning": "Direct response to INFO command returned full cluster status without AUTH challenge.",
-        "keyRiskFactors": [
-          "Session Hijacking",
-          "Internal Pivot Target",
-          "Zero-Auth Cache"
-        ]
-      }
-    },
-    {
-      "id": "FND-SQLI-03",
-      "scanId": "SCN-SAMPLE-01",
-      "projectId": "PRJ-FINTECH-CORE",
-      "title": "SQL Injection in Settlement Reconciliation Query",
-      "vulnerabilityCategory": "SQL Injection",
-      "cwe": "CWE-89",
-      "cve": "CVE-2024-21626",
-      "severity": "Critical",
-      "confidence": "Confirmed",
-      "asset": "ledger.payments.internal",
-      "hostname": "ledger.payments.internal",
-      "endpoint": "/api/v1/ledger/reconcile",
-      "httpMethod": "GET",
-      "parameter": "batch_id",
-      "description": "The settlement batch reconciliation endpoint constructs raw SQL queries via string concatenation, allowing extraction of full cardholder ledger tables.",
-      "affectedComponent": "LedgerRepository.ts:88",
-      "evidence": {
-        "request": "GET /api/v1/ledger/reconcile?batch_id=1' UNION SELECT 1,version(),current_user,schema()-- HTTP/1.1",
-        "response": "HTTP/1.1 200 OK\n{\"batch_id\": 1, \"ledger_owner\": \"postgres@payments-db-prod\", \"version\": \"PostgreSQL 16.2\"}",
-        "payload": "' UNION SELECT 1,version(),current_user,schema()--"
-      },
-      "authContext": "Internal Service",
-      "dataSensitivity": "PII/Financial",
-      "status": "open",
-      "dedupGroupId": "DEDUP-SQLI-03",
-      "sourceCount": 2,
-      "createdAt": "2026-09-25T09:07:57.091Z",
-      "provenance": [
-        {
-          "scanner": "Semgrep SAST 1.68",
-          "scannerFindingId": "semgrep-sqli-ledger",
-          "timestamp": "2026-09-25T09:07:57.091Z",
-          "scanId": "SCN-SAMPLE-01"
-        },
-        {
-          "scanner": "OWASP ZAP 2.15",
-          "scannerFindingId": "ZAP-89-02",
-          "timestamp": "2026-09-25T09:07:57.091Z",
-          "scanId": "SCN-SAMPLE-01"
-        }
-      ],
-      "aiTriage": {
-        "relevance": "High",
-        "calibratedConfidence": "confirmed by evidence",
-        "contextualSeverity": "Critical",
-        "businessImpact": "Direct exfiltration and modification of production payment ledgers and customer transaction records.",
-        "exploitabilityAssessment": "Confirmed SQL injection with schema extraction payload execution.",
-        "evidenceQuality": "High",
-        "manualVerificationRecommended": false,
-        "reasoning": "Database metadata was reflected in response object confirming successful injection.",
-        "keyRiskFactors": [
-          "Crown Jewel Data Loss",
-          "Financial Ledger Tampering",
-          "High Exploitability"
-        ]
-      }
-    },
-    {
-      "id": "FND-CORS-04",
-      "scanId": "SCN-SAMPLE-01",
-      "projectId": "PRJ-FINTECH-CORE",
-      "title": "Overly Permissive Cross-Origin Resource Sharing (CORS)",
-      "vulnerabilityCategory": "Security Misconfiguration",
-      "cwe": "CWE-942",
-      "severity": "Medium",
-      "confidence": "Confirmed",
-      "asset": "api.payments.enterprise.internal",
-      "hostname": "api.payments.enterprise.internal",
-      "endpoint": "/api/v1/user/profile",
-      "httpMethod": "OPTIONS",
-      "description": "API returns Access-Control-Allow-Origin: * alongside Access-Control-Allow-Credentials: true, enabling cross-site data theft from logged-in browser sessions.",
-      "affectedComponent": "CorsMiddleware.ts",
-      "evidence": {
-        "request": "OPTIONS /api/v1/user/profile HTTP/1.1\nOrigin: https://evil-attacker.com",
-        "response": "Access-Control-Allow-Origin: https://evil-attacker.com\nAccess-Control-Allow-Credentials: true",
-        "payload": "Origin: https://evil-attacker.com"
-      },
-      "authContext": "Low Privilege",
-      "dataSensitivity": "Confidential",
-      "status": "open",
-      "dedupGroupId": "DEDUP-CORS-04",
-      "sourceCount": 1,
-      "createdAt": "2026-09-25T09:07:57.091Z",
-      "provenance": [
-        {
-          "scanner": "OWASP ZAP 2.15",
-          "scannerFindingId": "ZAP-942-01",
-          "timestamp": "2026-09-25T09:07:57.091Z",
-          "scanId": "SCN-SAMPLE-01"
-        }
-      ],
-      "aiTriage": {
-        "relevance": "Medium",
-        "calibratedConfidence": "confirmed by evidence",
-        "contextualSeverity": "Medium",
-        "businessImpact": "Authenticated user session data can be scraped by malicious third-party websites visited by employees.",
-        "exploitabilityAssessment": "Requires user interaction (phishing link or malicious origin visit).",
-        "evidenceQuality": "High",
-        "manualVerificationRecommended": false,
-        "reasoning": "Wildcard/reflected origin with credentials verified by header response inspection.",
-        "keyRiskFactors": [
-          "Cross-Site Data Theft",
-          "Browser Origin Bypass"
-        ]
-      }
-    },
-    {
-      "id": "FND-JWT-05",
-      "scanId": "SCN-SAMPLE-01",
-      "projectId": "PRJ-FINTECH-CORE",
-      "title": "Hardcoded Weak JWT Signing Secret in Service Configuration",
-      "vulnerabilityCategory": "Cryptographic Issues",
-      "cwe": "CWE-798",
-      "cve": "CVE-2023-45853",
-      "severity": "High",
-      "confidence": "Confirmed",
-      "asset": "auth.payments.enterprise.internal",
-      "hostname": "auth.payments.enterprise.internal",
-      "endpoint": "/auth/verify",
-      "description": "The internal microservice authentication module uses a static hardcoded HMAC key (\"payments_secret_key_2024!\"), permitting arbitrary token forgery.",
-      "affectedComponent": "src/config/jwt.ts:14",
-      "evidence": {
-        "rawOutput": "const JWT_SECRET = process.env.JWT_SECRET || 'payments_secret_key_2024!';",
-        "payload": "Static string literal detected in codebase"
-      },
-      "authContext": "Internal Service",
-      "dataSensitivity": "Credentials/Secrets",
-      "status": "open",
-      "dedupGroupId": "DEDUP-JWT-05",
-      "sourceCount": 1,
-      "createdAt": "2026-09-25T09:07:57.091Z",
-      "provenance": [
-        {
-          "scanner": "Semgrep SAST 1.68",
-          "scannerFindingId": "semgrep-jwt-hardcoded",
-          "timestamp": "2026-09-25T09:07:57.091Z",
-          "scanId": "SCN-SAMPLE-01"
-        }
-      ],
-      "aiTriage": {
-        "relevance": "High",
-        "calibratedConfidence": "confirmed by evidence",
-        "contextualSeverity": "High",
-        "businessImpact": "Attacker who knows the hardcoded secret can mint administrative JWTs with elevated authorization claims.",
-        "exploitabilityAssessment": "Trivial token generation once the static secret is known or decompiled.",
-        "evidenceQuality": "High",
-        "manualVerificationRecommended": false,
-        "reasoning": "Hardcoded fallback value discovered in production build code path.",
-        "keyRiskFactors": [
-          "Privilege Escalation",
-          "Universal Token Forgery"
-        ]
-      }
-    },
-    {
-      "id": "FND-GQN5B6-001",
-      "scanId": "SCN-MUGQN5B6",
-      "projectId": "PRJ-FINTECH-CORE",
+      "id": "FND-GR1G2S-001",
+      "scanId": "SCN-MUGR1G2S",
+      "projectId": "PRJ-MUGR1B0I",
       "title": "Security Finding",
       "vulnerabilityCategory": "General Security Weakness",
       "severity": "Medium",
@@ -362,11 +91,11 @@
           "scanner": "GENERIC_JSON",
           "scannerFindingId": "RAW-2003e6-0",
           "rawJson": "{\"title\":\"Security Finding\",\"severity\":\"Medium\",\"endpoint\":\"/\",\"evidence\":{\"rawOutput\":\"\"}}",
-          "timestamp": "2026-09-25T09:08:08.995Z",
-          "scanId": "SCN-MUGQN5B6"
+          "timestamp": "2026-09-25T09:19:16.133Z",
+          "scanId": "SCN-MUGR1G2S"
         }
       ],
-      "createdAt": "2026-09-25T09:08:08.995Z",
+      "createdAt": "2026-09-25T09:19:16.133Z",
       "aiTriage": {
         "relevance": "Medium",
         "calibratedConfidence": "potentially exploitable",
@@ -382,222 +111,34 @@
       }
     },
     {
-      "id": "FND-GQQVV9-001",
-      "scanId": "SCN-MUGQQVV9",
-      "projectId": "PRJ-MUGQQQ6D",
-      "title": "SQL Injection in account lookup",
-      "vulnerabilityCategory": "SQL Injection",
-      "cwe": "CWE-89",
-      "severity": "Critical",
-      "confidence": "Confirmed",
-      "asset": "api.example.test",
-      "endpoint": "/api/accounts",
-      "evidence": {
-        "rawOutput": "Synthetic scanner evidence: parameter behavior changed during validation."
-      },
-      "description": "The account lookup endpoint appears to construct a database query from untrusted input.",
-      "authContext": "Unauthenticated",
-      "dataSensitivity": "PII/Financial",
-      "status": "open",
-      "dedupGroupId": "DEDUP-YXBpLmV4YW1w",
-      "sourceCount": 2,
-      "provenance": [
-        {
-          "scanner": "GENERIC_JSON",
-          "scannerFindingId": "RAW-3465f6-0",
-          "rawJson": "{\"title\":\"SQL Injection in account lookup\",\"severity\":\"Critical\",\"endpoint\":\"/api/accounts\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: parameter behavior changed during validation.\"}}",
-          "timestamp": "2026-09-25T09:11:03.383Z",
-          "scanId": "SCN-MUGQQVV9"
-        },
-        {
-          "scanner": "GENERIC_JSON",
-          "scannerFindingId": "RAW-3465f6-1",
-          "rawJson": "{\"title\":\"SQL Injection in account lookup\",\"severity\":\"High\",\"endpoint\":\"/api/accounts?userId=sample\",\"evidence\":{\"rawOutput\":\"Synthetic duplicate observation from a second scanner pass.\"}}",
-          "timestamp": "2026-09-25T09:11:03.383Z",
-          "scanId": "SCN-MUGQQVV9"
-        }
-      ],
-      "createdAt": "2026-09-25T09:11:03.383Z",
-      "aiTriage": {
-        "relevance": "High",
-        "calibratedConfidence": "strongly indicated",
-        "contextualSeverity": "Critical",
-        "businessImpact": "Direct remote exploitation leading to unauthorized data extraction or lateral pivoting.",
-        "exploitabilityAssessment": "Requires appropriate network access and payload delivery.",
-        "evidenceQuality": "High",
-        "manualVerificationRecommended": false,
-        "reasoning": "Deterministic heuristic triage rule applied based on scanner CWE and matched patterns.",
-        "keyRiskFactors": [
-          "Critical Exploit Path",
-          "Unauthenticated Ingress"
-        ]
-      }
-    },
-    {
-      "id": "FND-GQQVV9-002",
-      "scanId": "SCN-MUGQQVV9",
-      "projectId": "PRJ-MUGQQQ6D",
-      "title": "Server-Side Request Forgery in URL preview",
-      "vulnerabilityCategory": "SSRF",
-      "cwe": "CWE-918",
-      "severity": "Critical",
-      "confidence": "High",
-      "asset": "api.example.test",
-      "endpoint": "/api/preview",
-      "evidence": {
-        "rawOutput": "Synthetic scanner evidence: outbound request destination was accepted during validation."
-      },
-      "description": "The preview service retrieves a caller-controlled URL without sufficient destination restrictions.",
-      "authContext": "Unauthenticated",
-      "dataSensitivity": "Credentials/Secrets",
-      "status": "open",
-      "dedupGroupId": "DEDUP-YXBpLmV4YW1w",
-      "sourceCount": 1,
-      "provenance": [
-        {
-          "scanner": "GENERIC_JSON",
-          "scannerFindingId": "RAW-15b327-0",
-          "rawJson": "{\"title\":\"Server-Side Request Forgery in URL preview\",\"severity\":\"High\",\"endpoint\":\"/api/preview\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: outbound request destination was accepted during validation.\"}}",
-          "timestamp": "2026-09-25T09:11:03.383Z",
-          "scanId": "SCN-MUGQQVV9"
-        }
-      ],
-      "createdAt": "2026-09-25T09:11:03.383Z",
-      "aiTriage": {
-        "relevance": "High",
-        "calibratedConfidence": "strongly indicated",
-        "contextualSeverity": "Critical",
-        "businessImpact": "Direct remote exploitation leading to unauthorized data extraction or lateral pivoting.",
-        "exploitabilityAssessment": "Requires appropriate network access and payload delivery.",
-        "evidenceQuality": "High",
-        "manualVerificationRecommended": false,
-        "reasoning": "Deterministic heuristic triage rule applied based on scanner CWE and matched patterns.",
-        "keyRiskFactors": [
-          "Critical Exploit Path",
-          "Unauthenticated Ingress"
-        ]
-      }
-    },
-    {
-      "id": "FND-GQQVV9-003",
-      "scanId": "SCN-MUGQQVV9",
-      "projectId": "PRJ-MUGQQQ6D",
-      "title": "Broken object-level authorization",
-      "vulnerabilityCategory": "IDOR / Broken Access Control",
-      "cwe": "CWE-639",
-      "severity": "High",
-      "confidence": "Confirmed",
-      "asset": "api.example.test",
-      "endpoint": "/api/invoices/{id}",
-      "evidence": {
-        "rawOutput": "Synthetic scanner evidence: access-control response differed for a cross-tenant test record."
-      },
-      "description": "Authorization checks may not verify that the requested invoice belongs to the current tenant.",
-      "authContext": "Low Privilege",
-      "dataSensitivity": "PII/Financial",
-      "status": "open",
-      "dedupGroupId": "DEDUP-YXBpLmV4YW1w",
-      "sourceCount": 1,
-      "provenance": [
-        {
-          "scanner": "GENERIC_JSON",
-          "scannerFindingId": "RAW-3bcb80-0",
-          "rawJson": "{\"title\":\"Broken object-level authorization\",\"severity\":\"High\",\"endpoint\":\"/api/invoices/{id}\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: access-control response differed for a cross-tenant test record.\"}}",
-          "timestamp": "2026-09-25T09:11:03.383Z",
-          "scanId": "SCN-MUGQQVV9"
-        }
-      ],
-      "createdAt": "2026-09-25T09:11:03.383Z",
-      "aiTriage": {
-        "relevance": "High",
-        "calibratedConfidence": "strongly indicated",
-        "contextualSeverity": "High",
-        "businessImpact": "Circumvention of perimeter access controls and session compromise.",
-        "exploitabilityAssessment": "Requires appropriate network access and payload delivery.",
-        "evidenceQuality": "Moderate",
-        "manualVerificationRecommended": false,
-        "reasoning": "Deterministic heuristic triage rule applied based on scanner CWE and matched patterns.",
-        "keyRiskFactors": [
-          "Authentication Flaw",
-          "Access Control"
-        ]
-      }
-    },
-    {
-      "id": "FND-GQQVV9-004",
-      "scanId": "SCN-MUGQQVV9",
-      "projectId": "PRJ-MUGQQQ6D",
-      "title": "JWT signature verification weakness",
-      "vulnerabilityCategory": "Broken Authentication / JWT",
-      "cwe": "CWE-287",
-      "severity": "High",
-      "confidence": "Medium",
-      "asset": "api.example.test",
-      "endpoint": "/api/auth/verify",
-      "evidence": {
-        "rawOutput": "Synthetic scanner evidence: token validation configuration requires manual verification."
-      },
-      "description": "Token validation configuration may allow an unsupported signing algorithm.",
-      "authContext": "Unauthenticated",
-      "dataSensitivity": "Credentials/Secrets",
-      "status": "open",
-      "dedupGroupId": "DEDUP-YXBpLmV4YW1w",
-      "sourceCount": 1,
-      "provenance": [
-        {
-          "scanner": "GENERIC_JSON",
-          "scannerFindingId": "RAW-56cf0b-0",
-          "rawJson": "{\"title\":\"JWT signature verification weakness\",\"severity\":\"Critical\",\"endpoint\":\"/api/auth/verify\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: token validation configuration requires manual verification.\"}}",
-          "timestamp": "2026-09-25T09:11:03.383Z",
-          "scanId": "SCN-MUGQQVV9"
-        }
-      ],
-      "createdAt": "2026-09-25T09:11:03.383Z",
-      "aiTriage": {
-        "relevance": "High",
-        "calibratedConfidence": "strongly indicated",
-        "contextualSeverity": "High",
-        "businessImpact": "Circumvention of perimeter access controls and session compromise.",
-        "exploitabilityAssessment": "Requires appropriate network access and payload delivery.",
-        "evidenceQuality": "Moderate",
-        "manualVerificationRecommended": false,
-        "reasoning": "Deterministic heuristic triage rule applied based on scanner CWE and matched patterns.",
-        "keyRiskFactors": [
-          "Authentication Flaw",
-          "Access Control"
-        ]
-      }
-    },
-    {
-      "id": "FND-GQQVV9-005",
-      "scanId": "SCN-MUGQQVV9",
-      "projectId": "PRJ-MUGQQQ6D",
-      "title": "Reflected cross-site scripting",
-      "vulnerabilityCategory": "Cross-Site Scripting",
-      "cwe": "CWE-79",
+      "id": "FND-GR29PH-001",
+      "scanId": "SCN-MUGR29PH",
+      "projectId": "PRJ-MUGR1B0I",
+      "title": "Security Finding",
+      "vulnerabilityCategory": "General Security Weakness",
       "severity": "Medium",
       "confidence": "High",
-      "asset": "web.example.test",
-      "endpoint": "/search",
+      "asset": "Primary Target",
+      "endpoint": "/",
       "evidence": {
-        "rawOutput": "Synthetic scanner evidence: reflected input marker detected in response."
+        "rawOutput": ""
       },
-      "description": "Search input is reflected into an HTML response without consistent contextual encoding.",
+      "description": "",
       "authContext": "Unauthenticated",
       "dataSensitivity": "Internal",
       "status": "open",
-      "dedupGroupId": "DEDUP-d2ViLmV4YW1w",
+      "dedupGroupId": "DEDUP-cHJpbWFyeSB0",
       "sourceCount": 1,
       "provenance": [
         {
           "scanner": "GENERIC_JSON",
-          "scannerFindingId": "RAW-79ecb4-0",
-          "rawJson": "{\"title\":\"Reflected cross-site scripting\",\"severity\":\"Medium\",\"endpoint\":\"/search\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: reflected input marker detected in response.\"}}",
-          "timestamp": "2026-09-25T09:11:03.383Z",
-          "scanId": "SCN-MUGQQVV9"
+          "scannerFindingId": "RAW-2003e6-0",
+          "rawJson": "{\"title\":\"Security Finding\",\"severity\":\"Medium\",\"endpoint\":\"/\",\"evidence\":{\"rawOutput\":\"\"}}",
+          "timestamp": "2026-09-25T09:19:54.533Z",
+          "scanId": "SCN-MUGR29PH"
         }
       ],
-      "createdAt": "2026-09-25T09:11:03.383Z",
+      "createdAt": "2026-09-25T09:19:54.533Z",
       "aiTriage": {
         "relevance": "Medium",
         "calibratedConfidence": "potentially exploitable",
@@ -613,35 +154,266 @@
       }
     },
     {
-      "id": "FND-GQQVV9-006",
-      "scanId": "SCN-MUGQQVV9",
-      "projectId": "PRJ-MUGQQQ6D",
-      "title": "Hardcoded cloud access token",
-      "vulnerabilityCategory": "Hardcoded Secret",
+      "id": "FND-GR2SN7-001",
+      "scanId": "SCN-MUGR2SN7",
+      "projectId": "PRJ-MUGR1B0I",
+      "title": "Remote Code Execution (RCE) via Spring Expression Language (SpEL) Injection",
+      "vulnerabilityCategory": "General Security Weakness",
+      "cwe": "CWE-94",
+      "cve": "CVE-2022-22963",
+      "severity": "Critical",
+      "confidence": "Confirmed",
+      "asset": "payment-gateway.internal.net",
+      "endpoint": "/api/v1/functionRouter",
+      "evidence": {
+        "request": "POST /api/v1/functionRouter HTTP/1.1\nHost: payment-gateway.internal.net\nspring.cloud.function.routing-expression: T(java.lang.Runtime).getRuntime().exec(\"id\")",
+        "response": "HTTP/1.1 200 OK\nuid=0(root) gid=0(root) groups=0(root)"
+      },
+      "description": "Unauthenticated remote code execution via HTTP header routing expression allowing arbitrary command execution on the host container.",
+      "authContext": "Unauthenticated",
+      "dataSensitivity": "Restricted",
+      "status": "open",
+      "dedupGroupId": "DEDUP-cGF5bWVudC1n",
+      "sourceCount": 1,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-230aae-0",
+          "rawJson": "{\"title\":\"Remote Code Execution (RCE) via Spring Expression Language (SpEL) Injection\",\"severity\":\"Critical\",\"endpoint\":\"/api/v1/functionRouter\",\"evidence\":{\"request\":\"POST /api/v1/functionRouter HTTP/1.1\\nHost: payment-gateway.internal.net\\nspring.cloud.function.routing-expression: T(java.lang.Runtime).getRuntime().exec(\\\"id\\\")\",\"response\":\"HTTP/1.1 200 OK\\nuid=0(root) gid=0(root) groups=0(root)\"}}",
+          "timestamp": "2026-09-25T09:20:19.075Z",
+          "scanId": "SCN-MUGR2SN7"
+        }
+      ],
+      "createdAt": "2026-09-25T09:20:19.075Z",
+      "aiTriage": {
+        "relevance": "Medium",
+        "calibratedConfidence": "potentially exploitable",
+        "contextualSeverity": "Critical",
+        "businessImpact": "Potential security vulnerability requiring standard defensive hardening.",
+        "exploitabilityAssessment": "Requires appropriate network access and payload delivery.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": false,
+        "reasoning": "Deterministic heuristic triage rule applied based on scanner CWE and matched patterns.",
+        "keyRiskFactors": [
+          "Vulnerability Present"
+        ]
+      }
+    },
+    {
+      "id": "FND-GR2SN7-002",
+      "scanId": "SCN-MUGR2SN7",
+      "projectId": "PRJ-MUGR1B0I",
+      "title": "Unauthenticated OS Command Injection in Global Ingress Gateway",
+      "vulnerabilityCategory": "General Security Weakness",
+      "cwe": "CWE-78",
+      "cve": "CVE-2024-3400",
+      "severity": "Critical",
+      "confidence": "Confirmed",
+      "asset": "api.enterprise.internal",
+      "endpoint": "/ssl-vpn/hipreport.esp",
+      "evidence": {
+        "request": "POST /ssl-vpn/hipreport.esp HTTP/1.1\nCookie: SESSID=`whoami > /tmp/out.txt`",
+        "response": "HTTP/1.1 200 OK\nPayload executed as root."
+      },
+      "description": "Arbitrary command execution with root privileges on the edge security perimeter via unsanitized cookie headers.",
+      "authContext": "Unauthenticated",
+      "dataSensitivity": "Internal",
+      "status": "open",
+      "dedupGroupId": "DEDUP-YXBpLmVudGVy",
+      "sourceCount": 1,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-7be095-0",
+          "rawJson": "{\"title\":\"Unauthenticated OS Command Injection in Global Ingress Gateway\",\"severity\":\"Critical\",\"endpoint\":\"/ssl-vpn/hipreport.esp\",\"evidence\":{\"request\":\"POST /ssl-vpn/hipreport.esp HTTP/1.1\\nCookie: SESSID=`whoami > /tmp/out.txt`\",\"response\":\"HTTP/1.1 200 OK\\nPayload executed as root.\"}}",
+          "timestamp": "2026-09-25T09:20:19.075Z",
+          "scanId": "SCN-MUGR2SN7"
+        }
+      ],
+      "createdAt": "2026-09-25T09:20:19.075Z",
+      "aiTriage": {
+        "relevance": "Medium",
+        "calibratedConfidence": "potentially exploitable",
+        "contextualSeverity": "Critical",
+        "businessImpact": "Potential security vulnerability requiring standard defensive hardening.",
+        "exploitabilityAssessment": "Requires appropriate network access and payload delivery.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": false,
+        "reasoning": "Deterministic heuristic triage rule applied based on scanner CWE and matched patterns.",
+        "keyRiskFactors": [
+          "Vulnerability Present"
+        ]
+      }
+    },
+    {
+      "id": "FND-GR2SN7-003",
+      "scanId": "SCN-MUGR2SN7",
+      "projectId": "PRJ-MUGR1B0I",
+      "title": "Pre-Auth SQL Injection in PostgreSQL Core Financial Ledger",
+      "vulnerabilityCategory": "General Security Weakness",
+      "cwe": "CWE-89",
+      "cve": "CVE-2023-38606",
+      "severity": "Critical",
+      "confidence": "Confirmed",
+      "asset": "ledger-db.internal.net",
+      "endpoint": "/api/v1/ledger/transactions/export",
+      "evidence": {
+        "request": "GET /api/v1/ledger/transactions/export?sort_by=id;UNION+SELECT+card_number,cvv,balance+FROM+cards-- HTTP/1.1",
+        "response": "HTTP/1.1 200 OK\n{\"data\":[{\"card_number\":\"4111222233334444\",\"cvv\":\"123\",\"balance\":9500000}]}"
+      },
+      "description": "SQL injection in ledger table ordering parameter enables unauthenticated dump of customer balance tables and transaction history.",
+      "authContext": "Unauthenticated",
+      "dataSensitivity": "Restricted PII",
+      "status": "open",
+      "dedupGroupId": "DEDUP-bGVkZ2VyLWRi",
+      "sourceCount": 1,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-1b9e8e-0",
+          "rawJson": "{\"title\":\"Pre-Auth SQL Injection in PostgreSQL Core Financial Ledger\",\"severity\":\"Critical\",\"endpoint\":\"/api/v1/ledger/transactions/export\",\"evidence\":{\"request\":\"GET /api/v1/ledger/transactions/export?sort_by=id;UNION+SELECT+card_number,cvv,balance+FROM+cards-- HTTP/1.1\",\"response\":\"HTTP/1.1 200 OK\\n{\\\"data\\\":[{\\\"card_number\\\":\\\"4111222233334444\\\",\\\"cvv\\\":\\\"123\\\",\\\"balance\\\":9500000}]}\"}}",
+          "timestamp": "2026-09-25T09:20:19.075Z",
+          "scanId": "SCN-MUGR2SN7"
+        }
+      ],
+      "createdAt": "2026-09-25T09:20:19.075Z",
+      "aiTriage": {
+        "relevance": "Medium",
+        "calibratedConfidence": "potentially exploitable",
+        "contextualSeverity": "Critical",
+        "businessImpact": "Potential security vulnerability requiring standard defensive hardening.",
+        "exploitabilityAssessment": "Requires appropriate network access and payload delivery.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": false,
+        "reasoning": "Deterministic heuristic triage rule applied based on scanner CWE and matched patterns.",
+        "keyRiskFactors": [
+          "Vulnerability Present"
+        ]
+      }
+    },
+    {
+      "id": "FND-GR2SN7-004",
+      "scanId": "SCN-MUGR2SN7",
+      "projectId": "PRJ-MUGR1B0I",
+      "title": "Server-Side Request Forgery (SSRF) to Cloud Metadata & IAM Credentials",
+      "vulnerabilityCategory": "General Security Weakness",
+      "cwe": "CWE-918",
+      "cve": "CVE-2024-21887",
+      "severity": "Critical",
+      "confidence": "Confirmed",
+      "asset": "webhook-dispatcher.internal.net",
+      "endpoint": "/api/v2/webhooks/subscribe",
+      "evidence": {
+        "request": "POST /api/v2/webhooks/subscribe HTTP/1.1\n{\"callback_url\":\"http://169.254.169.254/latest/meta-data/iam/security-credentials/admin-role\"}",
+        "response": "HTTP/1.1 200 OK\n{\"AccessKeyId\":\"ASIAEXAMPLE\",\"SecretAccessKey\":\"SECRET_KEY_DUMP\"}"
+      },
+      "description": "Outbound webhook handler retrieves cloud instance profile metadata yielding full AWS STS temporary admin credentials.",
+      "authContext": "Unauthenticated",
+      "dataSensitivity": "Restricted",
+      "status": "open",
+      "dedupGroupId": "DEDUP-d2ViaG9vay1k",
+      "sourceCount": 1,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-283def-0",
+          "rawJson": "{\"title\":\"Server-Side Request Forgery (SSRF) to Cloud Metadata & IAM Credentials\",\"severity\":\"Critical\",\"endpoint\":\"/api/v2/webhooks/subscribe\",\"evidence\":{\"request\":\"POST /api/v2/webhooks/subscribe HTTP/1.1\\n{\\\"callback_url\\\":\\\"http://169.254.169.254/latest/meta-data/iam/security-credentials/admin-role\\\"}\",\"response\":\"HTTP/1.1 200 OK\\n{\\\"AccessKeyId\\\":\\\"ASIAEXAMPLE\\\",\\\"SecretAccessKey\\\":\\\"SECRET_KEY_DUMP\\\"}\"}}",
+          "timestamp": "2026-09-25T09:20:19.075Z",
+          "scanId": "SCN-MUGR2SN7"
+        }
+      ],
+      "createdAt": "2026-09-25T09:20:19.075Z",
+      "aiTriage": {
+        "relevance": "Medium",
+        "calibratedConfidence": "potentially exploitable",
+        "contextualSeverity": "Critical",
+        "businessImpact": "Potential security vulnerability requiring standard defensive hardening.",
+        "exploitabilityAssessment": "Requires appropriate network access and payload delivery.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": false,
+        "reasoning": "Deterministic heuristic triage rule applied based on scanner CWE and matched patterns.",
+        "keyRiskFactors": [
+          "Vulnerability Present"
+        ]
+      }
+    },
+    {
+      "id": "FND-GR2SN7-005",
+      "scanId": "SCN-MUGR2SN7",
+      "projectId": "PRJ-MUGR1B0I",
+      "title": "Authentication Bypass via JWT Algorithm Confusion (RS256 to HS256)",
+      "vulnerabilityCategory": "General Security Weakness",
+      "cwe": "CWE-287",
+      "cve": "CVE-2023-45133",
+      "severity": "Critical",
+      "confidence": "Confirmed",
+      "asset": "auth-identity.internal.net",
+      "endpoint": "/api/v1/auth/verify-token",
+      "evidence": {
+        "request": "POST /api/v1/auth/verify-token HTTP/1.1\nAuthorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiU3VwZXJBZG1pbiJ9...",
+        "response": "HTTP/1.1 200 OK\n{\"authenticated\":true,\"role\":\"SuperAdmin\"}"
+      },
+      "description": "JWT verifier accepts tokens signed with public RSA keys using symmetric HMAC-SHA256, permitting complete administrative identity forgery.",
+      "authContext": "Forged Token",
+      "dataSensitivity": "Restricted",
+      "status": "open",
+      "dedupGroupId": "DEDUP-YXV0aC1pZGVu",
+      "sourceCount": 1,
+      "provenance": [
+        {
+          "scanner": "GENERIC_JSON",
+          "scannerFindingId": "RAW-5eaf12-0",
+          "rawJson": "{\"title\":\"Authentication Bypass via JWT Algorithm Confusion (RS256 to HS256)\",\"severity\":\"Critical\",\"endpoint\":\"/api/v1/auth/verify-token\",\"evidence\":{\"request\":\"POST /api/v1/auth/verify-token HTTP/1.1\\nAuthorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiU3VwZXJBZG1pbiJ9...\",\"response\":\"HTTP/1.1 200 OK\\n{\\\"authenticated\\\":true,\\\"role\\\":\\\"SuperAdmin\\\"}\"}}",
+          "timestamp": "2026-09-25T09:20:19.075Z",
+          "scanId": "SCN-MUGR2SN7"
+        }
+      ],
+      "createdAt": "2026-09-25T09:20:19.075Z",
+      "aiTriage": {
+        "relevance": "Medium",
+        "calibratedConfidence": "potentially exploitable",
+        "contextualSeverity": "Critical",
+        "businessImpact": "Potential security vulnerability requiring standard defensive hardening.",
+        "exploitabilityAssessment": "Requires appropriate network access and payload delivery.",
+        "evidenceQuality": "Moderate",
+        "manualVerificationRecommended": false,
+        "reasoning": "Deterministic heuristic triage rule applied based on scanner CWE and matched patterns.",
+        "keyRiskFactors": [
+          "Vulnerability Present"
+        ]
+      }
+    },
+    {
+      "id": "FND-GR2SN7-006",
+      "scanId": "SCN-MUGR2SN7",
+      "projectId": "PRJ-MUGR1B0I",
+      "title": "Hardcoded Root Database Superuser Credentials in Production Microservice",
+      "vulnerabilityCategory": "General Security Weakness",
       "cwe": "CWE-798",
       "severity": "Critical",
       "confidence": "Confirmed",
-      "asset": "Source Codebase",
-      "endpoint": "src/config/cloud.ts:18",
+      "asset": "core-banking-service.internal.net",
+      "endpoint": "/config/application-prod.yml",
       "evidence": {
-        "rawOutput": "Synthetic scanner evidence: placeholder token marker detected in source."
+        "request": "GET /config/application-prod.yml HTTP/1.1",
+        "response": "datasource.url: postgresql://postgres:SuperSecretRootPass2026!@pg-cluster.internal.net:5432/core_banking"
       },
-      "description": "A cloud access token appears to be embedded in source configuration.",
-      "authContext": "Low Privilege",
-      "dataSensitivity": "Credentials/Secrets",
+      "description": "Plaintext database connection string containing master cluster credentials 'postgres:SuperSecretRootPass2026!' exposed via config endpoint.",
+      "authContext": "Unauthenticated",
+      "dataSensitivity": "Restricted",
       "status": "open",
-      "dedupGroupId": "DEDUP-c291cmNlIGNv",
+      "dedupGroupId": "DEDUP-Y29yZS1iYW5r",
       "sourceCount": 1,
       "provenance": [
         {
           "scanner": "GENERIC_JSON",
-          "scannerFindingId": "RAW-471615-0",
-          "rawJson": "{\"title\":\"Hardcoded cloud access token\",\"severity\":\"Critical\",\"endpoint\":\"src/config/cloud.ts:18\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: placeholder token marker detected in source.\"}}",
-          "timestamp": "2026-09-25T09:11:03.383Z",
-          "scanId": "SCN-MUGQQVV9"
+          "scannerFindingId": "RAW-3953de-0",
+          "rawJson": "{\"title\":\"Hardcoded Root Database Superuser Credentials in Production Microservice\",\"severity\":\"Critical\",\"endpoint\":\"/config/application-prod.yml\",\"evidence\":{\"request\":\"GET /config/application-prod.yml HTTP/1.1\",\"response\":\"datasource.url: postgresql://postgres:SuperSecretRootPass2026!@pg-cluster.internal.net:5432/core_banking\"}}",
+          "timestamp": "2026-09-25T09:20:19.075Z",
+          "scanId": "SCN-MUGR2SN7"
         }
       ],
-      "createdAt": "2026-09-25T09:11:03.383Z",
+      "createdAt": "2026-09-25T09:20:19.076Z",
       "aiTriage": {
         "relevance": "Medium",
         "calibratedConfidence": "potentially exploitable",
@@ -657,39 +429,41 @@
       }
     },
     {
-      "id": "FND-GQQVV9-007",
-      "scanId": "SCN-MUGQQVV9",
-      "projectId": "PRJ-MUGQQQ6D",
-      "title": "Vulnerable dependency in payment service",
-      "vulnerabilityCategory": "Dependency / Package Vulnerability",
-      "cve": "CVE-2025-0001",
-      "severity": "High",
+      "id": "FND-GR2SN7-007",
+      "scanId": "SCN-MUGR2SN7",
+      "projectId": "PRJ-MUGR1B0I",
+      "title": "Unrestricted File Upload Leading to Web Shell Execution",
+      "vulnerabilityCategory": "General Security Weakness",
+      "cwe": "CWE-434",
+      "cve": "CVE-2023-46604",
+      "severity": "Critical",
       "confidence": "Confirmed",
-      "asset": "payment-service:latest",
-      "endpoint": "package-lock.json",
+      "asset": "document-storage.internal.net",
+      "endpoint": "/api/v1/kyc/upload-id",
       "evidence": {
-        "rawOutput": "Synthetic scanner evidence: package version is below the recommended fixed version."
+        "request": "POST /api/v1/kyc/upload-id HTTP/1.1\nContent-Disposition: form-data; name=\"document\"; filename=\"shell.jsp\"",
+        "response": "HTTP/1.1 201 Created\n{\"url\":\"https://document-storage.internal.net/uploads/shell.jsp\"}"
       },
-      "description": "A production dependency has a known security issue and an available patched version.",
-      "authContext": "Internal Service",
-      "dataSensitivity": "Confidential",
+      "description": "KYC upload handler does not validate file extensions or content-type headers, allowing executable JSP web shells to be placed in the webroot.",
+      "authContext": "Unauthenticated",
+      "dataSensitivity": "Restricted",
       "status": "open",
-      "dedupGroupId": "DEDUP-cGF5bWVudC1z",
+      "dedupGroupId": "DEDUP-ZG9jdW1lbnQt",
       "sourceCount": 1,
       "provenance": [
         {
           "scanner": "GENERIC_JSON",
-          "scannerFindingId": "RAW-40498c-0",
-          "rawJson": "{\"title\":\"Vulnerable dependency in payment service\",\"severity\":\"High\",\"endpoint\":\"package-lock.json\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: package version is below the recommended fixed version.\"}}",
-          "timestamp": "2026-09-25T09:11:03.383Z",
-          "scanId": "SCN-MUGQQVV9"
+          "scannerFindingId": "RAW-408cc0-0",
+          "rawJson": "{\"title\":\"Unrestricted File Upload Leading to Web Shell Execution\",\"severity\":\"Critical\",\"endpoint\":\"/api/v1/kyc/upload-id\",\"evidence\":{\"request\":\"POST /api/v1/kyc/upload-id HTTP/1.1\\nContent-Disposition: form-data; name=\\\"document\\\"; filename=\\\"shell.jsp\\\"\",\"response\":\"HTTP/1.1 201 Created\\n{\\\"url\\\":\\\"https://document-storage.internal.net/uploads/shell.jsp\\\"}\"}}",
+          "timestamp": "2026-09-25T09:20:19.076Z",
+          "scanId": "SCN-MUGR2SN7"
         }
       ],
-      "createdAt": "2026-09-25T09:11:03.383Z",
+      "createdAt": "2026-09-25T09:20:19.076Z",
       "aiTriage": {
         "relevance": "Medium",
         "calibratedConfidence": "potentially exploitable",
-        "contextualSeverity": "High",
+        "contextualSeverity": "Critical",
         "businessImpact": "Potential security vulnerability requiring standard defensive hardening.",
         "exploitabilityAssessment": "Requires appropriate network access and payload delivery.",
         "evidenceQuality": "Moderate",
@@ -701,39 +475,41 @@
       }
     },
     {
-      "id": "FND-GQQVV9-008",
-      "scanId": "SCN-MUGQQVV9",
-      "projectId": "PRJ-MUGQQQ6D",
-      "title": "Exposed database administration service",
-      "vulnerabilityCategory": "Unrestricted Network Exposure",
-      "cwe": "CWE-200",
-      "severity": "High",
+      "id": "FND-GR2SN7-008",
+      "scanId": "SCN-MUGR2SN7",
+      "projectId": "PRJ-MUGR1B0I",
+      "title": "Insecure Java Object Deserialization in Apache ActiveMQ Cluster",
+      "vulnerabilityCategory": "General Security Weakness",
+      "cwe": "CWE-502",
+      "cve": "CVE-2023-46604",
+      "severity": "Critical",
       "confidence": "Confirmed",
-      "asset": "db.internal.example.test",
-      "endpoint": ":5432",
+      "asset": "message-broker.internal.net",
+      "endpoint": ":61616",
       "evidence": {
-        "rawOutput": "Synthetic scanner evidence: service exposure requires network policy review."
+        "request": "TCP connection to port 61616 sending ClassPathXmlApplicationContext payload",
+        "response": "Remote payload executed successfully on broker master node."
       },
-      "description": "A database administration service appears reachable from an overly broad network segment.",
+      "description": "OpenWire protocol handler permits unmarshaling of untrusted class instances, leading to unauthenticated arbitrary code execution.",
       "authContext": "Unauthenticated",
-      "dataSensitivity": "PII/Financial",
+      "dataSensitivity": "Restricted",
       "status": "open",
-      "dedupGroupId": "DEDUP-ZGIuaW50ZXJu",
+      "dedupGroupId": "DEDUP-bWVzc2FnZS1i",
       "sourceCount": 1,
       "provenance": [
         {
           "scanner": "GENERIC_JSON",
-          "scannerFindingId": "RAW-52c397-0",
-          "rawJson": "{\"title\":\"Exposed database administration service\",\"severity\":\"High\",\"endpoint\":\":5432\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: service exposure requires network policy review.\"}}",
-          "timestamp": "2026-09-25T09:11:03.383Z",
-          "scanId": "SCN-MUGQQVV9"
+          "scannerFindingId": "RAW-1fda92-0",
+          "rawJson": "{\"title\":\"Insecure Java Object Deserialization in Apache ActiveMQ Cluster\",\"severity\":\"Critical\",\"endpoint\":\":61616\",\"evidence\":{\"request\":\"TCP connection to port 61616 sending ClassPathXmlApplicationContext payload\",\"response\":\"Remote payload executed successfully on broker master node.\"}}",
+          "timestamp": "2026-09-25T09:20:19.076Z",
+          "scanId": "SCN-MUGR2SN7"
         }
       ],
-      "createdAt": "2026-09-25T09:11:03.383Z",
+      "createdAt": "2026-09-25T09:20:19.076Z",
       "aiTriage": {
         "relevance": "Medium",
         "calibratedConfidence": "potentially exploitable",
-        "contextualSeverity": "High",
+        "contextualSeverity": "Critical",
         "businessImpact": "Potential security vulnerability requiring standard defensive hardening.",
         "exploitabilityAssessment": "Requires appropriate network access and payload delivery.",
         "evidenceQuality": "Moderate",
@@ -745,39 +521,41 @@
       }
     },
     {
-      "id": "FND-GQQVV9-009",
-      "scanId": "SCN-MUGQQVV9",
-      "projectId": "PRJ-MUGQQQ6D",
-      "title": "Missing security headers",
-      "vulnerabilityCategory": "Security Misconfiguration",
-      "cwe": "CWE-693",
-      "severity": "Low",
-      "confidence": "High",
-      "asset": "web.example.test",
-      "endpoint": "/",
+      "id": "FND-GR2SN7-009",
+      "scanId": "SCN-MUGR2SN7",
+      "projectId": "PRJ-MUGR1B0I",
+      "title": "Exposed Kubernetes etcd Cluster with Unauthenticated Read/Write Access",
+      "vulnerabilityCategory": "General Security Weakness",
+      "cwe": "CWE-306",
+      "cve": "CVE-2020-8559",
+      "severity": "Critical",
+      "confidence": "Confirmed",
+      "asset": "k8s-control-plane.internal.net",
+      "endpoint": "k8s-control-plane.internal.net:2379",
       "evidence": {
-        "rawOutput": "Synthetic scanner evidence: expected response headers were absent."
+        "request": "etcdctl --endpoints=https://k8s-control-plane.internal.net:2379 get /registry/secrets/kube-system/ --prefix",
+        "response": "Extracted cluster service account tokens and TLS private keys."
       },
-      "description": "Recommended browser security headers are missing from the application response.",
+      "description": "Kubernetes etcd datastore port 2379 exposed to internal subnet without TLS client certificate verification, allowing full cluster secret extraction.",
       "authContext": "Unauthenticated",
-      "dataSensitivity": "Internal",
+      "dataSensitivity": "Restricted",
       "status": "open",
-      "dedupGroupId": "DEDUP-d2ViLmV4YW1w",
+      "dedupGroupId": "DEDUP-azhzLWNvbnRy",
       "sourceCount": 1,
       "provenance": [
         {
           "scanner": "GENERIC_JSON",
-          "scannerFindingId": "RAW-4c9c1a-0",
-          "rawJson": "{\"title\":\"Missing security headers\",\"severity\":\"Low\",\"endpoint\":\"/\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: expected response headers were absent.\"}}",
-          "timestamp": "2026-09-25T09:11:03.383Z",
-          "scanId": "SCN-MUGQQVV9"
+          "scannerFindingId": "RAW-50eedd-0",
+          "rawJson": "{\"title\":\"Exposed Kubernetes etcd Cluster with Unauthenticated Read/Write Access\",\"severity\":\"Critical\",\"endpoint\":\"k8s-control-plane.internal.net:2379\",\"evidence\":{\"request\":\"etcdctl --endpoints=https://k8s-control-plane.internal.net:2379 get /registry/secrets/kube-system/ --prefix\",\"response\":\"Extracted cluster service account tokens and TLS private keys.\"}}",
+          "timestamp": "2026-09-25T09:20:19.076Z",
+          "scanId": "SCN-MUGR2SN7"
         }
       ],
-      "createdAt": "2026-09-25T09:11:03.383Z",
+      "createdAt": "2026-09-25T09:20:19.076Z",
       "aiTriage": {
         "relevance": "Medium",
         "calibratedConfidence": "potentially exploitable",
-        "contextualSeverity": "Low",
+        "contextualSeverity": "Critical",
         "businessImpact": "Potential security vulnerability requiring standard defensive hardening.",
         "exploitabilityAssessment": "Requires appropriate network access and payload delivery.",
         "evidenceQuality": "Moderate",
@@ -789,39 +567,40 @@
       }
     },
     {
-      "id": "FND-GQQVV9-010",
-      "scanId": "SCN-MUGQQVV9",
-      "projectId": "PRJ-MUGQQQ6D",
-      "title": "Verbose error disclosure",
-      "vulnerabilityCategory": "Information Exposure",
-      "cwe": "CWE-209",
-      "severity": "Medium",
-      "confidence": "Medium",
-      "asset": "api.example.test",
-      "endpoint": "/api/orders",
+      "id": "FND-GR2SN7-010",
+      "scanId": "SCN-MUGR2SN7",
+      "projectId": "PRJ-MUGR1B0I",
+      "title": "Broken Object Level Authorization (BOLA) in Admin Settlement API",
+      "vulnerabilityCategory": "General Security Weakness",
+      "cwe": "CWE-639",
+      "severity": "Critical",
+      "confidence": "Confirmed",
+      "asset": "settlement-service.internal.net",
+      "endpoint": "/api/v2/settlements/approve/{settlementId}",
       "evidence": {
-        "rawOutput": "Synthetic scanner evidence: stack trace marker observed in an error response."
+        "request": "POST /api/v2/settlements/approve/ST-99824 HTTP/1.1\nAuthorization: Bearer <low_privilege_user_token>",
+        "response": "HTTP/1.1 200 OK\n{\"status\":\"SETTLED\",\"payout_amount\":5000000.00,\"beneficiary\":\"ATTACKER_ACCOUNT\"}"
       },
-      "description": "Error responses disclose internal implementation details that should be hidden from clients.",
-      "authContext": "Unauthenticated",
-      "dataSensitivity": "Internal",
+      "description": "Missing authorization check allows any standard user to trigger and approve wire transfers for arbitrary enterprise settlement accounts.",
+      "authContext": "Low Privilege User",
+      "dataSensitivity": "Restricted Financial",
       "status": "open",
-      "dedupGroupId": "DEDUP-YXBpLmV4YW1w",
+      "dedupGroupId": "DEDUP-c2V0dGxlbWVu",
       "sourceCount": 1,
       "provenance": [
         {
           "scanner": "GENERIC_JSON",
-          "scannerFindingId": "RAW-3a3a1e-0",
-          "rawJson": "{\"title\":\"Verbose error disclosure\",\"severity\":\"Medium\",\"endpoint\":\"/api/orders\",\"evidence\":{\"rawOutput\":\"Synthetic scanner evidence: stack trace marker observed in an error response.\"}}",
-          "timestamp": "2026-09-25T09:11:03.383Z",
-          "scanId": "SCN-MUGQQVV9"
+          "scannerFindingId": "RAW-2c9641-0",
+          "rawJson": "{\"title\":\"Broken Object Level Authorization (BOLA) in Admin Settlement API\",\"severity\":\"Critical\",\"endpoint\":\"/api/v2/settlements/approve/{settlementId}\",\"evidence\":{\"request\":\"POST /api/v2/settlements/approve/ST-99824 HTTP/1.1\\nAuthorization: Bearer <low_privilege_user_token>\",\"response\":\"HTTP/1.1 200 OK\\n{\\\"status\\\":\\\"SETTLED\\\",\\\"payout_amount\\\":5000000.00,\\\"beneficiary\\\":\\\"ATTACKER_ACCOUNT\\\"}\"}}",
+          "timestamp": "2026-09-25T09:20:19.076Z",
+          "scanId": "SCN-MUGR2SN7"
         }
       ],
-      "createdAt": "2026-09-25T09:11:03.383Z",
+      "createdAt": "2026-09-25T09:20:19.076Z",
       "aiTriage": {
         "relevance": "Medium",
         "calibratedConfidence": "potentially exploitable",
-        "contextualSeverity": "Medium",
+        "contextualSeverity": "Critical",
         "businessImpact": "Potential security vulnerability requiring standard defensive hardening.",
         "exploitabilityAssessment": "Requires appropriate network access and payload delivery.",
         "evidenceQuality": "Moderate",
@@ -836,304 +615,72 @@
   "relationships": [],
   "attackPaths": [
     {
-      "id": "PATH-01-CRIT",
-      "scanId": "SCN-SAMPLE-01",
-      "projectId": "PRJ-FINTECH-CORE",
-      "title": "Public SSRF → Internal Redis Compromise → Ledger SQLi Extraction",
-      "summary": "An unauthenticated attacker exploits SSRF on the public webhook API to reach the unauthenticated Redis cache, acquires internal service credentials, and pivots to the settlement ledger database via SQL injection.",
-      "severity": "Critical",
-      "confidence": "Strongly Indicated",
-      "contextualScore": 94,
-      "scoreBreakdown": {
-        "exposureScore": 24,
-        "exploitabilityScore": 24,
-        "assetCriticalityScore": 25,
-        "chainImpactScore": 21,
-        "bonusPenalties": 0,
-        "totalScore": 94,
-        "explanation": "Formula: Exposure (24/25) + Exploitability (24/25) + Asset Criticality (25/25) + Chain Multiplier (21/25) = 94/100."
-      },
+      "id": "AP-MUGR3IP0-1",
+      "projectId": "PRJ-MUGR1B0I",
+      "scanId": "SCN-MUGR29PH",
+      "title": "Initial Access via Unauthenticated General Security Weakness",
+      "summary": "An unauthenticated attacker accesses the root endpoint of the Primary Target and identifies a general security weakness. Depending on the specific nature of this weakness, the attacker could leverage it to perform reconnaissance, gather system metadata, or attempt initial entry into the application environment.",
       "nodes": [
         {
-          "id": "node-0",
-          "label": "Internet Threat Actor",
+          "id": "node-0-entry",
           "type": "threat_actor",
+          "label": "Adversary (Perimeter)",
           "isEntrypoint": true
         },
         {
-          "id": "node-1",
-          "label": "Public Webhook API",
-          "subLabel": "api.payments.enterprise.internal",
-          "type": "service",
-          "isEntrypoint": true
-        },
-        {
-          "id": "node-2",
-          "label": "SSRF in Webhook Dispatcher",
-          "subLabel": "CWE-918 / CVE-2024-38856",
-          "type": "vulnerability",
-          "findingRef": "FND-SSRF-01",
-          "severity": "Critical"
-        },
-        {
-          "id": "node-3",
-          "label": "Unauthenticated Redis Cache",
-          "subLabel": "redis.payments.internal:6379",
+          "id": "node-0-asset-0",
           "type": "asset",
-          "findingRef": "FND-REDIS-02",
-          "severity": "High"
-        },
-        {
-          "id": "node-4",
-          "label": "SQL Injection in Ledger",
-          "subLabel": "CWE-89 (LedgerRepository)",
-          "type": "vulnerability",
-          "findingRef": "FND-SQLI-03",
-          "severity": "Critical"
-        },
-        {
-          "id": "node-5",
-          "label": "Customer Transaction Ledger DB",
-          "subLabel": "PostgreSQL Production Data",
-          "type": "datastore",
+          "label": "Primary Target",
           "isTarget": true
         }
       ],
       "edges": [
         {
-          "id": "e1",
-          "fromNodeId": "node-0",
-          "toNodeId": "node-1",
-          "relation": "accesses",
-          "label": "HTTP POST /subscribe",
-          "riskWeight": 20
-        },
-        {
-          "id": "e2",
-          "fromNodeId": "node-1",
-          "toNodeId": "node-2",
-          "relation": "triggers",
-          "label": "Inject SSRF Payload",
-          "riskWeight": 30
-        },
-        {
-          "id": "e3",
-          "fromNodeId": "node-2",
-          "toNodeId": "node-3",
-          "relation": "pivots_to",
-          "label": "Pivot to Internal Redis (Port 6379)",
-          "riskWeight": 25
-        },
-        {
-          "id": "e4",
-          "fromNodeId": "node-3",
-          "toNodeId": "node-4",
-          "relation": "leaks_credential_for",
-          "label": "Steal Ledger Auth Token",
-          "riskWeight": 20
-        },
-        {
-          "id": "e5",
-          "fromNodeId": "node-4",
-          "toNodeId": "node-5",
-          "relation": "compromises",
-          "label": "Dump Cardholder Table",
-          "riskWeight": 35
+          "id": "edge-0-0",
+          "fromNodeId": "node-0-entry",
+          "toNodeId": "node-0-asset-0",
+          "relation": "attacks",
+          "label": "Security Finding",
+          "riskWeight": 8
         }
       ],
       "participatingFindingIds": [
-        "FND-SSRF-01",
-        "FND-REDIS-02",
-        "FND-SQLI-03"
+        "FND-GR29PH-001"
+      ],
+      "participatingAssets": [
+        "Primary Target"
       ],
       "prerequisites": [
-        "Public network access to api.payments.enterprise.internal",
-        "Unauthenticated webhook registration endpoint reachable",
-        "Flat internal subnet routing between API and Redis cluster"
+        "Network line-of-sight to the Primary Target root endpoint",
+        "Lack of access control or authentication on the target endpoint"
       ],
-      "impactAssessment": "Total compromise of cardholder transaction history, bank routing numbers, and payment audit logs.",
-      "recommendedFixSequence": [
-        "Implement strict URL whitelist validation and block internal RFC1918 & metadata IPs on WebhookService (Neutralizes Stage 1)",
-        "Enable Redis requirepass authentication and restrict Redis subnet ingress (Neutralizes Stage 2)",
-        "Convert LedgerRepository raw SQL concatenation to parameterized PreparedStatements (Neutralizes Stage 3)"
-      ],
-      "status": "active",
-      "participatingAssets": [
-        "api.payments.enterprise.internal",
-        "redis.payments.internal",
-        "ledger.payments.internal"
-      ]
-    },
-    {
-      "id": "PATH-02-HIGH",
-      "scanId": "SCN-SAMPLE-01",
-      "projectId": "PRJ-FINTECH-CORE",
-      "title": "Hardcoded JWT Secret → Admin Token Forgery → Microservice Takeover",
-      "summary": "An attacker leveraging code leaks or decompiled binaries utilizes the hardcoded HMAC secret to forge administrative JWTs, bypassing API authorization checks.",
+      "impactAssessment": "Potential compromise of the Primary Target's integrity or confidentiality, serving as a potential entry point for further internal reconnaissance.",
+      "contextualScore": 61,
       "severity": "High",
       "confidence": "Strongly Indicated",
-      "contextualScore": 82,
-      "scoreBreakdown": {
-        "exposureScore": 18,
-        "exploitabilityScore": 23,
-        "assetCriticalityScore": 22,
-        "chainImpactScore": 19,
-        "bonusPenalties": 0,
-        "totalScore": 82,
-        "explanation": "Formula: Exposure (18/25) + Exploitability (23/25) + Asset Criticality (22/25) + Chain Multiplier (19/25) = 82/100."
-      },
-      "nodes": [
-        {
-          "id": "node-jwt-0",
-          "label": "External Actor",
-          "type": "threat_actor",
-          "isEntrypoint": true
-        },
-        {
-          "id": "node-jwt-1",
-          "label": "Hardcoded JWT Secret",
-          "subLabel": "CWE-798 in jwt.ts",
-          "type": "vulnerability",
-          "findingRef": "FND-JWT-05",
-          "severity": "High"
-        },
-        {
-          "id": "node-jwt-2",
-          "label": "Auth Subsystem API",
-          "subLabel": "auth.payments.enterprise.internal",
-          "type": "service"
-        },
-        {
-          "id": "node-jwt-3",
-          "label": "Admin Management Gateway",
-          "subLabel": "Full Tenant Controls",
-          "type": "datastore",
-          "isTarget": true
-        }
-      ],
-      "edges": [
-        {
-          "id": "ej1",
-          "fromNodeId": "node-jwt-0",
-          "toNodeId": "node-jwt-1",
-          "relation": "discovers",
-          "label": "Decompile / Read Hardcoded Key",
-          "riskWeight": 20
-        },
-        {
-          "id": "ej2",
-          "fromNodeId": "node-jwt-1",
-          "toNodeId": "node-jwt-2",
-          "relation": "forges_token_for",
-          "label": "Forge Admin JWT Claim",
-          "riskWeight": 35
-        },
-        {
-          "id": "ej3",
-          "fromNodeId": "node-jwt-2",
-          "toNodeId": "node-jwt-3",
-          "relation": "escalates_to",
-          "label": "Gain Superadmin API Access",
-          "riskWeight": 30
-        }
-      ],
-      "participatingFindingIds": [
-        "FND-JWT-05"
-      ],
-      "prerequisites": [
-        "Knowledge of hardcoded JWT fallback string"
-      ],
-      "impactAssessment": "Unauthorized generation of valid administrative tokens for all internal payment microservices.",
-      "recommendedFixSequence": [
-        "Rotate signing keys and enforce mandatory KMS / Vault secret injection at runtime",
-        "Remove fallback strings from codebase and add CI SAST blocking rule"
-      ],
-      "status": "active",
-      "participatingAssets": [
-        "auth.payments.enterprise.internal",
-        "api.payments.enterprise.internal"
-      ]
-    },
-    {
-      "id": "AP-HEURISTIC-1",
-      "projectId": "PRJ-MUGQQQ6D",
-      "scanId": "SCN-MUGQQVV9",
-      "title": "Perimeter Ingress SSRF Pivot to Internal Redis Cache & Token Interception",
-      "summary": "An adversary triggers the SSRF on /api/preview to query internal cloud metadata and pivot into unauthenticated api.example.test.",
-      "nodes": [
-        {
-          "id": "h1-node-1",
-          "type": "threat_actor",
-          "label": "External Attacker",
-          "isEntrypoint": true
-        },
-        {
-          "id": "h1-node-2",
-          "type": "asset",
-          "label": "api.example.test"
-        },
-        {
-          "id": "h1-node-3",
-          "type": "datastore",
-          "label": "api.example.test",
-          "isTarget": true
-        }
-      ],
-      "edges": [
-        {
-          "id": "h1-edge-1",
-          "fromNodeId": "h1-node-1",
-          "toNodeId": "h1-node-2",
-          "relation": "exploits",
-          "label": "SSRF Webhook Ingress",
-          "riskWeight": 9
-        },
-        {
-          "id": "h1-edge-2",
-          "fromNodeId": "h1-node-2",
-          "toNodeId": "h1-node-3",
-          "relation": "pivots_to",
-          "label": "Unauthenticated Redis Access",
-          "riskWeight": 9
-        }
-      ],
-      "participatingFindingIds": [
-        "FND-GQQVV9-002",
-        "FND-GQQVV9-004"
-      ],
-      "participatingAssets": [
-        "api.example.test",
-        "api.example.test"
-      ],
-      "prerequisites": [
-        "Direct HTTP connectivity to public gateway API"
-      ],
-      "impactAssessment": "Exposure of cloud access credentials and lateral movement into the private compute tier.",
-      "contextualScore": 90,
-      "severity": "Critical",
-      "confidence": "Confirmed",
       "scoreBreakdown": {
         "exposureScore": 25,
-        "exploitabilityScore": 22,
-        "assetCriticalityScore": 25,
-        "chainImpactScore": 18,
+        "exploitabilityScore": 12,
+        "assetCriticalityScore": 12,
+        "chainImpactScore": 12,
         "bonusPenalties": 0,
-        "totalScore": 90,
-        "explanation": "Deterministic Contextual Formula: Exposure (25/25) + Exploitability (22/25) + Asset Criticality (25/25) + Chain Pivot Impact (18/25) = 90/100."
+        "totalScore": 61,
+        "explanation": "Deterministic Contextual Formula: Exposure (25/25) + Exploitability (12/25) + Asset Criticality (12/25) + Chain Pivot Impact (12/25) = 61/100."
       },
       "recommendedFixSequence": [
-        "Patch SSRF at /api/preview with strict URL schema and domain whitelisting",
-        "Enable password authentication and ACL on api.example.test"
+        "Perform a detailed code and configuration review of the root endpoint to identify the specific nature of the general security weakness.",
+        "Implement robust authentication and authorization controls to restrict access to sensitive endpoints.",
+        "Apply standard hardening guidelines and input validation to mitigate potential exploitation vectors."
       ],
-      "status": "active",
-      "remediationBottleneckFindingId": "FND-GQQVV9-002"
+      "remediationBottleneckFindingId": "FND-GR29PH-001",
+      "status": "active"
     },
     {
       "id": "AP-HEURISTIC-2",
-      "projectId": "PRJ-MUGQQQ6D",
-      "scanId": "SCN-MUGQQVV9",
+      "projectId": "PRJ-MUGR1B0I",
+      "scanId": "SCN-MUGR2SN7",
       "title": "SQL Injection in Financial Ledger to Complete Database Takeover",
-      "summary": "Exploitation of unsanitized parameters at /api/accounts enables arbitrary SQL execution against the PostgreSQL production cluster.",
+      "summary": "Exploitation of unsanitized parameters at /api/v1/ledger/transactions/export enables arbitrary SQL execution against the PostgreSQL production cluster.",
       "nodes": [
         {
           "id": "h2-node-1",
@@ -1144,7 +691,7 @@
         {
           "id": "h2-node-2",
           "type": "asset",
-          "label": "api.example.test"
+          "label": "ledger-db.internal.net"
         },
         {
           "id": "h2-node-3",
@@ -1172,81 +719,50 @@
         }
       ],
       "participatingFindingIds": [
-        "FND-GQQVV9-001"
+        "FND-GR2SN7-003"
       ],
       "participatingAssets": [
-        "api.example.test",
+        "ledger-db.internal.net",
         "PostgreSQL Core Ledger"
       ],
       "prerequisites": [
         "Valid application session or API query capability"
       ],
       "impactAssessment": "Direct exfiltration and modification of financial transaction records.",
-      "contextualScore": 98,
+      "contextualScore": 88,
       "severity": "Critical",
       "confidence": "Confirmed",
       "scoreBreakdown": {
         "exposureScore": 25,
         "exploitabilityScore": 25,
-        "assetCriticalityScore": 25,
+        "assetCriticalityScore": 20,
         "chainImpactScore": 18,
-        "bonusPenalties": 5,
-        "totalScore": 98,
-        "explanation": "Deterministic Contextual Formula: Exposure (25/25) + Exploitability (25/25) + Asset Criticality (25/25) + Chain Pivot Impact (18/25) + Unauth Crown-Jewel Modifier (+5) = 98/100."
+        "bonusPenalties": 0,
+        "totalScore": 88,
+        "explanation": "Deterministic Contextual Formula: Exposure (25/25) + Exploitability (25/25) + Asset Criticality (20/25) + Chain Pivot Impact (18/25) = 88/100."
       },
       "recommendedFixSequence": [
-        "Convert dynamic SQL queries at /api/accounts to parameterized prepared statements",
+        "Convert dynamic SQL queries at /api/v1/ledger/transactions/export to parameterized prepared statements",
         "Apply least-privilege database role permissions"
       ],
       "status": "active",
-      "remediationBottleneckFindingId": "FND-GQQVV9-001"
+      "remediationBottleneckFindingId": "FND-GR2SN7-003"
     }
   ],
   "remediations": [
     {
-      "id": "REM-CORE-001",
-      "projectId": "PRJ-FINTECH-CORE",
-      "title": "Remediate Security Finding",
-      "priority": "P3 - Low",
-      "affectedFindingIds": [
-        "FND-GQN5B6-001"
-      ],
-      "affectedAttackPathIds": [],
-      "pathsEliminatedCount": 0,
-      "engineeringAction": "Apply secure coding standards and input sanitization to / on Primary Target.",
-      "architecturalSafeguards": [
-        "Input validation",
-        "Least privilege"
-      ],
-      "validationRequirements": "Verify via targeted security re-test and regression scan that 1 finding(s) no longer replicate.",
-      "estimatedRiskReductionPercent": 15,
-      "status": "pending",
-      "aiGuidance": {
-        "rootCauseExplanation": "Root cause stems from insufficient validation or lack of isolated access boundaries on api.payments.enterprise.internal.",
-        "impactRationale": "Remediating this item severs the primary link across 0 attack paths, reducing risk score by 15 points.",
-        "remediationBlueprint": "1. Implement strict input validation and boundary enforcement.\n2. Adopt defense-in-depth architectural controls.\n3. Audit logs for anomalous access patterns.",
-        "verificationSteps": [
-          "1. Send benign payload to verify operational functionality.",
-          "2. Send boundary test payload to verify request is rejected with 400/422 status.",
-          "3. Verify no private internal addresses (10.0.0.0/8, 169.254.169.254) can be reached.",
-          "4. Check audit logs to verify security event is recorded."
-        ],
-        "residualRiskNotes": "Ensure downstream dependencies also enforce authentication and principle of least privilege."
-      }
-    },
-    {
-      "id": "REM-QQ6D-001",
-      "projectId": "PRJ-MUGQQQ6D",
-      "title": "Enforce Parameterized SQL Queries & Prepared Statements on api.example.test",
+      "id": "REM-1B0I-003",
+      "projectId": "PRJ-MUGR1B0I",
+      "title": "Enforce Parameterized SQL Queries & Prepared Statements on ledger-db.internal.net",
       "priority": "P0 - Immediate",
       "affectedFindingIds": [
-        "FND-GQQVV9-001"
+        "FND-GR2SN7-003"
       ],
       "affectedAttackPathIds": [
         "AP-HEURISTIC-2"
       ],
       "pathsEliminatedCount": 1,
-      "engineeringAction": "Refactor dynamic SQL queries on /api/accounts to use parameterized queries/ORM with strict query parameter typing.",
+      "engineeringAction": "Refactor dynamic SQL queries on /api/v1/ledger/transactions/export to use parameterized queries/ORM with strict query parameter typing.",
       "architecturalSafeguards": [
         "Prepared Statements / Parameterized Queries",
         "Database user principle of least privilege",
@@ -1257,122 +773,18 @@
       "status": "pending"
     },
     {
-      "id": "REM-QQ6D-002",
-      "projectId": "PRJ-MUGQQQ6D",
-      "title": "Harden Outbound HTTP Requests & Network Egress on api.example.test",
-      "priority": "P0 - Immediate",
-      "affectedFindingIds": [
-        "FND-GQQVV9-002"
-      ],
-      "affectedAttackPathIds": [
-        "AP-HEURISTIC-1"
-      ],
-      "pathsEliminatedCount": 1,
-      "engineeringAction": "Implement strict destination allowlisting, block RFC1918/link-local IP addresses (169.254.169.254), and disable HTTP redirects on /api/preview.",
-      "architecturalSafeguards": [
-        "Egress IP/Domain Allowlisting",
-        "Block cloud metadata endpoint (169.254.169.254)",
-        "Isolated outbound proxy"
-      ],
-      "validationRequirements": "Verify via targeted security re-test and regression scan that 1 finding(s) no longer replicate.",
-      "estimatedRiskReductionPercent": 33,
-      "status": "pending"
-    },
-    {
-      "id": "REM-QQ6D-003",
-      "projectId": "PRJ-MUGQQQ6D",
-      "title": "Enforce Cryptographic Token Verification & Auth Middleware on api.example.test",
-      "priority": "P0 - Immediate",
-      "affectedFindingIds": [
-        "FND-GQQVV9-003",
-        "FND-GQQVV9-004"
-      ],
-      "affectedAttackPathIds": [
-        "AP-HEURISTIC-1"
-      ],
-      "pathsEliminatedCount": 1,
-      "engineeringAction": "Verify asymmetric JWT signatures (RS256) and reject unsigned / \"none\" algorithm tokens at the API gateway layer.",
-      "architecturalSafeguards": [
-        "Strict RS256 algorithm enforcement",
-        "Mandatory expiration and audience claim checks",
-        "Centralized auth middleware"
-      ],
-      "validationRequirements": "Verify via targeted security re-test and regression scan that 2 finding(s) no longer replicate.",
-      "estimatedRiskReductionPercent": 41,
-      "status": "pending"
-    },
-    {
-      "id": "REM-QQ6D-005",
-      "projectId": "PRJ-MUGQQQ6D",
-      "title": "Enforce Cryptographic Token Verification & Auth Middleware on Source Codebase",
+      "id": "REM-1B0I-001",
+      "projectId": "PRJ-MUGR1B0I",
+      "title": "Remediate Remote Code Execution (RCE) via Spring Expression Language (SpEL) Injection",
       "priority": "P1 - High",
       "affectedFindingIds": [
-        "FND-GQQVV9-006"
+        "FND-GR2SN7-001",
+        "FND-GR2SN7-007",
+        "FND-GR2SN7-008"
       ],
       "affectedAttackPathIds": [],
       "pathsEliminatedCount": 0,
-      "engineeringAction": "Verify asymmetric JWT signatures (RS256) and reject unsigned / \"none\" algorithm tokens at the API gateway layer.",
-      "architecturalSafeguards": [
-        "Strict RS256 algorithm enforcement",
-        "Mandatory expiration and audience claim checks",
-        "Centralized auth middleware"
-      ],
-      "validationRequirements": "Verify via targeted security re-test and regression scan that 1 finding(s) no longer replicate.",
-      "estimatedRiskReductionPercent": 15,
-      "status": "pending"
-    },
-    {
-      "id": "REM-QQ6D-004",
-      "projectId": "PRJ-MUGQQQ6D",
-      "title": "Apply Context-Aware Contextual Output Encoding & CSP on web.example.test",
-      "priority": "P3 - Low",
-      "affectedFindingIds": [
-        "FND-GQQVV9-005"
-      ],
-      "affectedAttackPathIds": [],
-      "pathsEliminatedCount": 0,
-      "engineeringAction": "Sanitize and encode all untrusted user reflections in /search and deploy a restrictive Content-Security-Policy (CSP) header.",
-      "architecturalSafeguards": [
-        "Contextual HTML/JS output encoding",
-        "Strict Content-Security-Policy",
-        "HttpOnly cookie flags"
-      ],
-      "validationRequirements": "Verify via targeted security re-test and regression scan that 1 finding(s) no longer replicate.",
-      "estimatedRiskReductionPercent": 15,
-      "status": "pending"
-    },
-    {
-      "id": "REM-QQ6D-006",
-      "projectId": "PRJ-MUGQQQ6D",
-      "title": "Upgrade Vulnerable Dependencies & Packages on payment-service:latest",
-      "priority": "P3 - Low",
-      "affectedFindingIds": [
-        "FND-GQQVV9-007"
-      ],
-      "affectedAttackPathIds": [],
-      "pathsEliminatedCount": 0,
-      "engineeringAction": "Update vulnerable packages to patched upstream versions to eliminate known CVEs.",
-      "architecturalSafeguards": [
-        "Automated software composition analysis (SCA)",
-        "Continuous dependency patch pipelines"
-      ],
-      "validationRequirements": "Verify via targeted security re-test and regression scan that 1 finding(s) no longer replicate.",
-      "estimatedRiskReductionPercent": 15,
-      "status": "pending"
-    },
-    {
-      "id": "REM-QQ6D-007",
-      "projectId": "PRJ-MUGQQQ6D",
-      "title": "Remediate Exposed database administration service",
-      "priority": "P3 - Low",
-      "affectedFindingIds": [
-        "FND-GQQVV9-008",
-        "FND-GQQVV9-009",
-        "FND-GQQVV9-010"
-      ],
-      "affectedAttackPathIds": [],
-      "pathsEliminatedCount": 0,
-      "engineeringAction": "Apply secure coding standards and input sanitization to :5432 on db.internal.example.test.",
+      "engineeringAction": "Apply secure coding standards and input sanitization to /api/v1/functionRouter on payment-gateway.internal.net.",
       "architecturalSafeguards": [
         "Input validation",
         "Least privilege"
@@ -1380,98 +792,164 @@
       "validationRequirements": "Verify via targeted security re-test and regression scan that 3 finding(s) no longer replicate.",
       "estimatedRiskReductionPercent": 24,
       "status": "pending"
-    }
-  ],
-  "comparisons": [
+    },
     {
-      "id": "CMP-E-01-N5B6",
-      "projectId": "PRJ-FINTECH-CORE",
-      "scan1Id": "SCN-SAMPLE-01",
-      "scan2Id": "SCN-MUGQN5B6",
-      "scan1Name": "owasp-zap-gateway-scan.json",
-      "scan2Name": "post-remediation-verification.json",
-      "createdAt": "2026-09-25T09:08:18.125Z",
-      "resolvedFindingIds": [
-        "FND-SSRF-01",
-        "FND-REDIS-02",
-        "FND-SQLI-03",
-        "FND-CORS-04",
-        "FND-JWT-05"
+      "id": "REM-1B0I-002",
+      "projectId": "PRJ-MUGR1B0I",
+      "title": "Enforce Cryptographic Token Verification & Auth Middleware on api.enterprise.internal",
+      "priority": "P1 - High",
+      "affectedFindingIds": [
+        "FND-GR2SN7-002"
       ],
-      "persistentFindingIds": [],
-      "newFindingIds": [
-        "FND-GQN5B6-001"
+      "affectedAttackPathIds": [],
+      "pathsEliminatedCount": 0,
+      "engineeringAction": "Verify asymmetric JWT signatures (RS256) and reject unsigned / \"none\" algorithm tokens at the API gateway layer.",
+      "architecturalSafeguards": [
+        "Strict RS256 algorithm enforcement",
+        "Mandatory expiration and audience claim checks",
+        "Centralized auth middleware"
       ],
-      "eliminatedPathIds": [
-        "PATH-01-CRIT",
-        "PATH-02-HIGH"
+      "validationRequirements": "Verify via targeted security re-test and regression scan that 1 finding(s) no longer replicate.",
+      "estimatedRiskReductionPercent": 15,
+      "status": "pending"
+    },
+    {
+      "id": "REM-1B0I-004",
+      "projectId": "PRJ-MUGR1B0I",
+      "title": "Harden Outbound HTTP Requests & Network Egress on webhook-dispatcher.internal.net",
+      "priority": "P1 - High",
+      "affectedFindingIds": [
+        "FND-GR2SN7-004"
       ],
-      "newPathIds": [],
-      "riskScoreDelta": -176,
-      "riskDelta": {
-        "beforeScore": 176,
-        "afterScore": 0,
-        "scoreReductionPct": 100
-      },
-      "aiSummary": "Security posture delta: 5 findings resolved, 2 attack paths eliminated, resulting in a net contextual risk reduction of 176 points."
+      "affectedAttackPathIds": [],
+      "pathsEliminatedCount": 0,
+      "engineeringAction": "Implement strict destination allowlisting, block RFC1918/link-local IP addresses (169.254.169.254), and disable HTTP redirects on /api/v2/webhooks/subscribe.",
+      "architecturalSafeguards": [
+        "Egress IP/Domain Allowlisting",
+        "Block cloud metadata endpoint (169.254.169.254)",
+        "Isolated outbound proxy"
+      ],
+      "validationRequirements": "Verify via targeted security re-test and regression scan that 1 finding(s) no longer replicate.",
+      "estimatedRiskReductionPercent": 15,
+      "status": "pending"
+    },
+    {
+      "id": "REM-1B0I-005",
+      "projectId": "PRJ-MUGR1B0I",
+      "title": "Enforce Cryptographic Token Verification & Auth Middleware on auth-identity.internal.net",
+      "priority": "P1 - High",
+      "affectedFindingIds": [
+        "FND-GR2SN7-005"
+      ],
+      "affectedAttackPathIds": [],
+      "pathsEliminatedCount": 0,
+      "engineeringAction": "Verify asymmetric JWT signatures (RS256) and reject unsigned / \"none\" algorithm tokens at the API gateway layer.",
+      "architecturalSafeguards": [
+        "Strict RS256 algorithm enforcement",
+        "Mandatory expiration and audience claim checks",
+        "Centralized auth middleware"
+      ],
+      "validationRequirements": "Verify via targeted security re-test and regression scan that 1 finding(s) no longer replicate.",
+      "estimatedRiskReductionPercent": 15,
+      "status": "pending"
+    },
+    {
+      "id": "REM-1B0I-006",
+      "projectId": "PRJ-MUGR1B0I",
+      "title": "Rotate Exposed Credentials & Migrate to Secrets Manager on core-banking-service.internal.net",
+      "priority": "P1 - High",
+      "affectedFindingIds": [
+        "FND-GR2SN7-006"
+      ],
+      "affectedAttackPathIds": [],
+      "pathsEliminatedCount": 0,
+      "engineeringAction": "Immediately revoke exposed credentials, rotate API keys, and migrate configurations to a secure key vault/secrets manager.",
+      "architecturalSafeguards": [
+        "Automated secret rotation",
+        "Environment secret injection",
+        "Static code secret scanning"
+      ],
+      "validationRequirements": "Verify via targeted security re-test and regression scan that 1 finding(s) no longer replicate.",
+      "estimatedRiskReductionPercent": 15,
+      "status": "pending"
+    },
+    {
+      "id": "REM-1B0I-007",
+      "projectId": "PRJ-MUGR1B0I",
+      "title": "Enforce Cryptographic Token Verification & Auth Middleware on k8s-control-plane.internal.net",
+      "priority": "P1 - High",
+      "affectedFindingIds": [
+        "FND-GR2SN7-009"
+      ],
+      "affectedAttackPathIds": [],
+      "pathsEliminatedCount": 0,
+      "engineeringAction": "Verify asymmetric JWT signatures (RS256) and reject unsigned / \"none\" algorithm tokens at the API gateway layer.",
+      "architecturalSafeguards": [
+        "Strict RS256 algorithm enforcement",
+        "Mandatory expiration and audience claim checks",
+        "Centralized auth middleware"
+      ],
+      "validationRequirements": "Verify via targeted security re-test and regression scan that 1 finding(s) no longer replicate.",
+      "estimatedRiskReductionPercent": 15,
+      "status": "pending"
+    },
+    {
+      "id": "REM-1B0I-008",
+      "projectId": "PRJ-MUGR1B0I",
+      "title": "Enforce Cryptographic Token Verification & Auth Middleware on settlement-service.internal.net",
+      "priority": "P1 - High",
+      "affectedFindingIds": [
+        "FND-GR2SN7-010"
+      ],
+      "affectedAttackPathIds": [],
+      "pathsEliminatedCount": 0,
+      "engineeringAction": "Verify asymmetric JWT signatures (RS256) and reject unsigned / \"none\" algorithm tokens at the API gateway layer.",
+      "architecturalSafeguards": [
+        "Strict RS256 algorithm enforcement",
+        "Mandatory expiration and audience claim checks",
+        "Centralized auth middleware"
+      ],
+      "validationRequirements": "Verify via targeted security re-test and regression scan that 1 finding(s) no longer replicate.",
+      "estimatedRiskReductionPercent": 15,
+      "status": "pending"
     }
   ],
+  "comparisons": [],
   "auditLogs": [
     {
-      "id": "LOG-1790327770203-357",
-      "timestamp": "2026-09-25T09:16:10.203Z",
+      "id": "LOG-1790328304120-138",
+      "timestamp": "2026-09-25T09:25:04.120Z",
       "action": "AI_CHAT_QUERY",
       "details": "Chat query with role 'remediation_engineer' (gemini-3.1-flash-lite).",
       "projectId": "PRJ-FINTECH-CORE"
     },
     {
-      "id": "LOG-1790327753320-541",
-      "timestamp": "2026-09-25T09:15:53.320Z",
-      "action": "AI_CHAT_QUERY",
-      "details": "Chat query with role 'defensive_advisor' (gemini-3.5-flash).",
-      "projectId": "PRJ-FINTECH-CORE"
-    },
-    {
-      "id": "LOG-1790327706479-439",
-      "timestamp": "2026-09-25T09:15:06.479Z",
-      "action": "AI_CHAT_QUERY",
-      "details": "Chat query with role 'defensive_advisor' (gemini-3.5-flash).",
-      "projectId": "PRJ-MUGQQQ6D"
-    },
-    {
-      "id": "LOG-1790327464092-620",
-      "timestamp": "2026-09-25T09:11:04.092Z",
+      "id": "LOG-1790328092431-36",
+      "timestamp": "2026-09-25T09:21:32.431Z",
       "action": "SCAN_UPLOADED",
-      "details": "Scan sample-vulnerability-report.json parsed, triaged, and attack paths generated (11 raw items).",
-      "projectId": "PRJ-MUGQQQ6D"
+      "details": "Scan demo-critical-scan.json parsed, triaged, and attack paths generated (10 raw items).",
+      "projectId": "PRJ-MUGR1B0I"
     },
     {
-      "id": "LOG-1790327456005-144",
-      "timestamp": "2026-09-25T09:10:56.005Z",
+      "id": "LOG-1790328052837-28",
+      "timestamp": "2026-09-25T09:20:52.837Z",
+      "action": "SCAN_UPLOADED",
+      "details": "Scan security-report-fintech-payments-&-auth-subsystem-2026-09-25.json parsed, triaged, and attack paths generated (1 raw items).",
+      "projectId": "PRJ-MUGR1B0I"
+    },
+    {
+      "id": "LOG-1790327997530-782",
+      "timestamp": "2026-09-25T09:19:57.530Z",
+      "action": "SCAN_UPLOADED",
+      "details": "Scan security-report-fintech-payments-&-auth-subsystem-2026-09-25.json parsed, triaged, and attack paths generated (1 raw items).",
+      "projectId": "PRJ-MUGR1B0I"
+    },
+    {
+      "id": "LOG-1790327949570-460",
+      "timestamp": "2026-09-25T09:19:09.570Z",
       "action": "PROJECT_CREATED",
-      "details": "Project 53gtre created. Authorized scope: h5h5",
-      "projectId": "PRJ-MUGQQQ6D"
-    },
-    {
-      "id": "LOG-1790327298126-700",
-      "timestamp": "2026-09-25T09:08:18.126Z",
-      "action": "SCANS_COMPARED",
-      "details": "Compared owasp-zap-gateway-scan.json with post-remediation-verification.json. Eliminated 2 attack paths.",
-      "projectId": "PRJ-FINTECH-CORE"
-    },
-    {
-      "id": "LOG-1790327289668-620",
-      "timestamp": "2026-09-25T09:08:09.668Z",
-      "action": "SAMPLE_LOADED",
-      "details": "Sample dataset 'post-remediation-verification.json' loaded and correlated.",
-      "projectId": "PRJ-FINTECH-CORE"
-    },
-    {
-      "id": "LOG-INIT-1",
-      "timestamp": "2026-09-25T09:07:57.092Z",
-      "action": "PROJECT_INITIALIZED",
-      "details": "Initial fintech defensive security assessment scope loaded.",
-      "projectId": "PRJ-FINTECH-CORE"
+      "details": "Project 4g45g created. Authorized scope: regergt",
+      "projectId": "PRJ-MUGR1B0I"
     }
   ]
 }

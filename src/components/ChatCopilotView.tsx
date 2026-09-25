@@ -17,7 +17,8 @@ import {
   HelpCircle,
   Download,
   AlertTriangle,
-  RotateCcw
+  RotateCcw,
+  Square
 } from 'lucide-react';
 
 export type GeminiModelChoice = 'gemini-3.1-pro-preview' | 'gemini-3.5-flash' | 'gemini-3.1-flash-lite';
@@ -49,13 +50,13 @@ const ROLES: {
   icon: any;
 }[] = [
   {
-    id: 'threat_analyst',
-    name: 'Threat Path Analyst',
-    defaultModel: 'gemini-3.1-pro-preview',
-    badge: 'Complex Tasks',
-    tagline: 'Deep exploit chaining & lateral movement reasoning',
-    description: 'Specializes in multi-step kill chains, privilege escalation bottlenecks, and complex vulnerability chaining.',
-    icon: Cpu,
+    id: 'remediation_engineer',
+    name: 'Rapid Remediation Engineer',
+    defaultModel: 'gemini-3.1-flash-lite',
+    badge: 'Fast Tasks (Instant)',
+    tagline: 'Instant code snippets, WAF rules & verification tests',
+    description: 'Generates immediate, production-ready code fixes, firewall configs, and validation test commands.',
+    icon: Zap,
   },
   {
     id: 'defensive_advisor',
@@ -67,15 +68,208 @@ const ROLES: {
     icon: Bot,
   },
   {
-    id: 'remediation_engineer',
-    name: 'Rapid Remediation Engineer',
-    defaultModel: 'gemini-3.1-flash-lite',
-    badge: 'Fast Tasks',
-    tagline: 'Instant code snippets, WAF rules & verification tests',
-    description: 'Generates immediate, production-ready code fixes, firewall configs, and validation test commands.',
-    icon: Zap,
+    id: 'threat_analyst',
+    name: 'Threat Path Analyst',
+    defaultModel: 'gemini-3.1-pro-preview',
+    badge: 'Complex Tasks',
+    tagline: 'Deep exploit chaining & lateral movement reasoning',
+    description: 'Specializes in multi-step kill chains, privilege escalation bottlenecks, and complex vulnerability chaining.',
+    icon: Cpu,
   },
 ];
+
+// Helper to render inline markdown styles: bold & inline code
+function renderInlineFormatted(text: string): React.ReactNode {
+  // Regex to split by inline code `...` and bold **...**
+  const parts = text.split(/(`[^`]+`|\*\*[^*]+\*\*)/g);
+  return parts.map((part, index) => {
+    if (part.startsWith('`') && part.endsWith('`') && part.length >= 2) {
+      return (
+        <code
+          key={index}
+          className="px-1.5 py-0.5 rounded bg-slate-950/80 border border-slate-800 text-cyan-300 font-mono text-[11px]"
+        >
+          {part.slice(1, -1)}
+        </code>
+      );
+    }
+    if (part.startsWith('**') && part.endsWith('**') && part.length >= 4) {
+      return (
+        <strong key={index} className="font-semibold text-slate-100">
+          {part.slice(2, -2)}
+        </strong>
+      );
+    }
+    return part;
+  });
+}
+
+// Structured message body renderer
+const FormattedMessageBody: React.FC<{ content: string; isStreaming?: boolean }> = ({ content, isStreaming }) => {
+  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+
+  if (!content && isStreaming) {
+    return (
+      <div className="flex items-center space-x-2 text-cyan-400 font-mono text-xs py-1">
+        <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+        <span>Synthesizing intelligence...</span>
+      </div>
+    );
+  }
+
+  // Parse lines into blocks (paragraphs, headers, code blocks, lists)
+  const lines = content.split('\n');
+  const elements: React.ReactNode[] = [];
+  let inCodeBlock = false;
+  let codeBlockLanguage = '';
+  let codeBlockLines: string[] = [];
+  let codeBlockIndex = 0;
+
+  const handleCopyCode = (code: string, idx: number) => {
+    navigator.clipboard.writeText(code);
+    setCopiedIndex(idx);
+    setTimeout(() => setCopiedIndex(null), 2000);
+  };
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    if (line.startsWith('```')) {
+      if (!inCodeBlock) {
+        // Start of code block
+        inCodeBlock = true;
+        codeBlockLanguage = line.replace('```', '').trim() || 'bash';
+        codeBlockLines = [];
+        codeBlockIndex = i;
+      } else {
+        // End of code block
+        inCodeBlock = false;
+        const codeText = codeBlockLines.join('\n');
+        const currentIndex = codeBlockIndex;
+        elements.push(
+          <div key={`code-${currentIndex}`} className="my-2.5 rounded-xl overflow-hidden border border-slate-800 bg-slate-950 font-mono text-xs">
+            <div className="flex items-center justify-between px-3 py-1.5 bg-slate-900 border-b border-slate-800 text-[10px] text-slate-400">
+              <span className="uppercase font-bold tracking-wider text-cyan-400">{codeBlockLanguage}</span>
+              <button
+                onClick={() => handleCopyCode(codeText, currentIndex)}
+                className="flex items-center space-x-1 text-slate-400 hover:text-slate-200 transition"
+              >
+                {copiedIndex === currentIndex ? (
+                  <>
+                    <Check className="w-3 h-3 text-emerald-400" />
+                    <span className="text-emerald-400 font-sans">Copied</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-3 h-3" />
+                    <span className="font-sans">Copy</span>
+                  </>
+                )}
+              </button>
+            </div>
+            <pre className="p-3 text-[11px] text-slate-200 overflow-x-auto leading-relaxed">
+              <code>{codeText}</code>
+            </pre>
+          </div>
+        );
+      }
+      continue;
+    }
+
+    if (inCodeBlock) {
+      codeBlockLines.push(line);
+      continue;
+    }
+
+    // Headers
+    if (line.startsWith('### ')) {
+      elements.push(
+        <h4 key={`h4-${i}`} className="text-sm font-bold text-cyan-300 mt-2.5 mb-1 flex items-center space-x-1.5">
+          <span>{line.replace('### ', '')}</span>
+        </h4>
+      );
+      continue;
+    }
+    if (line.startsWith('## ')) {
+      elements.push(
+        <h3 key={`h3-${i}`} className="text-sm font-bold text-slate-100 mt-3 mb-1 border-b border-slate-800/80 pb-0.5">
+          {line.replace('## ', '')}
+        </h3>
+      );
+      continue;
+    }
+    if (line.startsWith('# ')) {
+      elements.push(
+        <h2 key={`h2-${i}`} className="text-base font-bold text-slate-100 mt-3 mb-1.5">
+          {line.replace('# ', '')}
+        </h2>
+      );
+      continue;
+    }
+
+    // Bullet item
+    if (line.startsWith('* ') || line.startsWith('- ')) {
+      elements.push(
+        <div key={`bullet-${i}`} className="flex items-start space-x-2 pl-2 py-0.5 text-xs text-slate-300">
+          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 mt-1.5 shrink-0" />
+          <div className="flex-1 leading-relaxed">
+            {renderInlineFormatted(line.slice(2))}
+          </div>
+        </div>
+      );
+      continue;
+    }
+
+    // Numbered item (e.g. "1. ")
+    const numMatch = line.match(/^(\d+)\.\s+(.*)/);
+    if (numMatch) {
+      elements.push(
+        <div key={`num-${i}`} className="flex items-start space-x-2 pl-2 py-0.5 text-xs text-slate-300">
+          <span className="font-mono font-bold text-cyan-400 shrink-0 text-[11px] mt-0.5">
+            {numMatch[1]}.
+          </span>
+          <div className="flex-1 leading-relaxed">
+            {renderInlineFormatted(numMatch[2])}
+          </div>
+        </div>
+      );
+      continue;
+    }
+
+    // Empty line
+    if (!line.trim()) {
+      elements.push(<div key={`empty-${i}`} className="h-1.5" />);
+      continue;
+    }
+
+    // Normal paragraph
+    elements.push(
+      <p key={`p-${i}`} className="leading-relaxed text-slate-200">
+        {renderInlineFormatted(line)}
+      </p>
+    );
+  }
+
+  // If still in code block at end of stream
+  if (inCodeBlock && codeBlockLines.length > 0) {
+    elements.push(
+      <div key="unclosed-code" className="my-2 rounded-xl overflow-hidden border border-slate-800 bg-slate-950 font-mono text-xs">
+        <pre className="p-3 text-[11px] text-slate-200 overflow-x-auto leading-relaxed">
+          <code>{codeBlockLines.join('\n')}</code>
+        </pre>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-1 text-xs">
+      {elements}
+      {isStreaming && (
+        <span className="inline-block w-1.5 h-3.5 bg-cyan-400 ml-1 translate-y-0.5 animate-pulse" />
+      )}
+    </div>
+  );
+};
 
 export const ChatCopilotView: React.FC<ChatCopilotViewProps> = ({
   currentProject,
@@ -83,12 +277,17 @@ export const ChatCopilotView: React.FC<ChatCopilotViewProps> = ({
   attackPaths,
   onNavigateTab,
 }) => {
-  const [selectedRole, setSelectedRole] = useState<ChatRoleId>('defensive_advisor');
-  const [selectedModel, setSelectedModel] = useState<GeminiModelChoice>('gemini-3.5-flash');
+  const [selectedRole, setSelectedRole] = useState<ChatRoleId>('remediation_engineer');
+  const [selectedModel, setSelectedModel] = useState<GeminiModelChoice>('gemini-3.1-flash-lite');
   const [includeContext, setIncludeContext] = useState<boolean>(true);
   const [inputMessage, setInputMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [streamingMessageId, setStreamingMessageId] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   // Initialize conversation thread with role-specific greeting
   const [messages, setMessages] = useState<ChatMessage[]>(() => {
@@ -98,14 +297,11 @@ export const ChatCopilotView: React.FC<ChatCopilotViewProps> = ({
         role: 'model',
         content: `👋 Hello! I am your **Gemini Defensive Security Copilot**.\n\nI can analyze your vulnerability evidence, evaluate multi-hop attack paths, suggest structural remediation architectures, or write immediate WAF and code patches.\n\nSelect a specialist persona above or type your question below to begin.`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        modelUsed: 'gemini-3.5-flash',
-        roleId: 'defensive_advisor',
+        modelUsed: 'gemini-3.1-flash-lite',
+        roleId: 'remediation_engineer',
       },
     ];
   });
-
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   // When role changes, update default model to match user requirement guidelines
   const handleRoleChange = (roleId: ChatRoleId) => {
@@ -119,7 +315,7 @@ export const ChatCopilotView: React.FC<ChatCopilotViewProps> = ({
   // Auto-scroll to bottom of conversation thread
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, isLoading]);
+  }, [messages, isLoading, streamingMessageId]);
 
   // Build dynamic project context for the chatbot
   const getProjectContextSummary = (): string => {
@@ -136,6 +332,15 @@ Key Vulnerabilities:
 ${topFindings || 'No findings recorded.'}`;
   };
 
+  const handleStopGenerating = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    setIsLoading(false);
+    setStreamingMessageId(null);
+  };
+
   const handleSendMessage = async (customText?: string) => {
     const textToSend = (customText || inputMessage).trim();
     if (!textToSend || isLoading) return;
@@ -147,54 +352,107 @@ ${topFindings || 'No findings recorded.'}`;
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
 
+    const assistantPlaceholderId = `msg-${Date.now()}-model`;
+    const modelPlaceholderMessage: ChatMessage = {
+      id: assistantPlaceholderId,
+      role: 'model',
+      content: '',
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      modelUsed: selectedModel,
+      roleId: selectedRole,
+    };
+
     const newMessages = [...messages, userMessage];
-    setMessages(newMessages);
+    setMessages([...newMessages, modelPlaceholderMessage]);
     setInputMessage('');
     setIsLoading(true);
+    setStreamingMessageId(assistantPlaceholderId);
+
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
+    // Map thread to API payload format
+    const payloadMessages = newMessages
+      .filter(m => m.id !== 'msg-welcome')
+      .map(m => ({
+        role: m.role,
+        content: m.content,
+      }));
+
+    if (payloadMessages.length === 0) {
+      payloadMessages.push({ role: 'user', content: textToSend });
+    }
 
     try {
-      // Map thread to API payload format
-      const payloadMessages = newMessages
-        .filter(m => m.id !== 'msg-welcome')
-        .map(m => ({
-          role: m.role,
-          content: m.content,
-        }));
-
-      // Ensure at least one message is sent
-      if (payloadMessages.length === 0) {
-        payloadMessages.push({ role: 'user', content: textToSend });
+      let accumulatedContent = '';
+      await api.streamChatMessage(
+        payloadMessages,
+        {
+          model: selectedModel,
+          roleId: selectedRole,
+          projectId: currentProject?.id,
+          contextSummary: includeContext ? getProjectContextSummary() : undefined,
+        },
+        (chunk, meta) => {
+          accumulatedContent += chunk;
+          setMessages(prev =>
+            prev.map(m =>
+              m.id === assistantPlaceholderId
+                ? {
+                    ...m,
+                    content: accumulatedContent,
+                    modelUsed: meta.modelUsed || m.modelUsed,
+                  }
+                : m
+            )
+          );
+        },
+        controller.signal
+      );
+    } catch (err: any) {
+      if (err.name === 'AbortError') {
+        // User aborted manually
+        return;
       }
 
-      const res = await api.sendChatMessage(payloadMessages, {
-        model: selectedModel,
-        roleId: selectedRole,
-        projectId: currentProject?.id,
-        contextSummary: includeContext ? getProjectContextSummary() : undefined,
-      });
+      console.warn('Stream failed, attempting fallback direct chat call:', err.message);
 
-      const modelMessage: ChatMessage = {
-        id: `msg-${Date.now()}-model`,
-        role: 'model',
-        content: res.reply,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        modelUsed: res.modelUsed || selectedModel,
-        roleId: selectedRole,
-      };
+      // Attempt direct fallback call
+      try {
+        const directRes = await api.sendChatMessage(payloadMessages, {
+          model: selectedModel,
+          roleId: selectedRole,
+          projectId: currentProject?.id,
+          contextSummary: includeContext ? getProjectContextSummary() : undefined,
+        });
 
-      setMessages(prev => [...prev, modelMessage]);
-    } catch (err: any) {
-      const errorMessage: ChatMessage = {
-        id: `msg-${Date.now()}-err`,
-        role: 'model',
-        content: `⚠️ **Notice:** ${err.message || 'Failed to complete chat query. Please try again.'}`,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        modelUsed: selectedModel,
-        roleId: selectedRole,
-      };
-      setMessages(prev => [...prev, errorMessage]);
+        setMessages(prev =>
+          prev.map(m =>
+            m.id === assistantPlaceholderId
+              ? {
+                  ...m,
+                  content: directRes.reply,
+                  modelUsed: directRes.modelUsed,
+                }
+              : m
+          )
+        );
+      } catch (fallbackErr: any) {
+        setMessages(prev =>
+          prev.map(m =>
+            m.id === assistantPlaceholderId
+              ? {
+                  ...m,
+                  content: `⚠️ **Defensive Notice:** ${err.message || fallbackErr.message || 'Generation failed. Please try again with Fast Tasks (gemini-3.1-flash-lite).'}`,
+                }
+              : m
+          )
+        );
+      }
     } finally {
       setIsLoading(false);
+      setStreamingMessageId(null);
+      abortControllerRef.current = null;
       setTimeout(() => inputRef.current?.focus(), 100);
     }
   };
@@ -242,7 +500,7 @@ ${topFindings || 'No findings recorded.'}`;
     URL.revokeObjectURL(url);
   };
 
-  const activeRoleDef = ROLES.find(r => r.id === selectedRole) || ROLES[1];
+  const activeRoleDef = ROLES.find(r => r.id === selectedRole) || ROLES[0];
 
   const quickPrompts = [
     {
@@ -280,8 +538,9 @@ ${topFindings || 'No findings recorded.'}`;
             <div>
               <div className="flex items-center space-x-2">
                 <h2 className="text-base font-bold text-slate-100">Gemini Security Chatbot</h2>
-                <span className="text-[10px] px-2 py-0.5 rounded font-mono font-bold bg-cyan-950 text-cyan-300 border border-cyan-800 uppercase">
-                  Multi-Turn Thread
+                <span className="text-[10px] px-2 py-0.5 rounded font-mono font-bold bg-cyan-950 text-cyan-300 border border-cyan-800 uppercase flex items-center space-x-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>Real-Time Streaming</span>
                 </span>
               </div>
               <p className="text-xs text-slate-400 mt-0.5">
@@ -302,14 +561,14 @@ ${topFindings || 'No findings recorded.'}`;
                 onChange={(e) => setSelectedModel(e.target.value as GeminiModelChoice)}
                 className="bg-transparent text-slate-200 text-xs font-mono font-bold focus:outline-none cursor-pointer"
               >
-                <option value="gemini-3.1-pro-preview" className="bg-slate-900 text-slate-200">
-                  gemini-3.1-pro-preview (Complex Tasks)
+                <option value="gemini-3.1-flash-lite" className="bg-slate-900 text-slate-200">
+                  gemini-3.1-flash-lite ⚡ (Fast Tasks - Instant)
                 </option>
                 <option value="gemini-3.5-flash" className="bg-slate-900 text-slate-200">
-                  gemini-3.5-flash (General Tasks)
+                  gemini-3.5-flash 🛡️ (General Tasks)
                 </option>
-                <option value="gemini-3.1-flash-lite" className="bg-slate-900 text-slate-200">
-                  gemini-3.1-flash-lite (Fast Tasks)
+                <option value="gemini-3.1-pro-preview" className="bg-slate-900 text-slate-200">
+                  gemini-3.1-pro-preview 🧠 (Complex Tasks)
                 </option>
               </select>
             </div>
@@ -374,10 +633,10 @@ ${topFindings || 'No findings recorded.'}`;
                       {role.name}
                     </span>
                     <span className={`text-[9px] font-mono px-1.5 py-0.2 rounded font-bold uppercase ${
-                      role.id === 'threat_analyst'
-                        ? 'bg-purple-950 text-purple-300 border border-purple-800/50'
-                        : role.id === 'remediation_engineer'
+                      role.id === 'remediation_engineer'
                         ? 'bg-emerald-950 text-emerald-300 border border-emerald-800/50'
+                        : role.id === 'threat_analyst'
+                        ? 'bg-purple-950 text-purple-300 border border-purple-800/50'
                         : 'bg-cyan-950 text-cyan-300 border border-cyan-800/50'
                     }`}>
                       {role.badge}
@@ -397,6 +656,8 @@ ${topFindings || 'No findings recorded.'}`;
       <div className="cyber-card rounded-2xl p-4 sm:p-6 border border-slate-800 flex-1 overflow-y-auto space-y-4 shadow-inner">
         {messages.map((message) => {
           const isUser = message.role === 'user';
+          const isCurrentlyStreaming = streamingMessageId === message.id;
+
           return (
             <div
               key={message.id}
@@ -415,7 +676,7 @@ ${topFindings || 'No findings recorded.'}`;
 
               {/* Message Bubble */}
               <div
-                className={`max-w-[85%] sm:max-w-[78%] rounded-2xl p-4 space-y-2 text-xs leading-relaxed shadow-md ${
+                className={`max-w-[88%] sm:max-w-[80%] rounded-2xl p-4 space-y-2 text-xs leading-relaxed shadow-md ${
                   isUser
                     ? 'bg-gradient-to-br from-cyan-950/90 to-slate-900 text-slate-100 border border-cyan-700/50'
                     : 'bg-slate-900/95 text-slate-200 border border-slate-800'
@@ -430,6 +691,11 @@ ${topFindings || 'No findings recorded.'}`;
                     {!isUser && message.modelUsed && (
                       <span className="px-1.5 py-0.2 rounded bg-slate-950 text-cyan-400 border border-slate-800">
                         {message.modelUsed}
+                      </span>
+                    )}
+                    {isCurrentlyStreaming && (
+                      <span className="px-1.5 py-0.2 rounded bg-cyan-950 text-cyan-300 border border-cyan-800 animate-pulse">
+                        streaming
                       </span>
                     )}
                   </div>
@@ -450,43 +716,11 @@ ${topFindings || 'No findings recorded.'}`;
                 </div>
 
                 {/* Message Content with Markdown & Code styling */}
-                <div className="whitespace-pre-wrap font-sans text-xs space-y-1.5 selection:bg-cyan-500/30">
-                  {message.content.split('\n').map((line, lIdx) => {
-                    // Check for headers
-                    if (line.startsWith('### ')) {
-                      return <h4 key={lIdx} className="text-sm font-bold text-cyan-300 mt-2">{line.replace('### ', '')}</h4>;
-                    }
-                    if (line.startsWith('## ')) {
-                      return <h3 key={lIdx} className="text-sm font-bold text-slate-100 mt-2">{line.replace('## ', '')}</h3>;
-                    }
-                    if (line.startsWith('# ')) {
-                      return <h2 key={lIdx} className="text-base font-bold text-slate-100 mt-2">{line.replace('# ', '')}</h2>;
-                    }
-                    // Check for code blocks
-                    if (line.startsWith('```')) {
-                      return <div key={lIdx} className="font-mono text-[11px] text-cyan-400/90 py-0.5">{line}</div>;
-                    }
-                    // Normal text
-                    return <p key={lIdx} className="leading-relaxed">{line}</p>;
-                  })}
-                </div>
+                <FormattedMessageBody content={message.content} isStreaming={isCurrentlyStreaming} />
               </div>
             </div>
           );
         })}
-
-        {/* Loading Indicator */}
-        {isLoading && (
-          <div className="flex items-start space-x-3">
-            <div className="w-8 h-8 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-cyan-400 shrink-0">
-              <Bot className="w-4 h-4 animate-spin" />
-            </div>
-            <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 text-xs font-mono text-cyan-400 flex items-center space-x-2.5 shadow-sm">
-              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-              <span>Gemini ({selectedModel}) is synthesizing threat intelligence...</span>
-            </div>
-          </div>
-        )}
 
         <div ref={messagesEndRef} />
       </div>
@@ -521,27 +755,40 @@ ${topFindings || 'No findings recorded.'}`;
             onChange={(e) => setInputMessage(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={`Ask ${activeRoleDef.name} (${selectedModel})... [Press Enter to send, Shift+Enter for new line]`}
-            disabled={isLoading}
+            disabled={isLoading && !streamingMessageId}
             className="flex-1 bg-slate-950 text-slate-100 placeholder-slate-500 text-xs rounded-xl p-3 border border-slate-800 focus:outline-none focus:border-cyan-500 resize-none font-sans"
           />
-          <button
-            id="send-chat-btn"
-            onClick={() => handleSendMessage()}
-            disabled={!inputMessage.trim() || isLoading}
-            className="p-3 bg-gradient-to-r from-cyan-600 to-cyan-500 hover:from-cyan-500 hover:to-cyan-400 disabled:from-slate-800 disabled:to-slate-800 disabled:text-slate-500 text-white rounded-xl transition shadow-md shadow-cyan-950 shrink-0"
-            title="Send Message (Enter)"
-          >
-            <Send className="w-4 h-4" />
-          </button>
+
+          {isLoading ? (
+            <button
+              id="stop-chat-btn"
+              onClick={handleStopGenerating}
+              className="p-3 bg-rose-950/80 hover:bg-rose-900 border border-rose-800 text-rose-300 rounded-xl transition shadow-md shrink-0 flex items-center space-x-1 text-xs font-mono"
+              title="Stop Generation"
+            >
+              <Square className="w-3.5 h-3.5 fill-current" />
+              <span>Stop</span>
+            </button>
+          ) : (
+            <button
+              id="send-chat-btn"
+              onClick={() => handleSendMessage()}
+              disabled={!inputMessage.trim()}
+              className="p-3 bg-gradient-to-r from-cyan-600 to-cyan-500 hover:from-cyan-500 hover:to-cyan-400 disabled:from-slate-800 disabled:to-slate-800 disabled:text-slate-500 text-white rounded-xl transition shadow-md shadow-cyan-950 shrink-0"
+              title="Send Message (Enter)"
+            >
+              <Send className="w-4 h-4" />
+            </button>
+          )}
         </div>
 
         {/* Footer Guidance */}
         <div className="flex items-center justify-between text-[11px] text-slate-500 mt-2 px-1 font-mono">
           <span>
-            {currentProject ? `Active Scope: ${currentProject.name}` : 'No active project selected'}
+            {currentProject ? `Scope: ${currentProject.name}` : 'No active project selected'}
           </span>
           <span className="hidden sm:inline">
-            Model: <strong className="text-slate-400">{selectedModel}</strong>
+            Active: <strong className="text-cyan-400">{selectedModel}</strong> (Streaming SSE enabled)
           </span>
         </div>
       </div>
