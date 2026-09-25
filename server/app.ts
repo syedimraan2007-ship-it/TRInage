@@ -4,7 +4,7 @@ import { db } from './db';
 import { SAMPLE_RAW_FILES } from './sampleData';
 import { detectAndParseScan } from './parsers/index';
 import { deduplicateFindings } from './services/deduplication';
-import { aiTriageFindings, aiCorrelateAndBuildAttackPaths, aiGenerateRemediationGuidance } from './services/gemini';
+import { aiTriageFindings, aiCorrelateAndBuildAttackPaths, aiGenerateRemediationGuidance, chatWithGemini } from './services/gemini';
 import { generateRemediationQueue } from './services/remediationEngine';
 import { compareScans } from './services/comparisonEngine';
 import { AssessmentReport, Scan } from '../src/types';
@@ -460,6 +460,82 @@ export function createApiApp() {
   router.get('/audit-logs', (req, res) => {
     const { projectId } = req.query;
     res.json(db.getAuditLogs(projectId as string | undefined));
+  });
+
+  // Gemini Multi-Turn Chatbot
+  router.post('/chat', async (req, res) => {
+    const { messages, model, roleId, systemInstruction, contextSummary, projectId } = req.body || {};
+
+    if (!Array.isArray(messages) || messages.length === 0) {
+      return res.status(400).json({ error: 'Conversation messages array is required.' });
+    }
+
+    let dynamicContext = contextSummary || '';
+    if (!dynamicContext && projectId) {
+      const metrics = db.getDashboardMetrics(projectId);
+      const paths = db.getAttackPaths(projectId);
+      const findings = db.getFindings(projectId);
+      dynamicContext = `Active Project ID: ${projectId}. Total canonical findings: ${findings.length} (Critical: ${metrics.criticalFindings}, High: ${metrics.highFindings}). Active Attack Paths: ${paths.length}. Crown Jewel Datastores / Assets: ${metrics.affectedAssets.slice(0, 5).join(', ')}.`;
+    }
+
+    try {
+      const result = await chatWithGemini(messages, {
+        model,
+        roleId,
+        systemInstruction,
+        contextSummary: dynamicContext,
+      });
+
+      if (projectId) {
+        db.logAudit(projectId, 'AI_CHAT_QUERY', `Chat query with role '${roleId || 'defensive_advisor'}' (${result.modelUsed}).`);
+      }
+
+      res.json({
+        reply: result.reply,
+        modelUsed: result.modelUsed,
+        fallbackOccurred: result.fallbackOccurred,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message || 'Chat generation failed' });
+    }
+  });
+
+  router.post('/projects/:projectId/chat', async (req, res) => {
+    const { messages, model, roleId, systemInstruction, contextSummary } = req.body || {};
+    const projectId = req.params.projectId;
+
+    if (!Array.isArray(messages) || messages.length === 0) {
+      return res.status(400).json({ error: 'Conversation messages array is required.' });
+    }
+
+    let dynamicContext = contextSummary || '';
+    if (!dynamicContext && projectId) {
+      const metrics = db.getDashboardMetrics(projectId);
+      const paths = db.getAttackPaths(projectId);
+      const findings = db.getFindings(projectId);
+      dynamicContext = `Active Project ID: ${projectId}. Total canonical findings: ${findings.length} (Critical: ${metrics.criticalFindings}, High: ${metrics.highFindings}). Active Attack Paths: ${paths.length}. Crown Jewel Datastores / Assets: ${metrics.affectedAssets.slice(0, 5).join(', ')}.`;
+    }
+
+    try {
+      const result = await chatWithGemini(messages, {
+        model,
+        roleId,
+        systemInstruction,
+        contextSummary: dynamicContext,
+      });
+
+      db.logAudit(projectId, 'AI_CHAT_QUERY', `Chat query with role '${roleId || 'defensive_advisor'}' (${result.modelUsed}).`);
+
+      res.json({
+        reply: result.reply,
+        modelUsed: result.modelUsed,
+        fallbackOccurred: result.fallbackOccurred,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message || 'Chat generation failed' });
+    }
   });
 
   // Mount router at both '/api' and '/'

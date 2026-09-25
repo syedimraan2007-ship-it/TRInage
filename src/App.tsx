@@ -11,9 +11,10 @@ import { RemediationQueueView } from './components/RemediationQueueView';
 import { ScanComparisonView } from './components/ScanComparisonView';
 import { IngestionHubView } from './components/IngestionHubView';
 import { ReportView } from './components/ReportView';
+import { ChatCopilotView } from './components/ChatCopilotView';
 import { NewProjectModal } from './components/NewProjectModal';
 import { AuditLogModal } from './components/AuditLogModal';
-import { Activity, ShieldAlert, FolderPlus } from 'lucide-react';
+import { Activity, ShieldAlert, FolderPlus, Bot, Sparkles } from 'lucide-react';
 
 export function App() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -300,6 +301,15 @@ export function App() {
               />
             )}
 
+            {activeTab === 'chat' && (
+              <ChatCopilotView
+                currentProject={currentProject}
+                findings={findings}
+                attackPaths={attackPaths}
+                onNavigateTab={(tab) => setActiveTab(tab)}
+              />
+            )}
+
             {activeTab === 'comparison' && (
               <ScanComparisonView
                 scans={scans}
@@ -328,6 +338,22 @@ export function App() {
           </>
         )}
       </main>
+
+      {/* Floating AI Copilot Quick Launcher */}
+      {currentProject && activeTab !== 'chat' && (
+        <button
+          id="floating-chat-launcher"
+          onClick={() => setActiveTab('chat')}
+          className="fixed bottom-6 right-6 z-40 px-4 py-3 bg-gradient-to-r from-cyan-600 to-cyan-500 hover:from-cyan-500 hover:to-cyan-400 text-white rounded-2xl shadow-xl shadow-cyan-950/80 border border-cyan-400/40 flex items-center space-x-2.5 transition group hover:scale-105"
+          title="Open Gemini Defensive Copilot"
+        >
+          <div className="relative">
+            <Bot className="w-5 h-5 text-white" />
+            <Sparkles className="w-2.5 h-2.5 text-yellow-300 absolute -top-1 -right-1 animate-pulse" />
+          </div>
+          <span className="text-xs font-bold font-sans">AI Copilot</span>
+        </button>
+      )}
 
       {/* New Project Scope Modal */}
       <NewProjectModal

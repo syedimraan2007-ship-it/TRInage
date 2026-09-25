@@ -475,4 +475,28 @@ export const api = {
       return [];
     }
   },
+
+  // Gemini Multi-Turn Chat
+  async sendChatMessage(
+    messages: { role: 'user' | 'model'; content: string }[],
+    options: {
+      model?: 'gemini-3.1-pro-preview' | 'gemini-3.5-flash' | 'gemini-3.1-flash-lite';
+      roleId?: 'threat_analyst' | 'defensive_advisor' | 'remediation_engineer';
+      projectId?: string;
+      contextSummary?: string;
+    } = {}
+  ): Promise<{ reply: string; modelUsed: string; fallbackOccurred?: boolean; timestamp: string }> {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messages,
+        model: options.model,
+        roleId: options.roleId,
+        projectId: options.projectId,
+        contextSummary: options.contextSummary,
+      }),
+    });
+    return handleResponse<{ reply: string; modelUsed: string; fallbackOccurred?: boolean; timestamp: string }>(res, 'Failed to get AI chatbot response');
+  },
 };

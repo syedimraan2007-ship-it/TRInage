@@ -2,7 +2,7 @@ import { db } from './db';
 import { SAMPLE_RAW_FILES } from './sampleData';
 import { detectAndParseScan } from './parsers/index';
 import { deduplicateFindings } from './services/deduplication';
-import { aiTriageFindings, aiCorrelateAndBuildAttackPaths, aiGenerateRemediationGuidance } from './services/gemini';
+import { aiTriageFindings, aiCorrelateAndBuildAttackPaths, aiGenerateRemediationGuidance, chatWithGemini } from './services/gemini';
 import { generateRemediationQueue } from './services/remediationEngine';
 import { compareScans } from './services/comparisonEngine';
 import { AssessmentReport, Scan } from '../src/types';
@@ -180,6 +180,44 @@ export async function handleApiRequest(req: any, res: any) {
     if (pathname === '/audit-logs' && req.method === 'GET') {
       const projId = getQuery('projectId');
       return sendJson(200, db.getAuditLogs(projId || undefined));
+    }
+
+    // 4.1 Chat
+    if (pathname === '/chat' && req.method === 'POST') {
+      const { messages, model, roleId, systemInstruction, contextSummary, projectId } = body || {};
+      if (!Array.isArray(messages) || messages.length === 0) {
+        return sendJson(400, { error: 'Conversation messages array is required.' });
+      }
+
+      let dynamicContext = contextSummary || '';
+      if (!dynamicContext && projectId) {
+        const metrics = db.getDashboardMetrics(projectId);
+        const paths = db.getAttackPaths(projectId);
+        const findings = db.getFindings(projectId);
+        dynamicContext = `Active Project ID: ${projectId}. Total canonical findings: ${findings.length} (Critical: ${metrics.criticalFindings}, High: ${metrics.highFindings}). Active Attack Paths: ${paths.length}. Crown Jewel Datastores / Assets: ${metrics.affectedAssets.slice(0, 5).join(', ')}.`;
+      }
+
+      try {
+        const result = await chatWithGemini(messages, {
+          model,
+          roleId,
+          systemInstruction,
+          contextSummary: dynamicContext,
+        });
+
+        if (projectId) {
+          db.logAudit(projectId, 'AI_CHAT_QUERY', `Chat query with role '${roleId || 'defensive_advisor'}' (${result.modelUsed}).`);
+        }
+
+        return sendJson(200, {
+          reply: result.reply,
+          modelUsed: result.modelUsed,
+          fallbackOccurred: result.fallbackOccurred,
+          timestamp: new Date().toISOString(),
+        });
+      } catch (err: any) {
+        return sendJson(500, { error: err.message || 'Chat generation failed' });
+      }
     }
 
     // 5. Projects Collection

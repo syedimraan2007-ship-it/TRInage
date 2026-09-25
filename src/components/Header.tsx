@@ -50,6 +50,7 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'attack-paths', label: 'Attack Paths', count: counts?.attackPaths },
     { id: 'findings', label: 'Findings Matrix', count: counts?.findings },
     { id: 'remediation', label: 'Remediation Queue', count: counts?.remediations },
+    { id: 'chat', label: 'AI Copilot Chat' },
     { id: 'comparison', label: 'Scan Comparison' },
     { id: 'ingestion', label: 'Scan Ingestion' },
     { id: 'report', label: 'Security Report' },
