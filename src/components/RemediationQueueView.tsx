@@ -1,18 +1,23 @@
 import React, { useState } from 'react';
-import { RemediationItem } from '../types';
+import { RemediationItem, NormalizedFinding, AttackPath } from '../types';
+import { api } from '../api';
 import { ShieldCheck, Sparkles, CheckCircle2, Terminal, Code2, AlertTriangle, X, Check, Lock, Copy } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface RemediationQueueViewProps {
   remediations: RemediationItem[];
   projectId: string;
+  findings?: NormalizedFinding[];
+  attackPaths?: AttackPath[];
   onUpdateStatus: (id: string, status: RemediationItem['status']) => void;
-  onGenerateAiGuide: (id: string) => Promise<any>;
+  onGenerateAiGuide?: (id: string) => Promise<any>;
 }
 
 export const RemediationQueueView: React.FC<RemediationQueueViewProps> = ({
   remediations,
   projectId,
+  findings,
+  attackPaths,
   onUpdateStatus,
   onGenerateAiGuide,
 }) => {
@@ -45,9 +50,12 @@ export const RemediationQueueView: React.FC<RemediationQueueViewProps> = ({
     if (!item.aiGuidance) {
       setIsGeneratingAi(true);
       try {
-        const guidance = await onGenerateAiGuide(item.id);
+        const guidance = onGenerateAiGuide
+          ? await onGenerateAiGuide(item.id)
+          : await api.getAiRemediationGuide(projectId, item.id);
         setSelectedItemForAi({ ...item, aiGuidance: guidance });
-      } catch {
+      } catch (err) {
+        console.error('Failed to generate AI guidance:', err);
       } finally {
         setIsGeneratingAi(false);
       }

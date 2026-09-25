@@ -167,6 +167,21 @@ export function App() {
     await loadProjectData(currentProject.id);
   };
 
+  const handleGenerateAiGuide = async (id: string) => {
+    if (!currentProject) throw new Error('No active project');
+    const guidance = await api.getAiRemediationGuide(currentProject.id, id);
+    setRemediations(prev => prev.map(r => r.id === id ? { ...r, aiGuidance: guidance } : r));
+    return guidance;
+  };
+
+  const handleCompareScans = async (scan1Id: string, scan2Id: string) => {
+    if (!currentProject) throw new Error('No active project');
+    const comp = await api.compareScans(currentProject.id, scan1Id, scan2Id);
+    setComparisons(prev => [comp, ...prev.filter(c => c.id !== comp.id)]);
+    await loadProjectData(currentProject.id);
+    return comp;
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center space-y-4 text-cyan-400">
@@ -281,6 +296,7 @@ export function App() {
                 attackPaths={attackPaths}
                 projectId={currentProject.id}
                 onUpdateStatus={handleUpdateRemediation}
+                onGenerateAiGuide={handleGenerateAiGuide}
               />
             )}
 
@@ -289,6 +305,7 @@ export function App() {
                 scans={scans}
                 comparisons={comparisons}
                 projectId={currentProject.id}
+                onCompareScans={handleCompareScans}
                 onScanCompared={() => loadProjectData(currentProject.id)}
               />
             )}

@@ -46,6 +46,36 @@ export const FindingsView: React.FC<FindingsViewProps> = ({
 
   const rawCountTotal = (findings || []).reduce((acc, f) => acc + (f?.sourceCount || 1), 0);
 
+  const rowsToDisplay = useMemo(() => {
+    if (viewMode === 'canonical') {
+      return filteredFindings.map(f => ({
+        key: f.id,
+        finding: f,
+        rawProvenance: null as any,
+      }));
+    }
+    // Raw events mode: unroll each scanner provenance finding
+    const rows: { key: string; finding: NormalizedFinding; rawProvenance: any }[] = [];
+    filteredFindings.forEach(f => {
+      if (f.provenance && f.provenance.length > 0) {
+        f.provenance.forEach((p, idx) => {
+          rows.push({
+            key: `${f.id}-prov-${idx}-${p.scannerFindingId || idx}`,
+            finding: f,
+            rawProvenance: p,
+          });
+        });
+      } else {
+        rows.push({
+          key: f.id,
+          finding: f,
+          rawProvenance: { scanner: 'Direct Import', scannerFindingId: f.id, timestamp: f.createdAt, scanId: f.scanId },
+        });
+      }
+    });
+    return rows;
+  }, [filteredFindings, viewMode]);
+
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
     setCopiedPayload(true);
@@ -185,16 +215,16 @@ export const FindingsView: React.FC<FindingsViewProps> = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/60 font-sans">
-              {filteredFindings.length === 0 ? (
+              {rowsToDisplay.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="py-12 text-center text-slate-500 font-mono">
                     No security findings match your filter criteria.
                   </td>
                 </tr>
               ) : (
-                filteredFindings.map((finding) => (
+                rowsToDisplay.map(({ key, finding, rawProvenance }) => (
                   <tr
-                    key={finding.id}
+                    key={key}
                     onClick={() => setSelectedFinding(finding)}
                     className="hover:bg-slate-800/40 cursor-pointer transition"
                   >
@@ -220,7 +250,14 @@ export const FindingsView: React.FC<FindingsViewProps> = ({
                     {/* Title & Category */}
                     <td className="py-3.5 px-4 max-w-xs sm:max-w-sm">
                       <div className="font-bold text-slate-100 truncate">{finding.title}</div>
-                      <div className="text-[11px] text-slate-400 truncate mt-0.5">{finding.vulnerabilityCategory}</div>
+                      <div className="text-[11px] text-slate-400 truncate mt-0.5 flex items-center gap-1.5">
+                        <span>{finding.vulnerabilityCategory}</span>
+                        {rawProvenance && (
+                          <span className="text-[10px] text-cyan-400 font-mono bg-slate-950 px-1 py-0.2 rounded border border-slate-800">
+                            {rawProvenance.scanner}
+                          </span>
+                        )}
+                      </div>
                     </td>
 
                     {/* Asset & Endpoint */}
@@ -257,9 +294,15 @@ export const FindingsView: React.FC<FindingsViewProps> = ({
 
                     {/* Provenance */}
                     <td className="py-3.5 px-4 font-mono text-slate-400 whitespace-nowrap">
-                      <span className="px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-300 text-[11px]">
-                        {finding.sourceCount || 1} {(finding.sourceCount || 1) === 1 ? 'source' : 'sources'}
-                      </span>
+                      {rawProvenance ? (
+                        <span className="px-2 py-0.5 rounded bg-cyan-950/80 border border-cyan-800 text-cyan-300 text-[11px]">
+                          {rawProvenance.scannerFindingId || rawProvenance.scanner}
+                        </span>
+                      ) : (
+                        <span className="px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-300 text-[11px]">
+                          {finding.sourceCount || 1} {(finding.sourceCount || 1) === 1 ? 'source' : 'sources'}
+                        </span>
+                      )}
                     </td>
 
                     {/* Status */}

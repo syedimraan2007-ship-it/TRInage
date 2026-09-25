@@ -82,6 +82,12 @@ export function createApiApp() {
     try {
       const parsed = detectAndParseScan(rawContent, filename, projectId, scanId);
       const dedup = deduplicateFindings(parsed.findings, parsed.scannerType, scanId, projectId);
+      let findings = dedup.canonicalFindings;
+
+      // Automatically execute AI triage and attack-path synthesis
+      findings = await aiTriageFindings(findings);
+      const paths = await aiCorrelateAndBuildAttackPaths(findings, projectId, scanId);
+      const remediations = generateRemediationQueue(findings, paths, projectId);
 
       const newScan: Scan = {
         id: scanId,
@@ -91,22 +97,31 @@ export function createApiApp() {
         uploadedAt: new Date().toISOString(),
         totalRawFindings: dedup.rawCount,
         deduplicatedCount: dedup.deduplicatedCount,
-        status: 'normalized',
-        statusMessage: `Normalized ${dedup.rawCount} raw findings into ${dedup.deduplicatedCount} canonical findings.`,
+        status: 'completed',
+        statusMessage: `Completed analysis: ${findings.length} findings, ${paths.length} attack paths, ${remediations.length} remediation actions.`,
         summary: {
-          critical: dedup.canonicalFindings.filter(f => f.severity === 'Critical').length,
-          high: dedup.canonicalFindings.filter(f => f.severity === 'High').length,
-          medium: dedup.canonicalFindings.filter(f => f.severity === 'Medium').length,
-          low: dedup.canonicalFindings.filter(f => f.severity === 'Low').length,
-          info: dedup.canonicalFindings.filter(f => f.severity === 'Info').length,
+          critical: findings.filter(f => f.severity === 'Critical').length,
+          high: findings.filter(f => f.severity === 'High').length,
+          medium: findings.filter(f => f.severity === 'Medium').length,
+          low: findings.filter(f => f.severity === 'Low').length,
+          info: findings.filter(f => f.severity === 'Info').length,
         },
       };
 
       db.addScan(newScan);
-      db.setFindingsForScan(scanId, dedup.canonicalFindings);
-      db.logAudit(projectId, 'SCAN_UPLOADED', `Scan ${filename} parsed as ${parsed.scannerType} (${dedup.rawCount} raw items).`);
+      db.setFindingsForScan(scanId, findings);
+      db.setAttackPathsForScan(scanId, paths);
+      db.setRemediations(projectId, remediations);
+      db.logAudit(projectId, 'SCAN_UPLOADED', `Scan ${filename} parsed, triaged, and attack paths generated (${dedup.rawCount} raw items).`);
 
-      res.json({ scan: newScan, deduplication: dedup });
+      res.json({
+        scan: newScan,
+        deduplication: dedup,
+        findings,
+        attackPaths: paths,
+        remediations,
+        metrics: db.getDashboardMetrics(projectId),
+      });
     } catch (err: any) {
       res.status(400).json({ error: err.message || 'Failed to parse security scan format.' });
     }
@@ -395,31 +410,47 @@ export function createApiApp() {
     try {
       const parsed = detectAndParseScan(rawContent, filename, targetProjectId, scanId);
       const dedup = deduplicateFindings(parsed.findings, parsed.scannerType, scanId, targetProjectId);
+      let findings = dedup.canonicalFindings;
+
+      // Automatically execute AI triage and attack-path synthesis
+      findings = await aiTriageFindings(findings);
+      const paths = await aiCorrelateAndBuildAttackPaths(findings, targetProjectId, scanId);
+      const remediations = generateRemediationQueue(findings, paths, targetProjectId);
 
       const newScan: Scan = {
         id: scanId,
-        projectId,
+        projectId: targetProjectId,
         filename,
         scannerType: parsed.scannerType as any,
         uploadedAt: new Date().toISOString(),
         totalRawFindings: dedup.rawCount,
         deduplicatedCount: dedup.deduplicatedCount,
-        status: 'normalized',
-        statusMessage: `Normalized ${dedup.rawCount} raw findings into ${dedup.deduplicatedCount} canonical findings.`,
+        status: 'completed',
+        statusMessage: `Completed analysis: ${findings.length} findings, ${paths.length} attack paths, ${remediations.length} remediation actions.`,
         summary: {
-          critical: dedup.canonicalFindings.filter(f => f.severity === 'Critical').length,
-          high: dedup.canonicalFindings.filter(f => f.severity === 'High').length,
-          medium: dedup.canonicalFindings.filter(f => f.severity === 'Medium').length,
-          low: dedup.canonicalFindings.filter(f => f.severity === 'Low').length,
-          info: dedup.canonicalFindings.filter(f => f.severity === 'Info').length,
+          critical: findings.filter(f => f.severity === 'Critical').length,
+          high: findings.filter(f => f.severity === 'High').length,
+          medium: findings.filter(f => f.severity === 'Medium').length,
+          low: findings.filter(f => f.severity === 'Low').length,
+          info: findings.filter(f => f.severity === 'Info').length,
         },
       };
 
       db.addScan(newScan);
-      db.setFindingsForScan(scanId, dedup.canonicalFindings);
-      db.logAudit(targetProjectId, 'SAMPLE_LOADED', `Sample dataset '${filename}' loaded.`);
+      db.setFindingsForScan(scanId, findings);
+      db.setAttackPathsForScan(scanId, paths);
+      db.setRemediations(targetProjectId, remediations);
+      db.logAudit(targetProjectId, 'SAMPLE_LOADED', `Sample dataset '${filename}' loaded and correlated.`);
 
-      res.json({ scan: newScan, deduplication: dedup, rawContent });
+      res.json({
+        scan: newScan,
+        deduplication: dedup,
+        findings,
+        attackPaths: paths,
+        remediations,
+        metrics: db.getDashboardMetrics(targetProjectId),
+        rawContent,
+      });
     } catch (err: any) {
       res.status(400).json({ error: err.message });
     }

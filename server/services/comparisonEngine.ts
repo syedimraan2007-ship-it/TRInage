@@ -61,6 +61,9 @@ export async function compareScans(
   const scan1TotalRisk = scan1Paths.reduce((acc, p) => acc + p.contextualScore, 0);
   const scan2TotalRisk = scan2Paths.reduce((acc, p) => acc + p.contextualScore, 0);
   const riskScoreDelta = scan2TotalRisk - scan1TotalRisk;
+  const scoreReductionPct = scan1TotalRisk > 0
+    ? Math.max(0, Math.round(((scan1TotalRisk - scan2TotalRisk) / scan1TotalRisk) * 100))
+    : 0;
 
   const resolvedTitles = scan1Findings
     .filter(f => resolvedFindingIds.includes(f.id))
@@ -97,6 +100,11 @@ export async function compareScans(
     eliminatedPathIds,
     newPathIds,
     riskScoreDelta,
+    riskDelta: {
+      beforeScore: scan1TotalRisk,
+      afterScore: scan2TotalRisk,
+      scoreReductionPct,
+    },
     aiSummary,
   };
 }

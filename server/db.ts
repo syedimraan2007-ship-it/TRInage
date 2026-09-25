@@ -28,15 +28,42 @@ declare global {
 }
 
 function createInitialData(): DatabaseSchema {
+  const initialScan: Scan = {
+    id: 'SCN-SAMPLE-01',
+    projectId: SAMPLE_PROJECT.id,
+    filename: 'owasp-zap-gateway-scan.json',
+    scannerType: 'zap',
+    uploadedAt: new Date().toISOString(),
+    totalRawFindings: SAMPLE_FINDINGS.length,
+    deduplicatedCount: SAMPLE_FINDINGS.length,
+    status: 'completed',
+    statusMessage: `Completed analysis: ${SAMPLE_FINDINGS.length} findings, ${SAMPLE_ATTACK_PATHS.length} attack paths, ${SAMPLE_REMEDIATIONS.length} remediation actions.`,
+    summary: {
+      critical: SAMPLE_FINDINGS.filter(f => f.severity === 'Critical').length,
+      high: SAMPLE_FINDINGS.filter(f => f.severity === 'High').length,
+      medium: SAMPLE_FINDINGS.filter(f => f.severity === 'Medium').length,
+      low: SAMPLE_FINDINGS.filter(f => f.severity === 'Low').length,
+      info: SAMPLE_FINDINGS.filter(f => f.severity === 'Info').length,
+    },
+  };
+
   return {
-    projects: [],
-    scans: [],
-    findings: [],
+    projects: [{ ...SAMPLE_PROJECT }],
+    scans: [initialScan],
+    findings: [...SAMPLE_FINDINGS],
     relationships: [],
-    attackPaths: [],
-    remediations: [],
+    attackPaths: [...SAMPLE_ATTACK_PATHS],
+    remediations: [...SAMPLE_REMEDIATIONS],
     comparisons: [],
-    auditLogs: [],
+    auditLogs: [
+      {
+        id: `LOG-INIT-1`,
+        timestamp: new Date().toISOString(),
+        action: 'PROJECT_INITIALIZED',
+        details: 'Initial fintech defensive security assessment scope loaded.',
+        projectId: SAMPLE_PROJECT.id,
+      },
+    ],
   };
 }
 
@@ -269,7 +296,7 @@ class Database {
 
     const avgRisk = activePaths.length > 0
       ? Math.round(activePaths.reduce((acc, p) => acc + p.contextualScore, 0) / activePaths.length)
-      : criticalFindings > 0 ? 75 : highFindings > 0 ? 55 : 20;
+      : findings.length === 0 ? 0 : criticalFindings > 0 ? 75 : highFindings > 0 ? 55 : 20;
 
     let posture: 'CRITICAL RISK' | 'ELEVATED RISK' | 'MODERATE RISK' | 'SECURE POSTURE' = 'SECURE POSTURE';
     if (criticalAttackPaths > 0 || criticalFindings > 0) posture = 'CRITICAL RISK';

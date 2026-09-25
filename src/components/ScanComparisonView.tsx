@@ -1,17 +1,22 @@
 import React, { useState } from 'react';
 import { Scan, ScanComparison } from '../types';
+import { api } from '../api';
 import { GitCompare, ShieldCheck, TrendingDown, RefreshCw, CheckCircle2, AlertTriangle } from 'lucide-react';
 
 interface ScanComparisonViewProps {
   scans: Scan[];
   comparisons: ScanComparison[];
-  onCompareScans: (scan1Id: string, scan2Id: string) => Promise<ScanComparison>;
+  projectId?: string;
+  onCompareScans?: (scan1Id: string, scan2Id: string) => Promise<ScanComparison>;
+  onScanCompared?: () => void;
 }
 
 export const ScanComparisonView: React.FC<ScanComparisonViewProps> = ({
   scans,
   comparisons,
+  projectId,
   onCompareScans,
+  onScanCompared,
 }) => {
   const [scan1Id, setScan1Id] = useState<string>(scans[0]?.id || '');
   const [scan2Id, setScan2Id] = useState<string>(scans[1]?.id || '');
@@ -22,9 +27,18 @@ export const ScanComparisonView: React.FC<ScanComparisonViewProps> = ({
     if (!scan1Id || !scan2Id || scan1Id === scan2Id) return;
     setIsComparing(true);
     try {
-      const comp = await onCompareScans(scan1Id, scan2Id);
+      let comp: ScanComparison;
+      if (onCompareScans) {
+        comp = await onCompareScans(scan1Id, scan2Id);
+      } else if (projectId) {
+        comp = await api.compareScans(projectId, scan1Id, scan2Id);
+      } else {
+        throw new Error('No comparison handler or project id available');
+      }
       setActiveComparison(comp);
-    } catch {
+      if (onScanCompared) onScanCompared();
+    } catch (err) {
+      console.error('Failed to run comparison:', err);
     } finally {
       setIsComparing(false);
     }
@@ -136,7 +150,9 @@ export const ScanComparisonView: React.FC<ScanComparisonViewProps> = ({
                 <div>
                   <span className="text-[10px] text-slate-400 font-mono block">RESIDUAL RISK DELTA</span>
                   <span className="text-base sm:text-lg font-bold font-mono text-emerald-400">
-                    {activeComparison.riskDelta.beforeScore} → {activeComparison.riskDelta.afterScore} pts ({activeComparison.riskDelta.scoreReductionPct}% Drop)
+                    {activeComparison.riskDelta
+                      ? `${activeComparison.riskDelta.beforeScore} → ${activeComparison.riskDelta.afterScore} pts (${activeComparison.riskDelta.scoreReductionPct}% Drop)`
+                      : `${activeComparison.riskScoreDelta <= 0 ? activeComparison.riskScoreDelta : '+' + activeComparison.riskScoreDelta} pts`}
                   </span>
                 </div>
               </div>

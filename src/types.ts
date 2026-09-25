@@ -197,6 +197,11 @@ export interface ScanComparison {
   eliminatedPathIds: string[];
   newPathIds: string[];
   riskScoreDelta: number; // e.g. -42 points
+  riskDelta?: {
+    beforeScore: number;
+    afterScore: number;
+    scoreReductionPct: number;
+  };
   aiSummary: string;
 }
 
